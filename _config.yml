@@ -21,6 +21,7 @@ plugins:
   - jekyll-remote-theme
 header_pages:
   - navigation/blog.md
+  - navigation/class.md
   - navigation/search.md
   - navigation/about.md
   - README4YML.md
