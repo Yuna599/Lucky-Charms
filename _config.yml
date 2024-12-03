@@ -2,8 +2,8 @@ title: Lucky Charms Blog
 description: "The BLOG"
 owner_name: Yuna Lee
 github_username: Yuna599
-github_repo: "portfolio_2025" 
-baseurl: "/portfolio_2025"
+github_repo: "Lucky-Charms" 
+baseurl: "/Lucky-Charms"
 future: true
 remote_theme: jekyll/minima
 minima:
