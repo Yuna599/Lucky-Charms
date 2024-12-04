@@ -11,7 +11,7 @@ Before looking at the one below, go to [here](navigation/crochet.md) and comback
 
 This is the button linked to the granny square tutorial:
 <a href="https://www.youtube.com/watch?v=euqnRKNJaXo">
-    <button style="background-color:    #808080; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer;">"Click! "</button>
+    <button style="background-color:    #20B2AA; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer;">"Click! "</button>
 
 
 
