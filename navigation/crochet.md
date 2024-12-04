@@ -19,12 +19,12 @@ FIRST PROJECT:
     To be honest, you can choose any projects that you like to start with but ideally, most crocheters start with a granny square with is very easy and perfect for beginners. 
     ![alt text](images/notebooks/granny-square-square.jpg)
 
-    GRANNY SQUARE:
-        When begginers start learning how to make a granny square, they would learn 2 new stitches called 'double crochet' and 'slip stitch'
-        To learn how to make a granny square, it is best to search them on youtube for a tutorial.
-        (To view the tutorial I suggest, go back to the homepage.)
+GRANNY SQUARE:
+     When begginers start learning how to make a granny square, they would learn 2 new stitches called 'double crochet' and 'slip stitch'
+    To learn how to make a granny square, it is best to search them on youtube for a tutorial.
+    (To view the tutorial I suggest, go back to the homepage.)
 
 AFTER THE FIRST PROJECT:
     After they learn how to use double crochet and slip stitch, they would eventually learn 3 other basic stitches: 'single crochet', 'half double crochet' and 'triple crochet'. 
 
-    After they learn these simple stitches and get used to it, they would be able to make better stitches and larger projects like bags, clothes and hats.
+After they learn these simple stitches and get used to it, they would be able to make better stitches and larger projects like bags, clothes and hats.
