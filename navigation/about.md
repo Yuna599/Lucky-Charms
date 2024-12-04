@@ -13,4 +13,10 @@ I was born in South Korea, and lived there until 1st grade. Then i moved to San 
 
 I'm really excited to learn new things in the Class!
 
-image: /images/IMG_4597.jpeg
+<html?>
+<body>
+
+<img src="images/notebooks/IMG_4597.jpeg" class="img-fluid" alt="...">
+
+<body>
+</html>
