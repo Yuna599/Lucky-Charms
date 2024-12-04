@@ -15,5 +15,5 @@ I'm really excited to learn new things in the Class!
 
 
 <body>
-<img src="images/notebooks/IMG_4597.jpeg">
-<body>
+<img src="images/notebooks/IMG_4597.jpeg" alt="Description of image">
+</body>
