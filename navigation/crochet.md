@@ -9,11 +9,11 @@ For people who really wanted to start a hobby could still couldn't find one, I t
 BEGGINERS:
     First of all, to start crocheting,  need a yarn and a crochet hook which aren't very expensive compared to other hobbies.
 
-    YARN:
-        The first yarn doesn't really matter, you can choose any color and possiblely any type of material yarn but I suggest a 100% acrylic yarn.
+YARN:
+    The first yarn doesn't really matter, you can choose any color and possiblely any type of material yarn but I suggest a 100% acrylic yarn.
 
-    CROCHET HOOK:
-        The hook matters because if the hook is too big, then the result might be too loose and if the hook is too small, it might be hard to grab the yarns when doing the projects. For most of the yarns, it would be a 4mm size so I suggest buying this size before buying any other.
+CROCHET HOOK:
+     The hook matters because if the hook is too big, then the result might be too loose and if the hook is too small, it might be hard to grab the yarns when doing the projects. For most of the yarns, it would be a 4mm size so I suggest buying this size before buying any other.
 
 FIRST PROJECT:
     To be honest, you can choose any projects that you like to start with but ideally, most crocheters start with a granny square with is very easy and perfect for beginners. 
