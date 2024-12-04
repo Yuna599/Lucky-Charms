@@ -3,6 +3,8 @@ layout: page
 title: About
 search_exclude: true
 permalink: /about
+hide: true
+image: /images/IMG_4597.jpeg
 ---
 
 Yuna Lee, 
