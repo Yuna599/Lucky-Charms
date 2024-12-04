@@ -3,7 +3,7 @@ layout: base
 title: Home 
 description: Home Page
 ---
-This blog contains my passion about crocheting!
+### This blog contains my passion about crocheting!
 
 <img src="navigation/images/notebooks/IMG_3986.jpeg" alt="Description" style="width:300px; height:auto;">
 
