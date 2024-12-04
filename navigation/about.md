@@ -4,7 +4,7 @@ title: About
 search_exclude: true
 permalink: /about
 hide: true
-image: /images/IMG_4597.jpeg
+image: /images/notebooks/IMG_4597.jpeg
 ---
 
 Yuna Lee, 
@@ -13,10 +13,7 @@ I was born in South Korea, and lived there until 1st grade. Then i moved to San 
 
 I'm really excited to learn new things in the Class!
 
-<html?>
-<body>
-
-<img src="images/notebooks/IMG_4597.jpeg" class="img-fluid" alt="...">
 
 <body>
-</html>
+<img src="images/notebooks/IMG_4597.jpeg">
+<body>
