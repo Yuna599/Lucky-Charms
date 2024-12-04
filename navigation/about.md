@@ -3,7 +3,7 @@ layout: page
 title: About
 search_exclude: true
 permalink: /about
-hide: true
+
 image: /images/notebooks/IMG_4597.jpeg
 ---
 
@@ -13,7 +13,3 @@ I was born in South Korea, and lived there until 1st grade. Then i moved to San 
 
 I'm really excited to learn new things in the Class!
 
-
-<body>
-<img src="images/notebooks/IMG_3986.jpeg" alt="Description of image">
-</body>
