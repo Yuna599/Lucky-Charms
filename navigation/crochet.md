@@ -17,6 +17,7 @@ The hook matters because if the hook is too big, then the result might be too lo
 
 ## FIRST PROJECT:
 To be honest, you can choose any projects that you like to start with but ideally, most crocheters start with a granny square with is very easy and perfect for beginners. 
+
     ![alt text](images/notebooks/granny-square-square.jpg)
 
 #### GRANNY SQUARE:
