@@ -13,3 +13,4 @@ I was born in South Korea, and lived there until 1st grade. Then i moved to San 
 
 I'm really excited to learn new things in the Class!
 
+![alt text](images/notebooks/IMG_4597.jpeg)
