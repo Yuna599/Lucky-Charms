@@ -14,8 +14,8 @@ This is the button linked to the granny square tutorial:
     <button style="background-color:   #20B2AA; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer;">"Click! "</button>
 
 This is a simple game!
-<a href="navigation/simplegame.md">
-    <button style="background-color:   #20B2AA; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer;">"Click to start the Game "</button>
+[Here](navigation/simplegame.md)
+ <button style="background-color:   #20B2AA; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer;">"Click to start the Game "</button>
 
 
 
