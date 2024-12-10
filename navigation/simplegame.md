@@ -21,20 +21,26 @@ Use the left and right arrow keys to control the ball. Avoid obstacles to keep p
       justify-content: center;
       align-items: center;
       height: 100vh;
-      background: #000;
+      background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
       color: white;
       font-family: Arial, sans-serif;
+      overflow: hidden;
     }
     canvas {
       display: block;
-      background: #111;
-      border: 2px solid #fff;
+      background: #222;
+      border: 3px solid white;
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
     }
     #score {
       position: absolute;
       top: 10px;
-      left: 10px;
-      font-size: 18px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 24px;
+      font-weight: bold;
+      color: #fff;
+      text-shadow: 0 0 5px rgba(0, 0, 0, 0.7);
     }
   </style>
 </head>
@@ -78,16 +84,22 @@ Use the left and right arrow keys to control the ball. Avoid obstacles to keep p
       ctx.beginPath();
       ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
       ctx.fillStyle = "lime";
+      ctx.shadowColor = "lime";
+      ctx.shadowBlur = 10;
       ctx.fill();
       ctx.closePath();
+      ctx.shadowBlur = 0;
     }
 
     // Draw obstacles
     function drawObstacles() {
-      ctx.fillStyle = "red";
+      ctx.fillStyle = "#ff6347"; // Tomato color
+      ctx.shadowColor = "rgba(255, 99, 71, 0.5)";
+      ctx.shadowBlur = 10;
       obstacles.forEach(obstacle => {
         ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
       });
+      ctx.shadowBlur = 0;
     }
 
     // Update game objects
