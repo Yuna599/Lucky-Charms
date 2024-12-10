@@ -4,9 +4,9 @@ title: simple crochet game
 search_exclude: true
 permalink: /simplegame/
 ---
-# Slope Game
+# Play the Slope Game!
 
-Below is a playable version of the Slope Game. Use the arrow keys to control the ball.
+Use the left and right arrow keys to control the ball. Avoid obstacles to keep playing!
 
 ```html
 <!DOCTYPE html>
@@ -18,28 +18,23 @@ Below is a playable version of the Slope Game. Use the arrow keys to control the
   <style>
     canvas {
       display: block;
-      margin: 0 auto;
+      margin: 20px auto;
       background: black;
+      border: 2px solid white;
     }
   </style>
 </head>
 <body>
   <canvas id="gameCanvas"></canvas>
   <script>
+    // Canvas setup
     const canvas = document.getElementById("gameCanvas");
     const ctx = canvas.getContext("2d");
-
     canvas.width = 800;
     canvas.height = 600;
 
     // Ball properties
-    const ball = {
-      x: canvas.width / 2,
-      y: canvas.height / 2,
-      radius: 10,
-      dx: 2, // Horizontal speed
-      dy: 2 // Vertical speed
-    };
+    const ball = { x: canvas.width / 2, y: canvas.height / 2, radius: 10, dx: 0, dy: 2 };
 
     // Player controls
     let keys = {};
@@ -52,24 +47,19 @@ Below is a playable version of the Slope Game. Use the arrow keys to control the
 
     // Generate obstacles
     function generateObstacles() {
-      for (let i = 1; i <= 5; i++) {
+      for (let i = 0; i < 5; i++) {
         obstacles.push({
           x: Math.random() * (canvas.width - obstacleWidth),
-          y: i * -obstacleSpacing,
+          y: -i * obstacleSpacing,
           width: obstacleWidth,
           height: obstacleHeight
         });
       }
     }
 
-    // Handle player controls
-    document.addEventListener("keydown", (event) => {
-      keys[event.key] = true;
-    });
-
-    document.addEventListener("keyup", (event) => {
-      keys[event.key] = false;
-    });
+    // Handle player input
+    document.addEventListener("keydown", (e) => (keys[e.key] = true));
+    document.addEventListener("keyup", (e) => (keys[e.key] = false));
 
     // Draw the ball
     function drawBall() {
@@ -88,22 +78,21 @@ Below is a playable version of the Slope Game. Use the arrow keys to control the
       });
     }
 
-    // Update the game state
+    // Update the game
     function update() {
-      // Ball movement
+      // Ball controls
       if (keys["ArrowLeft"] && ball.x - ball.radius > 0) ball.dx = -4;
       if (keys["ArrowRight"] && ball.x + ball.radius < canvas.width) ball.dx = 4;
 
       ball.x += ball.dx;
       ball.y += ball.dy;
 
-      // Reset horizontal movement
+      // Reset horizontal speed gradually
       ball.dx *= 0.9;
 
-      // Move obstacles down and reset if out of bounds
+      // Update obstacle positions
       obstacles.forEach((obstacle) => {
         obstacle.y += ball.dy;
-
         if (obstacle.y > canvas.height) {
           obstacle.y = -obstacleHeight;
           obstacle.x = Math.random() * (canvas.width - obstacleWidth);
@@ -121,17 +110,15 @@ Below is a playable version of the Slope Game. Use the arrow keys to control the
         }
       });
 
-      // Prevent ball from leaving screen
-      if (ball.x - ball.radius < 0 || ball.x + ball.radius > canvas.width) {
-        ball.dx = 0;
-      }
-      if (ball.y + ball.radius > canvas.height) {
+      // Prevent ball from leaving the canvas
+      if (ball.x - ball.radius < 0 || ball.x + ball.radius > canvas.width) ball.dx = 0;
+      if (ball.y - ball.radius > canvas.height) {
         alert("Game Over!");
         document.location.reload();
       }
     }
 
-    // Draw the game
+    // Clear canvas and draw all elements
     function draw() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       drawBall();
@@ -145,7 +132,7 @@ Below is a playable version of the Slope Game. Use the arrow keys to control the
       requestAnimationFrame(gameLoop);
     }
 
-    // Start the game
+    // Initialize the game
     generateObstacles();
     gameLoop();
   </script>
