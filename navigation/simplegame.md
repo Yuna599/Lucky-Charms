@@ -8,7 +8,6 @@ permalink: /simplegame/
 
 Use the left and right arrow keys to control the ball. Avoid obstacles to keep playing!
 
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -16,52 +15,65 @@ Use the left and right arrow keys to control the ball. Avoid obstacles to keep p
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Slope Game</title>
   <style>
+    body {
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background: #000;
+      color: white;
+      font-family: Arial, sans-serif;
+    }
     canvas {
       display: block;
-      margin: 20px auto;
-      background: black;
-      border: 2px solid white;
+      background: #111;
+      border: 2px solid #fff;
+    }
+    #score {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      font-size: 18px;
     }
   </style>
 </head>
 <body>
+  <div id="score">Score: 0</div>
   <canvas id="gameCanvas"></canvas>
   <script>
-    // Canvas setup
     const canvas = document.getElementById("gameCanvas");
     const ctx = canvas.getContext("2d");
     canvas.width = 800;
     canvas.height = 600;
 
-    // Ball properties
-    const ball = { x: canvas.width / 2, y: canvas.height / 2, radius: 10, dx: 0, dy: 2 };
-
-    // Player controls
+    // Game variables
+    const ball = { x: canvas.width / 2, y: canvas.height - 50, radius: 10, speed: 4, dx: 0, dy: 2 };
+    const obstacles = [];
+    const obstacleWidth = 100;
+    const obstacleHeight = 20;
+    const obstacleSpacing = 150;
+    let score = 0;
     let keys = {};
 
-    // Obstacles
-    const obstacles = [];
-    const obstacleWidth = 80;
-    const obstacleHeight = 20;
-    const obstacleSpacing = 200;
-
-    // Generate obstacles
+    // Generate initial obstacles
     function generateObstacles() {
       for (let i = 0; i < 5; i++) {
         obstacles.push({
           x: Math.random() * (canvas.width - obstacleWidth),
           y: -i * obstacleSpacing,
           width: obstacleWidth,
-          height: obstacleHeight
+          height: obstacleHeight,
+          speed: ball.dy,
         });
       }
     }
 
-    // Handle player input
-    document.addEventListener("keydown", (e) => (keys[e.key] = true));
-    document.addEventListener("keyup", (e) => (keys[e.key] = false));
+    // Handle keyboard input
+    document.addEventListener("keydown", (e) => keys[e.key] = true);
+    document.addEventListener("keyup", (e) => keys[e.key] = false);
 
-    // Draw the ball
+    // Draw ball
     function drawBall() {
       ctx.beginPath();
       ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
@@ -73,29 +85,32 @@ Use the left and right arrow keys to control the ball. Avoid obstacles to keep p
     // Draw obstacles
     function drawObstacles() {
       ctx.fillStyle = "red";
-      obstacles.forEach((obstacle) => {
+      obstacles.forEach(obstacle => {
         ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
       });
     }
 
-    // Update the game
+    // Update game objects
     function update() {
-      // Ball controls
-      if (keys["ArrowLeft"] && ball.x - ball.radius > 0) ball.dx = -4;
-      if (keys["ArrowRight"] && ball.x + ball.radius < canvas.width) ball.dx = 4;
-
+      // Ball movement
+      if (keys["ArrowLeft"] && ball.x - ball.radius > 0) ball.dx = -ball.speed;
+      if (keys["ArrowRight"] && ball.x + ball.radius < canvas.width) ball.dx = ball.speed;
       ball.x += ball.dx;
-      ball.y += ball.dy;
 
-      // Reset horizontal speed gradually
+      // Friction to smooth out movement
       ball.dx *= 0.9;
 
-      // Update obstacle positions
-      obstacles.forEach((obstacle) => {
-        obstacle.y += ball.dy;
+      // Update obstacles
+      obstacles.forEach(obstacle => {
+        obstacle.y += obstacle.speed;
+
+        // Reset obstacle position and increase score
         if (obstacle.y > canvas.height) {
           obstacle.y = -obstacleHeight;
           obstacle.x = Math.random() * (canvas.width - obstacleWidth);
+          score++;
+          document.getElementById("score").textContent = `Score: ${score}`;
+          obstacle.speed += 0.1; // Increase speed for difficulty
         }
 
         // Collision detection
@@ -105,20 +120,18 @@ Use the left and right arrow keys to control the ball. Avoid obstacles to keep p
           ball.y + ball.radius > obstacle.y &&
           ball.y - ball.radius < obstacle.y + obstacle.height
         ) {
-          alert("Game Over!");
+          alert(`Game Over! Final Score: ${score}`);
           document.location.reload();
         }
       });
 
-      // Prevent ball from leaving the canvas
-      if (ball.x - ball.radius < 0 || ball.x + ball.radius > canvas.width) ball.dx = 0;
-      if (ball.y - ball.radius > canvas.height) {
-        alert("Game Over!");
-        document.location.reload();
+      // Prevent ball from falling out of bounds
+      if (ball.x - ball.radius < 0 || ball.x + ball.radius > canvas.width) {
+        ball.dx = 0;
       }
     }
 
-    // Clear canvas and draw all elements
+    // Clear canvas and draw everything
     function draw() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       drawBall();
@@ -132,7 +145,7 @@ Use the left and right arrow keys to control the ball. Avoid obstacles to keep p
       requestAnimationFrame(gameLoop);
     }
 
-    // Initialize the game
+    // Start the game
     generateObstacles();
     gameLoop();
   </script>
