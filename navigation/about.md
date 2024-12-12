@@ -16,5 +16,13 @@ I was born in South Korea, and lived there until 1st grade. Then i moved to San 
         Click to View
     </button>
 
+#### Press the botton on the bottom to play game
+
+<a href="https://yuna599.github.io/Lucky-Charms/simplegame/" style="text-decoration: none;">
+    <button style="background-color: #20B2AA; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer;">
+        Click to play
+    </button>
+
+
 <img alt="Please Work" src="navigation/images/notebooks/korean-flag.jpg" style="width:200px; height:auto;"> <img alt="Please Work" src="navigation/images/notebooks/Flag_of_California.svg.png" style="width:200px; height:auto;">
 ![alt text](images/notebooks/IMG_4597.jpeg)
