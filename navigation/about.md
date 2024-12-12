@@ -23,6 +23,7 @@ I was born in South Korea, and lived there until 1st grade. Then i moved to San 
         Click to play
     </button>
 
+[TOOLS VERIFY](https://yuna599.github.io/Lucky-Charms/devops/tools/verify)
 
 <img alt="Please Work" src="navigation/images/notebooks/korean-flag.jpg" style="width:200px; height:auto;"> <img alt="Please Work" src="navigation/images/notebooks/Flag_of_California.svg.png" style="width:200px; height:auto;">
 ![alt text](images/notebooks/IMG_4597.jpeg)
