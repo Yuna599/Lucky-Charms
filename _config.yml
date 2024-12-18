@@ -21,6 +21,6 @@ plugins:
 header_pages:
   - navigation/about.md
   - navigation/blog.md
-  - navigation/crochet.md
+  - navigation/snake.md
   - navigation/search.md
   - navigation/snake.md
