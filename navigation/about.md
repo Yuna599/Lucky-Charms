@@ -32,4 +32,5 @@ I like the color dark green, and some of the movies I love is the alien series a
 
 
 [HW](../_notebooks/CSSE/Lessons/Iteration/2025-01-07-iterations_hw.ipynb)
+
 [popcorn hacks](../_notebooks/CSSE/Lessons/Iteration/2025-01-07-iterations_popcorn_hacks.ipynb)
