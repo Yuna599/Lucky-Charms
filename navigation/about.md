@@ -29,3 +29,7 @@ I like the color dark green, and some of the movies I love is the alien series a
 
 <img alt="Please Work" src="navigation/images/notebooks/korean-flag.jpg" style="width:200px; height:auto;"> <img alt="Please Work" src="navigation/images/notebooks/Flag_of_California.svg.png" style="width:200px; height:auto;">
 ![alt text](images/notebooks/IMG_4597.jpeg)
+
+
+[HW](../_notebooks/CSSE/Lessons/Iteration/2025-01-07-iterations_hw.ipynb)
+[popcorn hacks](../_notebooks/CSSE/Lessons/Iteration/2025-01-07-iterations_popcorn_hacks.ipynb)
