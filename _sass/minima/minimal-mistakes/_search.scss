@@ -106,10 +106,6 @@
   .archive__item-title {
     margin-top: 0;
   }
-
-  .archive__item-excerpt {
-    margin-bottom: 0;
-  }
 }
 
 /* Algolia search */
@@ -123,10 +119,4 @@
   color: $primary-color;
   font-style: normal;
   text-decoration: underline;
-}
-
-.archive__item-excerpt .ais-Highlight {
-  color: $primary-color;
-  font-style: normal;
-  font-weight: bold;
 }
