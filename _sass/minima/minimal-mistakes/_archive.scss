@@ -72,19 +72,6 @@
   }
 }
 
-.archive__item-excerpt {
-  margin-top: 0;
-  font-size: $type-size-6;
-
-  & + p {
-    text-indent: 0;
-  }
-
-  a {
-    position: relative;
-  }
-}
-
 .archive__item-teaser {
   position: relative;
   border-radius: $border-radius;
@@ -214,14 +201,7 @@
     font-size: $type-size-5;
   }
 
-  .archive__item-excerpt {
-    display: none;
 
-    @include breakpoint($medium) {
-      display: block;
-      font-size: $type-size-6;
-    }
-  }
 
   .archive__item-teaser {
     @include breakpoint($small) {

@@ -373,14 +373,6 @@ ul.social-icons {
         @include relative-font-size(1.5);
       }
     }
-
-    .post-excerpt {
-      margin-top: $spacing-unit / 2;
-
-      p {
-        margin-bottom: 0;
-      }
-    }
   }
 }
 
