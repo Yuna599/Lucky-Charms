@@ -30,6 +30,27 @@ jobs:
         uses: actions/checkout@v4
       - name: Setup Pages
         uses: actions/configure-pages@v5
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.1' # Set this to your desired Ruby version
+          bundler-cache: true
+      - name: Install Jekyll and dependencies
+        run: |
+          gem install bundler
+          bundle install
+      - name: Install Python dependencies
+        run: |
+          python -m venv venv  # Create virtual environment
+          source venv/bin/activate  # Activate the virtual environment
+          pip install -r requirements.txt  # Install Python packages
+
+      - name: Execute conversion script
+        run: |
+          source venv/bin/activate  # Activate virtual environment
+          python scripts/convert_notebooks.py  # Run your Python script
       - name: Build with Jekyll
         uses: actions/jekyll-build-pages@v1
         with:
