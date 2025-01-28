@@ -6,6 +6,7 @@ github_repo: "Lucky-Charms"
 repository: Yuna599/Lucky-Charms
 future: true
 remote_theme: jekyll/minima
+baseurl: "https://yuna599.github.io/Lucky-Charms"
 minima:
   skin: dark
   social_links:
