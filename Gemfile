@@ -6,7 +6,7 @@ gem "webrick", "~> 1.7"
 
 gem "execjs", "~> 2.8"
 
-gem "jekyll", "~> 3.10.0"
+gem "jekyll", "= 3.9.5"
 
 # Explicitly add required plugins
 gem "jekyll-seo-tag"
