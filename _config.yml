@@ -1,3 +1,4 @@
+---
 title: 'Lucky-Charms'
 description: "The BLOG"
 owner_name: Yuna Lee
@@ -5,6 +6,7 @@ github_username: Yuna599
 github_repo: "Lucky-Charms" 
 repository: Yuna599/Lucky-Charms
 future: true
+---
 # remote_theme: jekyll/minima
 
 minima:
