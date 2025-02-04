@@ -6,7 +6,6 @@ github_username: Yuna599
 github_repo: "Lucky-Charms" 
 repository: Yuna599/Lucky-Charms
 future: true
-key: value
 ---
 # remote_theme: jekyll/minima
 
