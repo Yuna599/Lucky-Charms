@@ -32,3 +32,6 @@ Rachit would get buffed here:
 After, there is a button, transporting Rachit to Disneyland to check if he has enough strength, if he doesn't, there would be a sign saying how he needs more strength, and if he has enough strength, it would let him go to the next stage.
 Rachit would attempt to pull out the sword here:
 ![alt text](images/gamify/IMG_1469.jpeg)
+
+### Game plan (Flowchart)
+![alt text](images/gamify/IMG_7590.png)
