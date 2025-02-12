@@ -20,3 +20,5 @@ gem "jekyll-optional-front-matter"
 gem "jekyll-readme-index"
 gem "jekyll-default-layout"
 gem "jekyll-titles-from-headings"
+
+gem "faraday-retry", "~> 2.2"
