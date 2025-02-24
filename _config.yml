@@ -26,7 +26,7 @@ plugins:
 header_pages:
   - navigation/about.md
   - navigation/blog.md
-# navigation/snake.md
+  - navigation/snake.md
   - navigation/search.md
   - navigation/GamePlan.md
   - navigation/adventureGame.md
