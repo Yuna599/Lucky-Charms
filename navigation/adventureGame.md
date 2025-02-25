@@ -1,7 +1,6 @@
 ---
 layout: base
 title: Adventure Game
-search_exclude: true
 permalink: /gamify/adventureGame
 ---
 
