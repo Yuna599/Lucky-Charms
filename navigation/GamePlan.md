@@ -5,36 +5,36 @@ search_exclude: true
 permalink: /gameplan/
 ---
 ### Game Objectives:
-The level starts by Rachit going to Disneyland, Finding a small kid pulling out the sword in the stone. Then he trys pulling the sword but it wouldn't move AT ALL. This motivates him to become buffed and come back to pull out the sword. 
+The level starts by Ali going to Disneyland, Finding a small kid pulling out the sword in the stone. Then he trys pulling the sword but it wouldn't move AT ALL. This motivates him to become buffed and come back to pull out the sword. 
 
 The strength that he needs in order to pass the game is 800 lb worth full body pulling strength.
-For Rachit to become buffed, he has to answer some questions about the lessons we've learned from the other students in the class. 
+For Ali to become buffed, he has to answer some questions about the lessons we've learned from the other students in the class. 
 One questions gives them 50 lb worth of full pulling strength. If they get one question wrong, they get 10 lb off, getting an injury. 
-When Rachit reaches exactly 800lb or more, his character changes into buffed Rachit(a.k.a the hulk).
+When Ali reaches exactly 800lb or more, his character changes into buffed Rachit(a.k.a the hulk).
 
 ### Game Characters: 
-#### - Rachit (Before Buffed)
-Basic idea of Rachit before getting buffed:
+#### - Ali (Before Buffed)
+Basic idea of Ali before getting buffed:
 
-![alt text](images/gamify/IMG_3801.jpeg)
+![alt text](images/gamify/pixil-frame-0__2_-removebg-preview.png)
 
-#### - Rachit (Buffed)
-Basic idea/picure of  buffed Rachit, might be developed over time :
+#### - Ali (Buffed)
+Basic idea/picure of  buffed Ali, might be developed over time :
 
-![alt text](images/gamify/IMG_1994.png)
+![alt text](<images/gamify/pixil-frame-0 (3).png>)
 
 
 ### Background:
 ##### There are two settings in the level, Disneyland and the Gym.
 #### Gym 
-Gym is for Rachit to become buffed by using benchpress, deadlifts and other weights. 
-Rachit would get buffed here: 
-![alt text](images/gamify/IMG_2072.jpeg)
+Gym is for Ali to become buffed by using benchpress, deadlifts and other weights. 
+Ali would get buffed here: 
+![alt text](images/gamify/IMG_7848.png)
 
 #### Disneyland(Sword in the Stone)
 After, there is a button, transporting Rachit to Disneyland to check if he has enough strength, if he doesn't, there would be a sign saying how he needs more strength, and if he has enough strength, it would let him go to the next stage.
-Rachit would attempt to pull out the sword here:
-![alt text](images/gamify/IMG_1469.jpeg)
+Ali would attempt to pull out the sword here:
+![alt text](images/gamify/IMG_7640.png)
 
 ### Game plan (Flowchart)
 ![alt text](images/gamify/IMG_7590.png)

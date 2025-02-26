@@ -22,3 +22,5 @@ gem "jekyll-default-layout"
 gem "jekyll-titles-from-headings"
 
 gem "faraday-retry", "~> 2.2"
+
+gem "jekyll-theme-cayman", "~> 0.2.0"
