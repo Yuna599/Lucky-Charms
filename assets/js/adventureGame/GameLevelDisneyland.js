@@ -1,6 +1,6 @@
 import Player from "./player.js"; 
 import NPC from "./NPC.js";
-import Prompt from "./prompt.js";
+import Prompt from "./Prompt.js";
 
 class GameLevelDisneyland {
     constructor(gameControl) {
