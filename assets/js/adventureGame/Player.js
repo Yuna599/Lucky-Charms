@@ -1,32 +1,42 @@
-import Character from './Character.js';
+import GameEnv from './GameEnv.js';
+import Character from "./Character.js";
+import { getStats } from "/Lucky-Charms/assets/js/adventureGame/StatsManager.js";
 
 class Player extends Character {
-    constructor({ x, y, spriteData }) {
-        super({ x, y, spriteData });
-
-        this.speed = 5;
+    constructor() {
+        super({ id: "aliCharacter", name: "Ali" }); // ✅ Pass correct data
+        this.keypress = { up: 87, left: 65, down: 83, right: 68 };
+        this.velocity = { x: 0, y: 0 };
+        this.direction = "down";
+        this.bindMovementKeyListeners();
     }
 
-    move(direction) {
-        switch (direction) {
-            case "up":
-                if (this.state.movement.up) this.y -= this.speed;
-                break;
-            case "down":
-                if (this.state.movement.down) this.y += this.speed;
-                break;
-            case "left":
-                if (this.state.movement.left) this.x -= this.speed;
-                break;
-            case "right":
-                if (this.state.movement.right) this.x += this.speed;
-                break;
+    bindMovementKeyListeners() {
+        addEventListener('keydown', this.handleKeyDown.bind(this));
+        addEventListener('keyup', this.handleKeyUp.bind(this));
+    }
+
+    handleKeyDown({ keyCode }) {
+        switch (keyCode) {
+            case this.keypress.up: this.velocity.y = -1; break;
+            case this.keypress.left: this.velocity.x = -1; break;
+            case this.keypress.down: this.velocity.y = 1; break;
+            case this.keypress.right: this.velocity.x = 1; break;
         }
     }
 
-    update() {
-        console.log("Player is updating position.");
+    handleKeyUp({ keyCode }) {
+        switch (keyCode) {
+            case this.keypress.up:
+            case this.keypress.down:
+                this.velocity.y = 0;
+                break;
+            case this.keypress.left:
+            case this.keypress.right:
+                this.velocity.x = 0;
+                break;
+        }
     }
 }
 
-export default Player;
+export default Player; // ✅ Ensure you export only once

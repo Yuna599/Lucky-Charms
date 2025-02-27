@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adventure Game</title>
+
+    <!-- Fix for font preload issue -->
+    <link rel="preload" href="https://fonts.googleapis.com/css?family=Open+Sans:400,700&display=swap" as="style" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:400,700&display=swap" crossorigin="anonymous">
+
+    <style>
+        body {
+            font-family: 'Open Sans', sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <h1>Welcome to the Adventure Game</h1>
+
+    <!-- Ensure your character element exists -->
+    <img id="aliCharacter" src="http://127.0.0.1:4100/Lucky-Charms/navigation/images/gamify/pixil-frame-0__2_-removebg-preview.png" style="display: none;">
+
+    <!-- Load all game scripts before starting the game -->
+    <script src="Character.js"></script>
+    <script src="Player.js"></script>
+    <script src="GameControl.js"></script>
+
+    <!-- Ensure GameControl.start() runs only after everything is loaded -->
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            GameControl.start();
+        });
+    </script>
+</body>
+</html>
+

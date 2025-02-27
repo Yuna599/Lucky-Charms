@@ -4,23 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ali's Adventure</title>
-    <style>
-        body {
-            margin: 0;
-            overflow: hidden;
-            background-color: black;
-        }
-        canvas {
-            display: block;
-        }
-    </style>
+    <script src="assets/Character.js"></script>
+    <script src="assets/Npc.js"></script>
+    <script src="assets/Player.js"></script>
+    <script src="assets/GameEnv.js"></script>
+    <script src="assets/StatsManager.js"></script>
+    <script src="assets/GameObjective.js"></script>
+    <script src="assets/Prompt.js"></script>
+    <script src="assets/GameControl.js"></script>
 </head>
 <body>
-    <canvas id="gameCanvas"></canvas>
-    
-    <script type="module">
-        import GameControl from './assets/js/adventureGame/GameControl.js';
-        GameControl.start();
-    </script>
+    <h1>Ali's Adventure</h1>
+    <button onclick="GameEnv.setBackground('Disneyland')">Go to Disneyland</button>
+    <button onclick="GameEnv.setBackground('Gym')">Go to Gym</button>
+    <button onclick="Prompt.askQuestion('What is 5 + 3?', '8', 3)">Answer Question</button>
 </body>
 </html>

@@ -1,5 +1,3 @@
-import statsManager from "./StatsManager.js";
-
 const Prompt = {
     isOpen: false,
     dim: false,
@@ -7,7 +5,6 @@ const Prompt = {
     backgroundDim: {
         create() {
             this.dim = true;
-            console.log("CREATE DIM");
             const dimDiv = document.createElement("div");
             dimDiv.id = "dim";
             dimDiv.style.backgroundColor = "black";
@@ -21,60 +18,55 @@ const Prompt = {
         },
         remove() {
             this.dim = false;
-            console.log("REMOVE DIM");
             const dimDiv = document.getElementById("dim");
-            if (dimDiv) dimDiv.remove();
+            dimDiv.remove();
             Prompt.isOpen = false;
+            promptTitle.style.display = "none";
+            promptDropDown.style.width = "0";
+            promptDropDown.style.top = "0";
+            promptDropDown.style.left = "-100%";
+            promptDropDown.style.transition = "all 0.3s ease-in-out";
         },
     },
 
     createPromptDisplayTable() {
         const table = document.createElement("table");
         table.className = "table prompt";
-
-        // Header row for questions
+    
         const header = document.createElement("tr");
         const th = document.createElement("th");
         th.colSpan = 2;
         th.innerText = "Answer the Questions Below:";
         header.appendChild(th);
         table.appendChild(header);
-
+    
         return table;
     },
-
+    
     updatePromptTable() {
         const table = this.createPromptDisplayTable();
-
         if (this.currentNpc && this.currentNpc.questions) {
-            this.currentNpc.questions.forEach((questionObj, index) => {
+            this.currentNpc.questions.forEach((question, index) => {
                 const row = document.createElement("tr");
-
-                // Question cell
                 const questionCell = document.createElement("td");
-                questionCell.innerText = `${index + 1}. ${questionObj.question}`;
+                questionCell.innerText = `${index + 1}. ${question}`;
                 row.appendChild(questionCell);
-
-                // Input cell
                 const inputCell = document.createElement("td");
                 const input = document.createElement("input");
                 input.type = "text";
                 input.placeholder = "Your answer here...";
-                input.dataset.index = index; // Save index for validation
+                input.dataset.questionIndex = index;
                 inputCell.appendChild(input);
                 row.appendChild(inputCell);
-
                 table.appendChild(row);
             });
-
-            // Submit button
             const submitRow = document.createElement("tr");
             const submitCell = document.createElement("td");
             submitCell.colSpan = 2;
             submitCell.style.textAlign = "center";
             const submitButton = document.createElement("button");
             submitButton.innerText = "Submit";
-            submitButton.addEventListener("click", this.handleSubmit.bind(this)); // Attach submission handler
+            submitButton.addEventListener("click", this.handleSubmit.bind(this));
             submitCell.appendChild(submitButton);
             submitRow.appendChild(submitCell);
             table.appendChild(submitRow);
@@ -86,8 +78,6 @@ const Prompt = {
             row.appendChild(noQuestionsCell);
             table.appendChild(row);
         }
-
-        // Scrollable container
         const container = document.createElement("div");
         container.style.maxHeight = "400px";
         container.style.overflowY = "auto";
@@ -100,69 +90,51 @@ const Prompt = {
     handleSubmit() {
         const inputs = document.querySelectorAll("input[type='text']");
         const answers = Array.from(inputs).map(input => ({
-            index: input.dataset.index,
-            answer: input.value.trim(),
+            questionIndex: input.dataset.questionIndex,
+            answer: input.value.trim()
         }));
-
-        let correctCount = 0;
-        let incorrectCount = 0;
-
-        answers.forEach(({ index, answer }) => {
-            const correctAnswer = this.currentNpc.questions[index].answer.trim().toLowerCase();
-            if (answer.toLowerCase() === correctAnswer) {
-                correctCount++;
-            } else {
-                incorrectCount++;
-            }
-        });
-
-        // Adjust Ali's strength
-        if (correctCount > 0) {
-            statsManager.addStrength(correctCount * 50);
-        }
-        if (incorrectCount > 0) {
-            statsManager.reduceStrength(incorrectCount * 10);
-        }
-
-        alert(`Correct: ${correctCount}, Incorrect: ${incorrectCount}`);
-        this.isOpen = false;
-        this.backgroundDim.remove();
+        console.log("Submitted Answers:", answers);
+        alert("Your answers have been submitted!");
+        Prompt.isOpen = false;
+        Prompt.backgroundDim.remove();
     },
-
+    
     openPromptPanel(npc) {
-        this.currentNpc = npc; // Assign the current NPC
         const promptDropDown = document.querySelector('.promptDropDown');
         const promptTitle = document.getElementById("promptTitle");
     
-        promptTitle.innerHTML = npc.quiz.title || "Questions";
+        if (this.isOpen) {
+            this.backgroundDim.remove();
+        }
+    
+        this.currentNpc = npc;
         this.isOpen = true;
     
-        if (this.isOpen) {
-            Prompt.backgroundDim.create();
+        promptDropDown.innerHTML = ""; 
+        
+        promptTitle.style.display = "block";
+        promptTitle.innerHTML = npc.quiz.title || "Questions";
+        promptDropDown.appendChild(promptTitle);
     
-            // Remove old table
-            const oldTable = document.getElementsByClassName("table scores")[0];
-            if (oldTable) oldTable.remove();
+        promptDropDown.appendChild(this.updatePromptTable());
     
-            // Update questions
-            Prompt.updatePromptDisplay();
+        this.backgroundDim.create();
     
-            // Display prompt
-            promptDropDown.style.position = "fixed";
-            promptDropDown.style.zIndex = "9999";
-            promptDropDown.style.width = "70%";
-            promptDropDown.style.top = "15%";
-            promptDropDown.style.left = "15%";
-            promptDropDown.style.transition = "all 0.3s ease-in-out";
+        promptDropDown.style.position = "fixed";
+        promptDropDown.style.zIndex = "9999";
+        promptDropDown.style.width = "70%"; 
+        promptDropDown.style.top = "15%";
+        promptDropDown.style.left = "15%"; 
+        promptDropDown.style.transition = "all 0.3s ease-in-out"; 
+    },
+    
+    shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
         }
-    },
-
-    initializePrompt() {
-        const promptTitle = document.createElement("div");
-        promptTitle.id = "promptTitle";
-        document.getElementById("promptDropDown").appendChild(promptTitle);
-    },
+        return array;
+    }
 };
 
 export default Prompt;
-

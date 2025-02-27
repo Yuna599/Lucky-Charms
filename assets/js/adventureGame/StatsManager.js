@@ -1,46 +1,61 @@
-const strengthElement = document.getElementById("strength");
+import { javaURI, fetchOptions } from "../api/config.js";
 
-/**
- * Manages player's stats.
- */
-class StatsManager {
-    static stats = { strength: 10, intelligence: 5 };
+const personId = 1;
 
-    /**
-     * Retrieves a stat value.
-     * @param {string} statName - The name of the stat.
-     * @returns {number} - The value of the stat.
-     */
-    static getStat(statName) {
-        return this.stats[statName] ?? 0; // Nullish coalescing to prevent errors
-    }
+const statsEndpoints = {
+    balance: `${javaURI}/rpg_answer/getBalance/${personId}`,
+    chatScore: `${javaURI}/rpg_answer/getChatScore/${personId}`,
+    questionsAnswered: `${javaURI}/rpg_answer/getQuestionsAnswered/${personId}`
+};
 
-    /**
-     * Sets a stat value.
-     * @param {string} statName - The name of the stat.
-     * @param {number} value - The new value.
-     */
-    static setStat(statName, value) {
-        this.stats[statName] = value;
-    }
-
-    /**
-     * Returns the player's current stats.
-     */
-    static getStats() {
-        return { ...this.stats };
-    }
-
-    /**
-     * Updates the UI with the current strength.
-     */
-    static updateUI() {
-        if (strengthElement) {
-            strengthElement.innerText = `Strength: ${this.getStat("strength")} lb`;
-        }
-    }
+// ✅ Exporting `getStats` only once (No import needed)
+export function getStats() {
+    return {
+        strength: 10,
+        stamina: 8,
+        intelligence: 7
+    };
 }
 
-// ✅ Properly export both default and named functions
-export default StatsManager;
-export { StatsManager, StatsManager as getStats };
+
+/**
+ * Fetches and updates all game stats in one call (Balance, Chat Score, Questions Answered).
+ */
+export function updateAllStats() {
+    Object.entries(statsEndpoints).forEach(([key, url]) => {
+        fetch(url, fetchOptions)
+            .then(response => response.json())
+            .then(data => {
+                const element = document.getElementById(key);
+                if (element) {
+                    element.innerText = data ?? 0;
+                } else {
+                    console.warn(`Element with ID '${key}' not found.`);
+                }
+            })
+            .catch(err => console.error(`Error fetching ${key}:`, err));
+    });
+}
+
+/**
+ * Fetches and updates a specific game stat by key.
+ * @param {string} key - The key representing the stat (balance, chatScore, questionsAnswered)
+ */
+export function updateStat(key) {
+    if (!statsEndpoints[key]) {
+        console.error(`Invalid stat key: ${key}`);
+        return;
+    }
+
+    fetch(statsEndpoints[key], fetchOptions)
+        .then(response => response.json())
+        .then(data => {
+            const element = document.getElementById(key);
+            if (element) {
+                element.innerText = data ?? 0;
+            } else {
+                console.warn(`Element with ID '${key}' not found.`);
+            }
+        })
+        .catch(err => console.error(`Error fetching ${key}:`, err));
+}
