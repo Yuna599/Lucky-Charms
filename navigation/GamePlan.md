@@ -10,7 +10,7 @@ The level starts by Ali going to Disneyland, Finding a small kid pulling out the
 The strength that he needs in order to pass the game is 800 lb worth full body pulling strength.
 For Ali to become buffed, he has to answer some questions about the lessons we've learned from the other students in the class. 
 One questions gives them 50 lb worth of full pulling strength. If they get one question wrong, they get 10 lb off, getting an injury. 
-When Ali reaches exactly 800lb or more, his character changes into buffed Rachit(a.k.a the hulk).
+When Ali reaches exactly 800lb or more, his character changes into buffed Ali.
 
 ### Game Characters: 
 #### - Ali (Before Buffed)

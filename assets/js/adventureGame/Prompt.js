@@ -1,11 +1,13 @@
+import statsManager from "./StatsManager.js";
+
 const Prompt = {
     isOpen: false,
     dim: false,
 
     backgroundDim: {
-        create () {
-            this.dim = true // sets the dim to be true when the prompt is opened
-            console.log("CREATE DIM")
+        create() {
+            this.dim = true;
+            console.log("CREATE DIM");
             const dimDiv = document.createElement("div");
             dimDiv.id = "dim";
             dimDiv.style.backgroundColor = "black";
@@ -14,27 +16,22 @@ const Prompt = {
             dimDiv.style.position = "absolute";
             dimDiv.style.opacity = "0.8";
             document.body.append(dimDiv);
-            dimDiv.style.zIndex = "9998"
-            dimDiv.addEventListener("click", Prompt.backgroundDim.remove)
+            dimDiv.style.zIndex = "9998";
+            dimDiv.addEventListener("click", Prompt.backgroundDim.remove);
         },
-        remove () {
-            this.dim = false
+        remove() {
+            this.dim = false;
             console.log("REMOVE DIM");
             const dimDiv = document.getElementById("dim");
-            dimDiv.remove();
-            Prompt.isOpen = false
-            promptTitle.style.display = "none";
-            promptDropDown.style.width = "0"; 
-            promptDropDown.style.top = "0";  
-            promptDropDown.style.left = "-100%"; 
-            promptDropDown.style.transition = "all 0.3s ease-in-out";
+            if (dimDiv) dimDiv.remove();
+            Prompt.isOpen = false;
         },
     },
 
     createPromptDisplayTable() {
         const table = document.createElement("table");
         table.className = "table prompt";
-    
+
         // Header row for questions
         const header = document.createElement("tr");
         const th = document.createElement("th");
@@ -42,39 +39,35 @@ const Prompt = {
         th.innerText = "Answer the Questions Below:";
         header.appendChild(th);
         table.appendChild(header);
-    
+
         return table;
-    },
-    
-    
-
-    toggleDetails() {
-        Prompt.detailed = !Prompt.detailed
-
-        Prompt.updatePromptDisplay()
     },
 
     updatePromptTable() {
         const table = this.createPromptDisplayTable();
-        // Use `currentNpc` to populate questions
+
         if (this.currentNpc && this.currentNpc.questions) {
-            this.currentNpc.questions.forEach((question, index) => {
+            this.currentNpc.questions.forEach((questionObj, index) => {
                 const row = document.createElement("tr");
+
                 // Question cell
                 const questionCell = document.createElement("td");
-                questionCell.innerText = `${index + 1}. ${question}`;
+                questionCell.innerText = `${index + 1}. ${questionObj.question}`;
                 row.appendChild(questionCell);
+
                 // Input cell
                 const inputCell = document.createElement("td");
                 const input = document.createElement("input");
                 input.type = "text";
                 input.placeholder = "Your answer here...";
-                input.dataset.questionIndex = index; // Tag input with the question index
+                input.dataset.index = index; // Save index for validation
                 inputCell.appendChild(input);
                 row.appendChild(inputCell);
+
                 table.appendChild(row);
             });
-            // Add submit button
+
+            // Submit button
             const submitRow = document.createElement("tr");
             const submitCell = document.createElement("td");
             submitCell.colSpan = 2;
@@ -93,129 +86,83 @@ const Prompt = {
             row.appendChild(noQuestionsCell);
             table.appendChild(row);
         }
-        // Wrap the table in a scrollable container
+
+        // Scrollable container
         const container = document.createElement("div");
-        container.style.maxHeight = "400px"; // Limit height for scrollability
-        container.style.overflowY = "auto"; // Enable vertical scrolling
-        container.style.border = "1px solid #ccc"; // Optional: add a border
-        container.style.padding = "10px"; // Optional: add some padding
+        container.style.maxHeight = "400px";
+        container.style.overflowY = "auto";
+        container.style.border = "1px solid #ccc";
+        container.style.padding = "10px";
         container.appendChild(table);
         return container;
     },
+
     handleSubmit() {
-        // Collect all answers
         const inputs = document.querySelectorAll("input[type='text']");
         const answers = Array.from(inputs).map(input => ({
-            questionIndex: input.dataset.questionIndex,
-            answer: input.value.trim()
+            index: input.dataset.index,
+            answer: input.value.trim(),
         }));
-        console.log("Submitted Answers:", answers);
-        // Handle the submission logic (e.g., save answers, validate, etc.)
-        alert("Your answers have been submitted!");
-        Prompt.isOpen = false;
-        Prompt.backgroundDim.remove();
-    },
-    
-    
-    updatePromptDisplay () {
-        const table = document.getElementsByClassName("table scores")[0]
-        const detailToggleSection = document.getElementById("detail-toggle-section")
-        const clearButtonRow = document.getElementById("clear-button-row")
-        const pagingButtonsRow = document.getElementById("paging-buttons-row")
 
-        if (detailToggleSection) {
-            detailToggleSection.remove()
+        let correctCount = 0;
+        let incorrectCount = 0;
+
+        answers.forEach(({ index, answer }) => {
+            const correctAnswer = this.currentNpc.questions[index].answer.trim().toLowerCase();
+            if (answer.toLowerCase() === correctAnswer) {
+                correctCount++;
+            } else {
+                incorrectCount++;
+            }
+        });
+
+        // Adjust Ali's strength
+        if (correctCount > 0) {
+            statsManager.addStrength(correctCount * 50);
+        }
+        if (incorrectCount > 0) {
+            statsManager.reduceStrength(incorrectCount * 10);
         }
 
-        if (table) {
-            table.remove() //remove old table if it is there
-        }
-
-        if (pagingButtonsRow) {
-            pagingButtonsRow.remove()
-        }
-
-        if (clearButtonRow) {
-            clearButtonRow.remove()
-        }
-
-        
-        document.getElementById("promptDropDown").append(Prompt.updatePromptTable()) //update new Prompt
-        
-        
-    },
-
-    backPage () {
-        const table = document.getElementsByClassName("table scores")[0]
-
-        if (Prompt.currentPage - 1 == 0) {
-            return;
-        }
-    
-
-        Prompt.currentPage -= 1
-
-        Prompt.updatePromptDisplay()
-    },
-    
-    frontPage () {
-        Prompt.currentPage += 1
-        Prompt.updatePromptDisplay()
-        
+        alert(`Correct: ${correctCount}, Incorrect: ${incorrectCount}`);
+        this.isOpen = false;
+        this.backgroundDim.remove();
     },
 
     openPromptPanel(npc) {
+        this.currentNpc = npc; // Assign the current NPC
         const promptDropDown = document.querySelector('.promptDropDown');
         const promptTitle = document.getElementById("promptTitle");
     
-        // Close any existing prompt before opening a new one
-        if (this.isOpen) {
-            this.backgroundDim.remove(); // Ensures previous dim is removed
-        }
-    
-        this.currentNpc = npc; // Assign the current NPC when opening the panel
+        promptTitle.innerHTML = npc.quiz.title || "Questions";
         this.isOpen = true;
     
-        // Ensure the previous content inside promptDropDown is removed
-        promptDropDown.innerHTML = ""; 
-        
-        promptTitle.style.display = "block";
-
-        // Add the new title
-        promptTitle.innerHTML = npc.quiz.title || "Questions";
-        promptDropDown.appendChild(promptTitle);
+        if (this.isOpen) {
+            Prompt.backgroundDim.create();
     
-        // Display the new questions
-        promptDropDown.appendChild(this.updatePromptTable());
+            // Remove old table
+            const oldTable = document.getElementsByClassName("table scores")[0];
+            if (oldTable) oldTable.remove();
     
-        // Handle the background dim effect
-        this.backgroundDim.create();
+            // Update questions
+            Prompt.updatePromptDisplay();
     
-        promptDropDown.style.position = "fixed";
-        promptDropDown.style.zIndex = "9999";
-        promptDropDown.style.width = "70%"; 
-        promptDropDown.style.top = "15%";
-        promptDropDown.style.left = "15%"; 
-        promptDropDown.style.transition = "all 0.3s ease-in-out"; 
+            // Display prompt
+            promptDropDown.style.position = "fixed";
+            promptDropDown.style.zIndex = "9999";
+            promptDropDown.style.width = "70%";
+            promptDropDown.style.top = "15%";
+            promptDropDown.style.left = "15%";
+            promptDropDown.style.transition = "all 0.3s ease-in-out";
+        }
     },
-    
 
-    initializePrompt () {
+    initializePrompt() {
         const promptTitle = document.createElement("div");
         promptTitle.id = "promptTitle";
         document.getElementById("promptDropDown").appendChild(promptTitle);
-        // document.getElementById("promptDropDown").append(this.updatePromptTable())
-
-       // document.getElementById("prompt-button").addEventListener("click",Prompt.openPromptPanel)
     },
-
-    shuffleArray(array) {
-        for (let i = array.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [array[i], array[j]] = [array[j], array[i]];
-        }
-        return array;
-    }
 };
 
 export default Prompt;
+

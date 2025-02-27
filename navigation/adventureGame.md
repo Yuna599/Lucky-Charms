@@ -5,16 +5,16 @@ permalink: /gamify/adventureGame
 ---
 
 <style>
-/* Existing CSS styling */
+/* Game Styling */
 #custom-prompt {
     display: none;
     position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background-color: #f0f8ff; /* Light blue background */
+    background-color: #f0f8ff;
     border-radius: 12px;
-    border: 1px solid #87ceeb; /* Sky blue border */
+    border: 1px solid #87ceeb;
     padding: 25px;
     width: 400px;
     max-width: 90%;
@@ -22,20 +22,6 @@ permalink: /gamify/adventureGame
     z-index: 1000;
 }
 
-#custom-prompt-box {
-    text-align: center;
-    position: relative;
-    padding: 40px 20px 20px;
-}
-
-#custom-prompt-message {
-    margin-bottom: 20px;
-    font-size: 18px;
-    font-weight: bold;
-    color: #4682b4;
-}
-
-/* New button style for NPC Tracker */
 #npcTrackerButton {
     position: relative;
     display: block;
@@ -52,11 +38,6 @@ permalink: /gamify/adventureGame
     z-index: 1000;
 }
 
-#npcTrackerButton:hover {
-    background-color: #5a9bd3;
-}
-
-/* NPC Tracker Pop-up */
 #npcTrackerPopup {
     display: none;
     position: fixed;
@@ -64,7 +45,6 @@ permalink: /gamify/adventureGame
     left: 50%;
     transform: translate(-50%, -50%);
     width: 40%;
-    height: auto;
     min-height: 20%;
     background-color: white;
     border: 2px solid #4682b4;
@@ -79,7 +59,7 @@ permalink: /gamify/adventureGame
 }
 </style>
 
-<!-- Score & Stats -->
+<!-- Game Stats -->
 <div id="score" style="position: absolute; top: 75px; left: 10px; color: black; font-size: 20px; background-color: white;">
    Time: <span id="timeScore">0</span>
 </div>
@@ -88,11 +68,10 @@ permalink: /gamify/adventureGame
     <div>Balance: <span id="balance">0</span></div>
     <div>Chat Score: <span id="chatScore">0</span></div>
     <div>Questions Answered: <span id="questionsAnswered">0</span></div>
-    
-    <!-- NPC Tracker Button added below the stats -->
     <button id="npcTrackerButton">NPC Tracker</button>
 </div>
 
+<!-- Game Canvas -->
 <div id="gameContainer">
     <div id="promptDropDown" class="promptDropDown" style="z-index: 9999"></div>
     <canvas id='gameCanvas'></canvas>
@@ -104,13 +83,13 @@ permalink: /gamify/adventureGame
     <ul id="npcTrackerList"></ul>
 </div>
 
+<!-- Game Scripts -->
 <script type="module">
     import GameControl from '{{site.baseurl}}/assets/js/adventureGame/GameControl.js';
     import Prompt from '{{site.baseurl}}/assets/js/adventureGame/Prompt.js';
     import { getStats } from '{{site.baseurl}}/assets/js/adventureGame/StatsManager.js';
-
-    const path = "{{site.baseurl}}";
-    GameControl.start(path);
+    
+    GameControl.start();
     GameControl.startTimer();
     Prompt.initializePrompt();
 
@@ -124,12 +103,11 @@ permalink: /gamify/adventureGame
 </script>
 
 <script>
-    let npcTracker = []; // Stores NPC names in order
+    let npcTracker = [];
 
-    // Function to update NPC tracker UI
     function updateNpcTracker() {
         const list = document.getElementById("npcTrackerList");
-        list.innerHTML = ""; // Clear old data
+        list.innerHTML = "";
         npcTracker.forEach(npc => {
             const li = document.createElement("li");
             li.textContent = npc;
@@ -137,45 +115,27 @@ permalink: /gamify/adventureGame
         });
     }
 
-    // Function to toggle the NPC Tracker pop-up
     function toggleNpcTracker() {
         const popup = document.getElementById("npcTrackerPopup");
-        if (popup.style.display === "none" || popup.style.display === "") {
-            updateNpcTracker();
-            popup.style.display = "block"; // Show the popup
-        } else {
-            popup.style.display = "none"; // Hide the popup
-        }
+        popup.style.display = (popup.style.display === "none" || popup.style.display === "") ? "block" : "none";
+        updateNpcTracker();
     }
 
-    // Wait until the DOM is fully loaded
     document.addEventListener("DOMContentLoaded", function() {
         const npcTrackerButton = document.getElementById("npcTrackerButton");
-        if (npcTrackerButton) {
-            npcTrackerButton.addEventListener("click", toggleNpcTracker);
-        }
+        if (npcTrackerButton) npcTrackerButton.addEventListener("click", toggleNpcTracker);
 
-        // Detect when the player presses "E" to interact with NPCs
         document.addEventListener("keydown", function(event) {
-            if (event.key === "e" || event.key === "E") {
-                trackNpcInteraction();
-            }
+            if (event.key.toLowerCase() === "e") trackNpcInteraction();
         });
     });
 
-    // Function to track NPC interactions
     function trackNpcInteraction() {
-        // List of possible NPCs to track (in order)
         const possibleNpcs = ["Tux", "Octocat", "Linux Robot"];
-
-        // If the player hasn't interacted yet, add the next NPC in order
         if (npcTracker.length < possibleNpcs.length) {
             const nextNpc = possibleNpcs[npcTracker.length];
-            if (!npcTracker.includes(nextNpc)) {
-                npcTracker.push(nextNpc);
-            }
+            if (!npcTracker.includes(nextNpc)) npcTracker.push(nextNpc);
         }
-
         updateNpcTracker();
     }
 </script>

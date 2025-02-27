@@ -1,63 +1,34 @@
 import GameEnv from './GameEnv.js';
-import GameObject from './GameObject.js';
 
-/** Background class for primary background
- * 
- */
-export class Background extends GameObject {
-    constructor(data = null) {
-        super();
-        if (data.src) {
-            this.image = new Image();
-            this.image.src = data.src;
-        } else {
-            this.image = null;
-        }
-        GameEnv.gameObjects.push(this);
+class Background {
+    constructor(ctx) {
+        this.ctx = ctx;
+        this.currentBackground = 'disneyland'; // Start with Disneyland
+        this.backgrounds = {
+            disneyland: new Image(),
+            gym: new Image()
+        };
+        this.backgrounds.disneyland.src = 'http://127.0.0.1:4100/Lucky-Charms/navigation/images/gamify/IMG_7640.png';
+        this.backgrounds.gym.src = 'http://127.0.0.1:4100/Lucky-Charms/navigation/images/gamify/IMG_7848.png';
+        
+        this.resize();
     }
 
-    /** This method draws to GameEnv context, primary background
-     * 
-     */
+    switchBackground(newBackground) {
+        if (this.backgrounds[newBackground]) {
+            this.currentBackground = newBackground;
+        }
+    }
+
     draw() {
-        const ctx = GameEnv.ctx;
-        const width = GameEnv.innerWidth;
-        const height = GameEnv.innerHeight;
-
-        if (this.image) {
-            // Draw the background image scaled to the canvas size
-            ctx.drawImage(this.image, 0, 0, width, height);
-        } else {
-            // Fill the canvas with fillstyle color if no image is provided
-            ctx.fillStyle = '#87CEEB';
-            ctx.fillRect(0, 0, width, height);
-        }
-    }
-
-    /** For primary background, update is the same as draw
-     * 
-     */
-    update() {
-        this.draw();
-    }
-
-    /** For primary background, resize is the same as draw
-     *
-     */
-    resize() {
-        this.draw();
-    }
-
-    /** Destroy Game Object
-     * remove object from GameEnv.gameObjects array
-     */
-    destroy() {
-        const index = GameEnv.gameObjects.indexOf(this);
-        if (index !== -1) {
-            GameEnv.gameObjects.splice(index, 1);
-        }
+        const bg = this.backgrounds[this.currentBackground];
+        this.ctx.drawImage(bg, 0, 0, GameEnv.innerWidth, GameEnv.innerHeight);
     }
     
+    resize() {
+        GameEnv.innerWidth = window.innerWidth;
+        GameEnv.innerHeight = window.innerHeight;
+    }
 }
 
 export default Background;

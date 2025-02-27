@@ -1,21 +1,22 @@
 title: "Lucky-Charms"
 description: "The BLOG"
-owner_name: Yuna Lee
-github_username: Yuna599
-github_repo: Lucky-Charms
-repository: Yuna599/Lucky-Charms
+owner_name: "Yuna Lee"
+github_username: "Yuna599"
+github_repo: "Lucky-Charms"
+repository: "Yuna599/Lucky-Charms"
 future: true
 baseurl: "/Lucky-Charms"
-remote_theme: jekyll/minima
+remote_theme: "jekyll/minima"
 
 minima:
   skin: dark
   social_links:
     - { platform: github, user_url: "https://github.com/nighthawkcoders"}
     - { platform: x, user_url: "https://x.com/NighthawkCoding/" }
-    - { platform: youtube, user_url: "https://www.youtube.com/@nighthawkcodingsociety2868" } 
+    - { platform: youtube, user_url: "https://www.youtube.com/@nighthawkcodingsociety2868" }
+# Uncomment the theme you want to use
 # remote_theme: pages-themes/midnight@v0.2.0
- remote_theme: pages-themes/cayman@v0.2.0
+remote_theme: pages-themes/cayman@v0.2.0
 # remote_theme: pages-themes/dinky@v0.2.0
 # remote_theme: pages-themes/minimal@v0.2.0
 # remote_theme: pages-themes/time-machine@v0.2.0
@@ -30,3 +31,4 @@ header_pages:
   - navigation/search.md
   - navigation/GamePlan.md
   - navigation/adventureGame.md
+

@@ -1,58 +1,46 @@
-import { javaURI, fetchOptions } from "../api/config.js";
+const strengthElement = document.getElementById("strength");
 
 /**
- * Fetches and updates the game stats UI (Balance, Chat Score, Questions Answered).
+ * Manages player's stats.
  */
-export function getStats() {
-    const personId = 1;
-    const endpoints = {
-        balance: `${javaURI}/rpg_answer/getBalance/${personId}`,
-        chatScore: `${javaURI}/rpg_answer/getChatScore/${personId}`,
-        questionsAnswered: `${javaURI}/rpg_answer/getQuestionsAnswered/${personId}`
-    };
+class StatsManager {
+    static stats = { strength: 10, intelligence: 5 };
 
-    for (let [key, url] of Object.entries(endpoints)) {
-        fetch(url, fetchOptions)
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById(key).innerText = data ?? 0;
-            })
-            .catch(err => console.error(`Error fetching ${key}:`, err));
+    /**
+     * Retrieves a stat value.
+     * @param {string} statName - The name of the stat.
+     * @returns {number} - The value of the stat.
+     */
+    static getStat(statName) {
+        return this.stats[statName] ?? 0; // Nullish coalescing to prevent errors
+    }
+
+    /**
+     * Sets a stat value.
+     * @param {string} statName - The name of the stat.
+     * @param {number} value - The new value.
+     */
+    static setStat(statName, value) {
+        this.stats[statName] = value;
+    }
+
+    /**
+     * Returns the player's current stats.
+     */
+    static getStats() {
+        return { ...this.stats };
+    }
+
+    /**
+     * Updates the UI with the current strength.
+     */
+    static updateUI() {
+        if (strengthElement) {
+            strengthElement.innerText = `Strength: ${this.getStat("strength")} lb`;
+        }
     }
 }
 
-/**
- * Fetches the player's current balance.
- */
-export function getBalance() {
-    fetch(`${javaURI}/rpg_answer/getBalance/1`, fetchOptions)
-        .then(response => response.json())
-        .then(data => {
-            document.getElementById("balance").innerText = data ?? 0;
-        })
-        .catch(err => console.error("Error fetching balance:", err));
-}
-
-/**
- * Fetches the player's current chat score.
- */
-export function getChatScore() {
-    fetch(`${javaURI}/rpg_answer/getChatScore/1`, fetchOptions)
-        .then(response => response.json())
-        .then(data => {
-            document.getElementById("chatScore").innerText = data ?? 0;
-        })
-        .catch(err => console.error("Error fetching chat score:", err));
-}
-
-/**
- * Fetches the number of questions answered by the player.
- */
-export function getQuestionsAnswered() {
-    fetch(`${javaURI}/rpg_answer/getQuestionsAnswered/1`, fetchOptions)
-        .then(response => response.json())
-        .then(data => {
-            document.getElementById("questionsAnswered").innerText = data ?? 0;
-        })
-        .catch(err => console.error("Error fetching questions answered:", err));
-}
+// ✅ Properly export both default and named functions
+export default StatsManager;
+export { StatsManager, StatsManager as getStats };
