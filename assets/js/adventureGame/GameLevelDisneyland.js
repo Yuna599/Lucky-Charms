@@ -1,39 +1,27 @@
+<<<<<<< HEAD
 import Player from "./player.js"; 
 import NPC from "./NPC.js";
 import Prompt from "./Prompt.js";
+=======
+import Background from './Background.js';
+import Character from './Character.js';
+>>>>>>> ea2d28e (asdfj)
 
-class GameLevelDisneyland {
+class DisneylandLevel {
     constructor(gameControl) {
         this.gameControl = gameControl;
-        this.player = new Player();
-        this.npc = new NPC("Wizard", "Answer correctly to prove your wisdom!");
-
-        this.quiz = {
-            title: "Test Your Knowledge!",
-            questions: [
-                "What is the capital of France?",
-                "Who wrote 'Hamlet'?",
-                "What is 5 + 5?"
-            ]
-        };
+        this.background = new Background({ src: 'http://127.0.0.1:4100/Lucky-Charms/navigation/images/gamify/IMG_7640.png' }, gameControl);
+        this.character = new Character();
     }
 
     loadLevel() {
-        console.log("Disneyland Level Loaded");
-
-        // Set the background to Disneyland
-        document.body.style.backgroundImage = "url('http://127.0.0.1:4100/Lucky-Charms/navigation/images/gamify/IMG_7640.png')";
-        document.body.style.backgroundSize = "cover";
-
-        // Show NPC and quiz prompt
-        this.npc.displayMessage();
-        this.startQuiz();
+        console.log("Loading Disneyland Level...");
+        // Load the Disneyland level assets and setup
+        this.gameControl.gameEnv.addObject(this.background);
+        this.gameControl.gameEnv.addObject(this.character);
     }
 
-    startQuiz() {
-        console.log("Starting quiz...");
-        Prompt.openPromptPanel(this.quiz);
-    }
+    // Add methods to handle Disneyland level logic
 }
 
-export default GameLevelDisneyland;
+export default DisneylandLevel;

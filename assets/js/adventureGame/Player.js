@@ -1,42 +1,54 @@
-import GameEnv from './GameEnv.js';
-import Character from "./Character.js";
-import { getStats } from "/Lucky-Charms/assets/js/adventureGame/StatsManager.js";
+import GameObject from './GameObject.js';
 
-class Player extends Character {
-    constructor() {
-        super({ id: "aliCharacter", name: "Ali" }); // ✅ Pass correct data
-        this.keypress = { up: 87, left: 65, down: 83, right: 68 };
+class Player extends GameObject {
+    constructor(gameEnv, data) {
+        super(gameEnv);
+        this.image = new Image();
+        this.image.src = data.src;
+        this.x = data.x;
+        this.y = data.y;
+        this.width = data.width;
+        this.height = data.height;
         this.velocity = { x: 0, y: 0 };
-        this.direction = "down";
-        this.bindMovementKeyListeners();
     }
 
-    bindMovementKeyListeners() {
-        addEventListener('keydown', this.handleKeyDown.bind(this));
-        addEventListener('keyup', this.handleKeyUp.bind(this));
+    update() {
+        this.x += this.velocity.x;
+        this.y += this.velocity.y;
+        this.draw();
     }
 
-    handleKeyDown({ keyCode }) {
-        switch (keyCode) {
-            case this.keypress.up: this.velocity.y = -1; break;
-            case this.keypress.left: this.velocity.x = -1; break;
-            case this.keypress.down: this.velocity.y = 1; break;
-            case this.keypress.right: this.velocity.x = 1; break;
+    draw() {
+        const ctx = this.gameEnv.ctx;
+        ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
+    }
+
+    resize() {
+        // Implement resize logic if needed
+    }
+
+    move(direction) {
+        const speed = 5;
+        switch (direction) {
+            case 'up':
+                this.velocity.y = -speed;
+                break;
+            case 'down':
+                this.velocity.y = speed;
+                break;
+            case 'left':
+                this.velocity.x = -speed;
+                break;
+            case 'right':
+                this.velocity.x = speed;
+                break;
         }
     }
 
-    handleKeyUp({ keyCode }) {
-        switch (keyCode) {
-            case this.keypress.up:
-            case this.keypress.down:
-                this.velocity.y = 0;
-                break;
-            case this.keypress.left:
-            case this.keypress.right:
-                this.velocity.x = 0;
-                break;
-        }
+    stop() {
+        this.velocity.x = 0;
+        this.velocity.y = 0;
     }
 }
 
-export default Player; // ✅ Ensure you export only once
+export default Player;

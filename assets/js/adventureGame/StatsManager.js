@@ -1,61 +1,58 @@
-import { javaURI, fetchOptions } from "../api/config.js";
+class StatsManager {
+    constructor() {
+        this.stats = {
+            balance: 0,
+            chatScore: 0,
+            questionsAnswered: 0
+        };
+    }
 
-const personId = 1;
+    updateAllStats() {
+        this.updateStat('balance', '/rpg_answer/getBalance/1');
+        this.updateStat('chatScore', '/rpg_answer/getChatScore/1');
+        this.updateStat('questionsAnswered', '/rpg_answer/getQuestionsAnswered/1');
+    }
 
-const statsEndpoints = {
-    balance: `${javaURI}/rpg_answer/getBalance/${personId}`,
-    chatScore: `${javaURI}/rpg_answer/getChatScore/${personId}`,
-    questionsAnswered: `${javaURI}/rpg_answer/getQuestionsAnswered/${personId}`
-};
+    async updateStat(key, url) {
+        try {
+            const response = await fetch(url);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const data = await response.json();
+            this.stats[key] = data;
+            this.updateStatElement(key, data);
+        } catch (error) {
+            console.error(`Error fetching ${key}:`, error);
+            this.stats[key] = 0; // Default to 0 on failure
+            this.updateStatElement(key, 0);
+        }
+    }
 
-// ✅ Exporting `getStats` only once (No import needed)
-export function getStats() {
+    updateStatElement(key, value) {
+        const element = document.getElementById(key);
+        if (element) {
+            element.innerText = value ?? 0;
+        } else {
+            console.warn(`Element with ID '${key}' not found.`);
+        }
+    }
+
+    getStats() {
+        return this.stats;
+    }
+}
+
+const statsManager = new StatsManager();
+export default statsManager;
+
+function getStats() {
+    // Your implementation here
     return {
-        strength: 10,
-        stamina: 8,
-        intelligence: 7
+        health: 100,
+        mana: 50,
+        experience: 200
     };
 }
 
-
-/**
- * Fetches and updates all game stats in one call (Balance, Chat Score, Questions Answered).
- */
-export function updateAllStats() {
-    Object.entries(statsEndpoints).forEach(([key, url]) => {
-        fetch(url, fetchOptions)
-            .then(response => response.json())
-            .then(data => {
-                const element = document.getElementById(key);
-                if (element) {
-                    element.innerText = data ?? 0;
-                } else {
-                    console.warn(`Element with ID '${key}' not found.`);
-                }
-            })
-            .catch(err => console.error(`Error fetching ${key}:`, err));
-    });
-}
-
-/**
- * Fetches and updates a specific game stat by key.
- * @param {string} key - The key representing the stat (balance, chatScore, questionsAnswered)
- */
-export function updateStat(key) {
-    if (!statsEndpoints[key]) {
-        console.error(`Invalid stat key: ${key}`);
-        return;
-    }
-
-    fetch(statsEndpoints[key], fetchOptions)
-        .then(response => response.json())
-        .then(data => {
-            const element = document.getElementById(key);
-            if (element) {
-                element.innerText = data ?? 0;
-            } else {
-                console.warn(`Element with ID '${key}' not found.`);
-            }
-        })
-        .catch(err => console.error(`Error fetching ${key}:`, err));
-}
+export { getStats };

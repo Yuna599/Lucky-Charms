@@ -1,75 +1,58 @@
-import GameEnv from './GameEnv.js';
 import GameObject from './GameObject.js';
 
-/** Background class for primary background with parallax and smooth transitions */
-export class Background extends GameObject {
-    constructor(data = null) {
-        super();
-        this.image = data?.src ? new Image() : null;
-        this.imageSrc = data?.src || null;
-        this.opacity = 1; // Used for smooth transitions
-        this.scrollOffset = 0; // Parallax effect offset
-        GameEnv.gameObjects.push(this);
-
-        if (this.imageSrc) {
-            this.image.src = this.imageSrc;
-        }
-    }
-
-    /** Smoothly switch to a new background */
-    changeBackground(newSrc) {
-        if (this.imageSrc !== newSrc) {
-            this.imageSrc = newSrc;
-            this.opacity = 0; // Start fade-in effect
+/** Background class for primary background
+ * 
+ */
+class Background extends GameObject {
+    constructor(data = null, gameEnv = null) {
+        super(gameEnv);
+        if (data.src) {
             this.image = new Image();
-            this.image.src = newSrc;
-        }
-    }
-
-    /** Draws the background with parallax effect and smooth transitions */
-    draw() {
-        const ctx = GameEnv.ctx;
-        const width = GameEnv.innerWidth;
-        const height = GameEnv.innerHeight;
-
-        // Apply parallax effect (moves background slightly as player moves)
-        this.scrollOffset -= 0.1; // Adjust this value for stronger/weaker effect
-
-        if (this.image) {
-            ctx.globalAlpha = this.opacity; // Apply fade-in effect
-            ctx.drawImage(this.image, this.scrollOffset, 0, width, height);
-            ctx.globalAlpha = 1; // Reset transparency
+            this.image.src = data.src;
         } else {
-            // Default gradient sky if no image is set
-            const gradient = ctx.createLinearGradient(0, 0, 0, height);
-            gradient.addColorStop(0, '#87CEEB'); // Light blue sky
-            gradient.addColorStop(1, '#1E90FF'); // Deep blue
-
-            ctx.fillStyle = gradient;
-            ctx.fillRect(0, 0, width, height);
-        }
-
-        // Gradually increase opacity for smooth transitions
-        if (this.opacity < 1) {
-            this.opacity += 0.02; // Adjust speed of transition
+            this.image = null;
         }
     }
 
-    /** Updates the background, including parallax scrolling */
+    /** For primary background, update is the same as draw
+     * 
+     */
     update() {
         this.draw();
     }
 
-    /** Resize handler */
+    /** This method draws to GameEnv context, primary background
+     * 
+     */
+    draw() {
+        const ctx = this.gameEnv.ctx;
+        const width = this.gameEnv.innerWidth;
+        const height = this.gameEnv.innerHeight;
+
+        if (this.image) {
+            // Draw the background image scaled to the canvas size
+            ctx.drawImage(this.image, 0, 0, width, height);
+        } else {
+            // Fill the canvas with fillstyle color if no image is provided
+            ctx.fillStyle = '#87CEEB';
+            ctx.fillRect(0, 0, width, height);
+        }
+    }
+
+    /** For primary background, resize is the same as draw
+     *
+     */
     resize() {
         this.draw();
     }
 
-    /** Destroy Game Object: remove from GameEnv */
+    /** Destroy Game Object
+     * remove object from this.gameEnv.gameObjects array
+     */
     destroy() {
-        const index = GameEnv.gameObjects.indexOf(this);
+        const index = this.gameEnv.gameObjects.indexOf(this);
         if (index !== -1) {
-            GameEnv.gameObjects.splice(index, 1);
+            this.gameEnv.gameObjects.splice(index, 1);
         }
     }
 }

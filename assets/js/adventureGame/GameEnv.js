@@ -1,82 +1,82 @@
 /**
- * GameEnv is a static class that manages the game environment.
+ * GameEnv manages the game environment.
  * 
- * This class handles the game canvas, calculates dimensions, and loads the correct background
- * based on the game's current setting (Disneyland or Gym). It ensures that all elements
- * are positioned correctly and maintains a single point of reference for shared resources.
+ * The focus of the file is the canvas management and the calculation of the game area dimensions. 
+ * All calculations are based on the window size, header, and footer.
+ * 
+ * This code uses an instance-based class pattern, which allows each GameLevel to have its own GameEnv.
+ * 
+ * The instance-based class pattern ensures that there can be multiple instances of the game environment,
+ * providing a separate point of reference for each game level. This approach helps maintain
+ * consistency and simplifies the management of shared resources like the canvas and its dimensions.
  * 
  * @class GameEnv
- * @property {Array} gameObjects - An array of game objects for the current level.
  * @property {Object} canvas - The canvas element.
  * @property {Object} ctx - The 2D rendering context of the canvas.
  * @property {number} innerWidth - The inner width of the game area.
  * @property {number} innerHeight - The inner height of the game area.
  * @property {number} top - The top offset of the game area.
  * @property {number} bottom - The bottom offset of the game area.
- * @property {boolean} timerActive - Flag to indicate if the timer is active.
- * @property {number} timerInterval - The interval for the timer.
- * @property {number} time - The current time.
- * @property {string} currentSetting - The current game setting (Disneyland or Gym).
  */
 class GameEnv {
-    static gameObjects = [];
-    static continueLevel = true;
-    static canvas;
-    static ctx;
-    static innerWidth;
-    static innerHeight;
-    static top;
-    static bottom;
-    static timerActive = false;
-    static timerInterval = 10;
-    static time = 0;
-    static currentSetting = 'Disneyland'; // Tracks the current game setting
-    
     constructor() {
-        throw new Error('GameEnv is a static class and cannot be instantiated.');
+        this.canvas = document.getElementById('gameCanvas');
+        this.ctx = this.canvas.getContext('2d');
+        this.innerWidth = this.canvas.width;
+        this.innerHeight = this.canvas.height;
+        this.top = 0;
+        this.bottom = 0;
+        /* Below properties are not part of is-A or has-A relationships,
+        *  they are references for easy accessibility in game objects */
+        this.path = ''; // Reference to the resource path
+        this.gameControl = null; // Reference to the GameControl instance
+        this.gameObjects = []; // Reference list of game objects instances    
     }
 
     /**
-     * Initializes the game environment, sets up the canvas, calculates dimensions, and loads the background.
+     * Create the game environment by setting up the canvas and calculating dimensions.
+     * 
+     * This method sets the canvas element, calculates the top and bottom offsets,
+     * and determines the inner width and height of the game area. It then sizes the canvas
+     * to fit within the calculated dimensions.
      */
-    static create() {
+    create() {
         this.setCanvas();
         this.setTop();
         this.setBottom();
         this.innerWidth = window.innerWidth;
         this.innerHeight = window.innerHeight - this.top - this.bottom;
         this.size();
-        this.loadBackground();
     }
 
     /**
      * Sets the canvas element and its 2D rendering context.
      */
-    static setCanvas() {
+    setCanvas() {
         this.canvas = document.getElementById('gameCanvas');
         this.ctx = this.canvas.getContext('2d');
     }
 
     /**
-     * Determines the top offset based on the height of the header element.
+     * Sets the top offset based on the height of the header element.
      */
-    static setTop() {
+    setTop() {
         const header = document.querySelector('header');
         this.top = header ? header.offsetHeight : 0;
     }
 
     /**
-     * Determines the bottom offset based on the height of the footer element.
+     * Sets the bottom offset based on the height of the footer element.
      */
-    static setBottom() {
+    setBottom() {
         const footer = document.querySelector('footer');
         this.bottom = footer ? footer.offsetHeight : 0;
     }
 
     /**
-     * Adjusts the canvas size to fit the calculated dimensions.
+     * Sizes the canvas to fit within the calculated dimensions.
      */
-    static size() {
+    size() {
         this.canvas.width = this.innerWidth;
         this.canvas.height = this.innerHeight;
         this.canvas.style.width = `${this.innerWidth}px`;
@@ -87,32 +87,48 @@ class GameEnv {
     }
 
     /**
-     * Resizes the game environment when the window size changes.
+     * Resizes the game environment by re-creating it.
      */
-    static resize() {
+    resize() {
         this.create();
     }
 
     /**
-     * Clears the canvas, preparing it for the next frame.
+     * Clears the canvas.
+     * 
+     * This method clears the entire canvas, making it ready for the next frame.
      */
-    static clear() {
+    clear() {
         this.ctx.clearRect(0, 0, this.innerWidth, this.innerHeight);
     }
 
     /**
-     * Loads the appropriate background image based on the current game setting.
+     * Adds a game object to the game environment.
+     * 
+     * @param {Object} gameObject - The game object to add.
      */
-    static loadBackground() {
-        let bgImage = new Image();
-        if (this.currentSetting === 'Disneyland') {
-            bgImage.src = 'http://127.0.0.1:4100/Lucky-Charms/navigation/images/gamify/IMG_7640.png';
-        } else if (this.currentSetting === 'Gym') {
-            bgImage.src = 'http://127.0.0.1:4100/Lucky-Charms/navigation/images/gamify/IMG_7848.png';
+    addObject(gameObject) {
+        this.gameObjects.push(gameObject);
+    }
+
+    /**
+     * Removes a game object from the game environment.
+     * 
+     * @param {Object} gameObject - The game object to remove.
+     */
+    removeObject(gameObject) {
+        const index = this.gameObjects.indexOf(gameObject);
+        if (index !== -1) {
+            this.gameObjects.splice(index, 1);
         }
-        bgImage.onload = () => {
-            this.ctx.drawImage(bgImage, 0, 0, this.innerWidth, this.innerHeight);
-        };
+    }
+
+    /**
+     * Updates the game environment by clearing the canvas and updating all game objects.
+     */
+    update() {
+        this.clear();
+        this.gameObjects.forEach(gameObject => gameObject.update());
     }
 }
 

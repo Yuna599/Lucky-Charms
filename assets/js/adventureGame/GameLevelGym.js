@@ -1,28 +1,21 @@
-import Player from "./player.js"; 
-import NPC from "./NPC.js"; 
+import Background from './Background.js';
+import Character from './Character.js';
 
-class GameLevelGym {
+class GymLevel {
     constructor(gameControl) {
         this.gameControl = gameControl;
-        this.player = new Player();
-        this.npc = new NPC("Trainer", "Keep working out to pull the sword!");
+        this.background = new Background({ src: 'http://127.0.0.1:4100/Lucky-Charms/navigation/images/gamify/IMG_7848.png' }, gameControl);
+        this.character = new Character();
     }
 
     loadLevel() {
-        console.log("Gym Level Loaded");
-
-        // Set the background to Gym
-        document.body.style.backgroundImage = "url('http://127.0.0.1:4100/Lucky-Charms/navigation/images/gamify/IMG_7848.png')";
-        document.body.style.backgroundSize = "cover";
-
-        // Display NPC and messages
-        this.npc.displayMessage();
+        console.log("Loading Gym Level...");
+        // Load the Gym level assets and setup
+        this.gameControl.gameEnv.addObject(this.background);
+        this.gameControl.gameEnv.addObject(this.character);
     }
 
-    startWorkout() {
-        console.log("Ali is working out...");
-        this.player.increaseStrength(5);
-    }
+    // Add methods to handle Gym level logic
 }
 
-export default GameLevelGym;
+export default GymLevel;

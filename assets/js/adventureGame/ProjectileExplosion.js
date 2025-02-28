@@ -1,6 +1,6 @@
 import GameObject from './GameObject.js';
 
-class Npc extends GameObject {
+class ProjectileExplosion extends GameObject {
     constructor(gameEnv, data) {
         super(gameEnv);
         this.image = new Image();
@@ -9,9 +9,16 @@ class Npc extends GameObject {
         this.y = data.y;
         this.width = data.width;
         this.height = data.height;
+        this.startTime = Date.now();
+        this.duration = data.EXPLOSION_SIMULATION.milliseconds;
     }
 
     update() {
+        const elapsedTime = Date.now() - this.startTime;
+        if (elapsedTime >= this.duration) {
+            this.destroy();
+            return;
+        }
         this.draw();
     }
 
@@ -25,4 +32,4 @@ class Npc extends GameObject {
     }
 }
 
-export default Npc;
+export default ProjectileExplosion;

@@ -1,201 +1,271 @@
-import GameEnv from './GameEnv.js';
 import GameObject from './GameObject.js';
 
-const SCALE_FACTOR = 25; 
-const STEP_FACTOR = 100;
-const ANIMATION_RATE = 5;
-const INIT_POSITION = { x: 100, y: 100 }; // Start at a more central position
-const GRAVITY = 0.5; // Gravity effect for jumps
-const JUMP_STRENGTH = -10; // Jumping power
+const SCALE_FACTOR = 25; // 1/nth of the height of the canvas
+const STEP_FACTOR = 100; // 1/nth, or N steps up and across the canvas
+const ANIMATION_RATE = 1; // 1/nth of the frame rate
+const INIT_POSITION = { x: 0, y: 0 };
 
 class Character extends GameObject {
-    constructor(data = null) {
-        super();
+    constructor(data = null, gameEnv = null) {
+        super(gameEnv);
+        this.data = data;
         this.state = {
+            ...this.state,
             animation: 'idle',
             direction: 'right',
-            isJumping: false,
-            isGrounded: true,
             isDying: false,
             isFinishing: false,
-        };
+        }; // Object control data
 
-        this.element = document.getElementById(this.id);
-
-    if (!this.element) {
-        console.error(`Element with ID "${this.id}" not found.`);
-    } else {
-        console.log(`Character initialized with ID: ${this.element.id}`);
-    }
-    class Character {
-        constructor(data) {
-            if (!data || !data.id) {
-                throw new Error("Character data with a valid ID is required");
-            }
-    
-            this.id = data.id;
-            this.name = data.name || "Unnamed";
-            this.sprite = document.getElementById(this.id);
-    
-            if (!this.sprite) {
-                console.error(`Element with ID '${this.id}' not found.`);
-            }
-        }
-    }
-    
-        // Create canvas element for the character
+        // Create canvas element
         this.canvas = document.createElement("canvas");
         this.canvas.id = data.id || "default";
         this.canvas.width = data.pixels?.width || 0;
         this.canvas.height = data.pixels?.height || 0;
+        this.hitbox = data?.hitbox || {};
         this.ctx = this.canvas.getContext('2d');
         document.getElementById("gameContainer").appendChild(this.canvas);
 
+        // Set initial object properties 
+        this.x = 0;
+        this.y = 0;
+        this.frame = 0;
+        
+        // Initialize the object's scale based on the game environment
+        this.scale = { width: this.gameEnv.innerWidth, height: this.gameEnv.innerHeight };
+        
+        // Check if sprite data is provided
+        if (data && data.src) {
+            this.scaleFactor = data.SCALE_FACTOR || SCALE_FACTOR;
+            this.stepFactor = data.STEP_FACTOR || STEP_FACTOR;
+            this.animationRate = data.ANIMATION_RATE || ANIMATION_RATE;
+            this.position = data.INIT_POSITION || INIT_POSITION;
     
-        this.scaleFactor = data?.SCALE_FACTOR || SCALE_FACTOR;
-        this.stepFactor = data?.STEP_FACTOR || STEP_FACTOR;
-        this.animationRate = data?.ANIMATION_RATE || ANIMATION_RATE;
-        this.position = { ...INIT_POSITION };
-
-        // Load the sprite
-        if (data?.src) {
+            // Load the sprite sheet
             this.spriteSheet = new Image();
             this.spriteSheet.src = data.src;
+
+            // Initialize animation properties
+            this.frameIndex = 0; // index reference to current frame
+            this.frameCounter = 0; // count each frame rate refresh
+            this.direction = 'down'; // Initial direction
+            this.spriteData = data;
         } else {
             throw new Error('Sprite data is required');
         }
 
-        // Physics & Movement
+        // Initialize the object's position and velocity
         this.velocity = { x: 0, y: 0 };
-        this.momentum = 0.9; // Helps slow down movement naturally
-        this.gravity = GRAVITY;
 
-        // Animation
-        this.frameIndex = 0;
-        this.frameCounter = 0;
-        this.direction = 'right';
-        this.spriteData = data;
-
-        GameEnv.gameObjects.push(this);
+        // Set the initial size and velocity of the object
         this.resize();
+
+        // Initialize strength and buff state
+        this.strength = 0;
+        this.isBuffed = false;
+        this.imageBeforeBuffed = new Image();
+        this.imageBeforeBuffed.src = 'http://127.0.0.1:4100/Lucky-Charms/navigation/images/gamify/pixil-frame-0__2_-removebg-preview.png';
+        this.imageBuffed = new Image();
+        this.imageBuffed.src = 'http://127.0.0.1:4100/Lucky-Charms/navigation/images/gamify/pixil-frame-0%20(3).png';
     }
 
-    /** Handles movement with momentum */
-    move(direction) {
-        if (direction === 'left') {
-            this.velocity.x = -this.xVelocity;
-            this.direction = 'left';
-        } else if (direction === 'right') {
-            this.velocity.x = this.xVelocity;
-            this.direction = 'right';
-        } else if (direction === 'jump' && this.state.isGrounded) {
-            this.velocity.y = JUMP_STRENGTH;
-            this.state.isGrounded = false;
-            this.state.isJumping = true;
-        }
-    }
-
-    /** Draws the character with animation, shadow, and smooth movement */
-    draw() {
-        if (!this.spriteSheet) return;
-
-        const ctx = this.ctx;
-        const frameWidth = this.spriteData.pixels.width / this.spriteData.orientation.columns;
-        const frameHeight = this.spriteData.pixels.height / this.spriteData.orientation.rows;
-        const directionData = this.spriteData[this.direction];
-
-        const frameX = (directionData.start + this.frameIndex) * frameWidth;
-        const frameY = directionData.row * frameHeight;
-
-        this.canvas.width = frameWidth;
-        this.canvas.height = frameHeight;
-        this.canvas.style.width = `${this.width}px`;
-        this.canvas.style.height = `${this.height}px`;
-        this.canvas.style.position = 'absolute';
-        this.canvas.style.left = `${this.position.x}px`;
-        this.canvas.style.top = `${GameEnv.top + this.position.y}px`;
-
-        // Clear and draw shadow
-        ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        ctx.shadowColor = "rgba(0, 0, 0, 0.3)";
-        ctx.shadowBlur = 10;
-        ctx.shadowOffsetY = 5;
-
-        // Draw sprite
-        ctx.drawImage(
-            this.spriteSheet,
-            frameX, frameY, frameWidth, frameHeight,
-            0, 0, this.canvas.width, this.canvas.height
-        );
-
-        // Animate frame update
-        this.frameCounter++;
-        if (this.frameCounter % this.animationRate === 0) {
-            this.frameIndex = (this.frameIndex + 1) % directionData.columns;
-        }
-    }
-
-    /** Updates character movement and applies physics */
+    /**
+     * Manages the object's look, state, and movement. 
+     * 
+     */
     update() {
         this.draw();
         this.collisionChecks();
+        this.move();
+    }
 
-        // Apply movement with momentum
-        this.velocity.x *= this.momentum;
+    /**
+     * Draws the object on the canvas.
+     * 
+     * This method renders the object using the sprite sheet if provided, otherwise a red square.
+     */
+    draw() {
+        if (this.spriteSheet) {
+            // Sprite Sheet frame size: pixels = total pixels / total frames
+            const frameWidth = this.spriteData.pixels.width / this.spriteData.orientation.columns;
+            const frameHeight = this.spriteData.pixels.height / this.spriteData.orientation.rows;
+    
+            // Sprite Sheet direction data source (e.g., front, left, right, back)
+            const directionData = this.spriteData[this.direction];
+    
+            // Sprite Sheet x and y declarations to store coordinates of current frame
+            let frameX, frameY;
+            // Sprite Sheet x and y current frame: coordinate = (index) * (pixels)
+            frameX = (directionData.start + this.frameIndex) * frameWidth;
+            frameY = directionData.row * frameHeight;
+    
+            // Set up the canvas dimensions and styles
+            this.canvas.width = frameWidth;
+            this.canvas.height = frameHeight;
+            this.canvas.style.width = `${this.width}px`;
+            this.canvas.style.height = `${this.height}px`;
+            this.canvas.style.position = 'absolute';
+            this.canvas.style.left = `${this.position.x}px`;
+            this.canvas.style.top = `${this.gameEnv.top+this.position.y}px`;
+    
+            // Clear the canvas before drawing
+            this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+   
+            // Apply transformations for rotation and mirroring
+            if (directionData.rotate || directionData.mirror || directionData.spin) {
+                // Translate to the context to the center of the sprite
+                this.ctx.translate(this.canvas.width / 2, this.canvas.height / 2);
+                // Apply rotation transformation
+                if (directionData.rotate) {
+                    this.ctx.rotate(directionData.rotate);
+                }
+                // Apply mirror transformation
+                if (directionData.mirror) {
+                    this.ctx.scale(-1, 1); // Flip horizontally
+                }
+                if (directionData.spin) {
+                    this.ctx.rotate(Math.PI / Math.floor(Math.random() * directionData.spin + 1));
+                }
+                // Translate the context back to the upper left corner
+                this.ctx.translate(-this.canvas.width / 2, -this.canvas.height / 2);
+            }
+
+            if (directionData.explode) {
+                this.ctx.filter = 'grayscale(50%) blur(5px)';
+            }   
+
+            // Draw the current frame of the sprite sheet
+            this.ctx.drawImage(
+                this.spriteSheet,
+                frameX, frameY, frameWidth, frameHeight, // Source rectangle
+                0, 0, this.canvas.width, this.canvas.height // Destination rectangle
+            );
+            
+    
+            // Update the frame index for animation at a slower rate
+            this.frameCounter++;
+            if (this.frameCounter % this.animationRate === 0) {
+                this.frameIndex = (this.frameIndex + 1) % directionData.columns;
+            }
+        } else {
+            // Draw default red square
+            this.ctx.fillStyle = 'red';
+            this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        }
+    }
+
+    /**
+     * Move the object and ensures it stays within the canvas boundaries.
+     * 
+     * This method changes the object's position based on its velocity and ensures that the object
+     * stays within the boundaries of the canvas.
+     */
+    move() {
+        // Update or change position according to velocity events
         this.position.x += this.velocity.x;
         this.position.y += this.velocity.y;
 
-        // Apply gravity
-        if (!this.state.isGrounded) {
-            this.velocity.y += this.gravity;
-        }
-
-        // Keep character within game boundaries
-        if (this.position.y + this.height > GameEnv.innerHeight) {
-            this.position.y = GameEnv.innerHeight - this.height;
+        // Ensure the object stays within the canvas boundaries
+        // Bottom of the canvas
+        if (this.position.y + this.height > this.gameEnv.innerHeight) {
+            this.position.y = this.gameEnv.innerHeight - this.height;
             this.velocity.y = 0;
-            this.state.isGrounded = true;
         }
+        // Top of the canvas
+        if (this.position.y < 0) {
+            this.position.y = 0;
+            this.velocity.y = 0;
+        }
+        // Right of the canvas
+        if (this.position.x + this.width > this.gameEnv.innerWidth) {
+            this.position.x = this.gameEnv.innerWidth - this.width;
+            this.velocity.x = 0;
+        }
+        // Left of the canvas
         if (this.position.x < 0) {
             this.position.x = 0;
-        }
-        if (this.position.x + this.width > GameEnv.innerWidth) {
-            this.position.x = GameEnv.innerWidth - this.width;
+            this.velocity.x = 0;
         }
     }
+    
 
-    /** Character grows as they level up */
-    levelUp() {
-        this.width *= 1.1; // Increase size
-        this.height *= 1.1;
-        this.xVelocity *= 1.05; // Move slightly faster
-        this.yVelocity *= 1.05;
-    }
-
-    /** Resizes the character based on game environment */
+    /**
+     * Resizes the object based on the game environment.
+     * 
+     * This method adjusts the object's size and velocity based on the scale of the game environment.
+     * It also adjusts the object's position proportionally based on the previous and current scale.
+     */
     resize() {
-        const newScale = { width: GameEnv.innerWidth, height: GameEnv.innerHeight };
+        // Calculate the new scale resulting from the window resize
+        const newScale = { width: this.gameEnv.innerWidth, height: this.gameEnv.innerHeight };
 
+        // Adjust the object's position proportionally
         this.position.x = (this.position.x / this.scale.width) * newScale.width;
         this.position.y = (this.position.y / this.scale.height) * newScale.height;
 
+        // Update the object's scale to the new scale
         this.scale = newScale;
-        this.size = this.scale.height / this.scaleFactor;
+
+        // Recalculate the object's size based on the new scale
+        this.size = this.scale.height / this.scaleFactor; 
+
+        // Recalculate the object's velocity steps based on the new scale
         this.xVelocity = this.scale.width / this.stepFactor;
         this.yVelocity = this.scale.height / this.stepFactor;
 
+        // Set the object's width and height to the new size (object is a square)
         this.width = this.size;
         this.height = this.size;
     }
+    
 
-    /** Destroy the character */
+    /* Destroy Game Object
+     * remove canvas element of object
+     * remove object from this.gameEnv.gameObjects array
+     */
     destroy() {
-        const index = GameEnv.gameObjects.indexOf(this);
+        const index = this.gameEnv.gameObjects.indexOf(this);
         if (index !== -1) {
+            // Remove the canvas from the DOM
             this.canvas.parentNode.removeChild(this.canvas);
-            GameEnv.gameObjects.splice(index, 1);
+            this.gameEnv.gameObjects.splice(index, 1);
         }
     }
+
+    /**
+     * Increases the object's strength by a specified amount.
+     * 
+     * @param {number} amount - The amount to increase the strength by.
+     */
+    increaseStrength(amount) {
+        this.strength += amount;
+        if (this.strength >= 800) {
+            this.isBuffed = true;
+            console.log("Ali is now buffed!");
+        }
+    }
+
+    /**
+     * Decreases the object's strength by a specified amount.
+     * 
+     * @param {number} amount - The amount to decrease the strength by.
+     */
+    decreaseStrength(amount) {
+        this.strength -= amount;
+        if (this.strength < 800) {
+            this.isBuffed = false;
+        }
+    }
+
+    /**
+     * Returns the current image based on the buffed state.
+     * 
+     * @returns {Image} - The current image.
+     */
+    getCurrentImage() {
+        return this.isBuffed ? this.imageBuffed : this.imageBeforeBuffed;
+    }
+    
 }
 
 export default Character;
