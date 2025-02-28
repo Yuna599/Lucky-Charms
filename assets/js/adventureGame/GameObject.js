@@ -33,6 +33,7 @@ class GameObject {
             collisionEvents: [],
             movement: { up: true, down: true, left: true, right: true },
         };
+        console.log('GameObject initialized with gameEnv:', gameEnv);
     }
 
     /**
@@ -41,7 +42,7 @@ class GameObject {
      * @abstract
      */
     update() {
-        // Override this method in subclasses
+        throw new Error("Method 'update()' must be implemented.");
     }
 
     /**
@@ -50,7 +51,7 @@ class GameObject {
      * @abstract
      */
     draw() {
-        // Override this method in subclasses
+        throw new Error("Method 'draw()' must be implemented.");
     }
 
     /**
@@ -68,7 +69,7 @@ class GameObject {
      * @abstract
      */
     destroy() {
-        this.gameEnv.removeObject(this);
+        throw new Error("Method 'destroy()' must be implemented.");
     }
 
     /** Collision checks
@@ -149,6 +150,7 @@ class GameObject {
         };
 
         this.collisionData = { hit, touchPoints };
+        console.log('Collision data:', this.collisionData);
     }
 
     /**

@@ -20,17 +20,17 @@
  */
 class GameEnv {
     constructor() {
-        this.canvas = document.getElementById('gameCanvas');
-        this.ctx = this.canvas.getContext('2d');
-        this.innerWidth = this.canvas.width;
-        this.innerHeight = this.canvas.height;
+        this.canvas = null;
+        this.ctx = null;
+        this.innerWidth = 0;
+        this.innerHeight = 0;
         this.top = 0;
         this.bottom = 0;
         /* Below properties are not part of is-A or has-A relationships,
         *  they are references for easy accessibility in game objects */
         this.path = ''; // Reference to the resource path
         this.gameControl = null; // Reference to the GameControl instance
-        this.gameObjects = []; // Reference list of game objects instances    
+        this.gameObjects = []; // Reference list of game objects instancces    
     }
 
     /**
@@ -100,35 +100,6 @@ class GameEnv {
      */
     clear() {
         this.ctx.clearRect(0, 0, this.innerWidth, this.innerHeight);
-    }
-
-    /**
-     * Adds a game object to the game environment.
-     * 
-     * @param {Object} gameObject - The game object to add.
-     */
-    addObject(gameObject) {
-        this.gameObjects.push(gameObject);
-    }
-
-    /**
-     * Removes a game object from the game environment.
-     * 
-     * @param {Object} gameObject - The game object to remove.
-     */
-    removeObject(gameObject) {
-        const index = this.gameObjects.indexOf(gameObject);
-        if (index !== -1) {
-            this.gameObjects.splice(index, 1);
-        }
-    }
-
-    /**
-     * Updates the game environment by clearing the canvas and updating all game objects.
-     */
-    update() {
-        this.clear();
-        this.gameObjects.forEach(gameObject => gameObject.update());
     }
 }
 

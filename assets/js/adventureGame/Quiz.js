@@ -1,101 +1,12 @@
 import gameControlInstance from "./GameControl.js";
+
 class Quiz {
     constructor() {
         this.isOpen = false;
         this.dim = false;
         this.currentNpc = null;
         this.currentPage = 0;
-        this.questions = this.generateQuestions();
-    }
-
-    generateQuestions() {
-        return [
-            {
-                question: "What is an array?",
-                choices: [
-                    "A data structure that can hold more than one value at a time.",
-                    "A single value.",
-                    "A function.",
-                    "A boolean."
-                ],
-                answer: "A data structure that can hold more than one value at a time."
-            },
-            {
-                question: "What is a boolean?",
-                choices: [
-                    "A data type that can hold one of two values: true or false.",
-                    "A number.",
-                    "A string.",
-                    "An array."
-                ],
-                answer: "A data type that can hold one of two values: true or false."
-            },
-            {
-                question: "What is a class?",
-                choices: [
-                    "A blueprint for creating objects with specific properties and methods.",
-                    "A function.",
-                    "A variable.",
-                    "A loop."
-                ],
-                answer: "A blueprint for creating objects with specific properties and methods."
-            },
-            {
-                question: "What is a method?",
-                choices: [
-                    "A function that is defined inside a class and can be called on objects created from that class.",
-                    "A variable.",
-                    "A loop.",
-                    "A condition."
-                ],
-                answer: "A function that is defined inside a class and can be called on objects created from that class."
-            },
-            {
-                question: "What is a condition?",
-                choices: [
-                    "An expression that evaluates to true or false and is used to control the flow of a program.",
-                    "A loop.",
-                    "A variable.",
-                    "A function."
-                ],
-                answer: "An expression that evaluates to true or false and is used to control the flow of a program."
-            },
-            {
-                question: "What is an iteration?",
-                choices: [
-                    "The repetition of a block of code, usually controlled by a loop.",
-                    "A condition.",
-                    "A variable.",
-                    "A function."
-                ],
-                answer: "The repetition of a block of code, usually controlled by a loop."
-            },
-            {
-                question: "What is a nested conditional?",
-                choices: [
-                    "A conditional statement inside another conditional statement.",
-                    "A loop inside another loop.",
-                    "A function inside another function.",
-                    "A variable inside another variable."
-                ],
-                answer: "A conditional statement inside another conditional statement."
-            },
-            {
-                question: "What is a variable?",
-                choices: [
-                    "A named storage location in memory that can hold a value.",
-                    "A function.",
-                    "A loop.",
-                    "A condition."
-                ],
-                answer: "A named storage location in memory that can hold a value."
-            }
-        ];
-    }
-
-    getRandomQuestion() {
-        const randomIndex = Math.floor(Math.random() * this.questions.length);
-        return this.questions[randomIndex];
+        console.log('Quiz initialized');
     }
 
     backgroundDim = {
@@ -129,7 +40,6 @@ class Quiz {
             promptDropDown.style.left = "-100%"; 
             promptDropDown.style.transition = "all 0.3s ease-in-out";
         },
-        
     };
 
     createDisplayTable() {
@@ -217,7 +127,6 @@ class Quiz {
         this.isOpen = false;
         this.backgroundDim.remove();
     }
-    
 
     updateDisplay() {
         const table = document.getElementsByClassName("table scores")[0];
@@ -298,10 +207,6 @@ class Quiz {
         promptTitle.id = "promptTitle";
         document.getElementById("promptDropDown").appendChild(promptTitle);
     }
-
-}
-export function submitAnswer() {
-    console.log("Answer submitted!");
 }
 
 export default Quiz;

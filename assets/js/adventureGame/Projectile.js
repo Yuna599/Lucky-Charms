@@ -1,29 +1,29 @@
-import GameObject from './GameObject.js';
+import Character from './Character.js';
 import ProjectileExplosion from './ProjectileExplosion.js';
 
 function newProjectileExplosion(data, gameEnv) {
     return new ProjectileExplosion(data, gameEnv);
 }
 
-class Projectile extends GameObject {
-    constructor(gameEnv, data) {
-        super(gameEnv);
-        this.image = new Image();
-        this.image.src = data.src;
-        this.x = data.x;
-        this.y = data.y;
-        this.width = data.width;
-        this.height = data.height;
-        this.velocity = data.velocity;
+class Projectile extends Character {
+    constructor(data, gameEnv) {
+        super(data, gameEnv);
         this.startTime = Date.now();
-        this.duration = data.TRANSLATE_SIMULATION.milliseconds;
+        this.duration = data.TRANSLATE_SIMULATION.miliseconds;
         this.calculateTranslatePositions();
         this.startScaleFactor = data.SCALE_FACTOR;
         this.endScaleFactor = data.TRANSLATE_SCALE_FACTOR;
         this.randomDelay = 0;
         this.delayStartTime = null;
+        console.log('Projectile initialized with data:', data);
     }
 
+    /**
+     * Calculate the start and end positions for the projectile's translation
+     * 1. The start position is the initial position of the projectile
+     * 2. The end position is the position the projectile will translate towards
+     * By placing this into a method, restart and resize will reset or update the positions for the projectile
+     */
     calculateTranslatePositions() {
         this.startPosition = {
             x: this.gameEnv.innerWidth * this.data.INIT_POSITION_RATIO.x,
@@ -33,26 +33,94 @@ class Projectile extends GameObject {
             x: this.gameEnv.innerWidth * this.data.TRANSLATE_POSITION_RATIO.x,
             y: this.gameEnv.innerHeight * this.data.TRANSLATE_POSITION_RATIO.y
         };
+        console.log('Calculated translate positions:', this.startPosition, this.endPosition);
     }
 
+    /**
+     * Update the projectile's position, size, and scale factor based on the translation animation
+     * 1. Calculate the progress of the animation
+     * 2. Calculate the intermediate position of the projectile
+     * 3. Calculate the new scale factor as the projectile gets larger as it travels
+     * Restart the projectile if the animation reaches the end
+     */
     update() {
+        // Calculate the progress of the animation
         const elapsedTime = Date.now() - this.startTime;
-        if (elapsedTime >= this.duration) {
-            this.destroy();
-            return;
+        const progress = Math.min(elapsedTime / this.duration, 1);
+
+        // If the animation reaches the end, trigger explosion and set delay
+        if (progress >= 1) {
+            if (this.delayStartTime === null) {
+                this.triggerExplosion();
+                this.randomDelay = Math.random() * this.data.TRANSLATE_SIMULATION.miliseconds * 5;
+                this.delayStartTime = Date.now();
+                console.log('Explosion triggered, random delay:', this.randomDelay);
+            } else if (Date.now() - this.delayStartTime >= this.randomDelay) {
+                this.restart();
+                console.log('Projectile restarted');
+            }
+            return; // Exit the update method to prevent further updates until restart
         }
-        this.x += this.velocity.x;
-        this.y += this.velocity.y;
-        this.draw();
+
+        // Calculate the intermediate position of the projectile
+        this.position.x = this.startPosition.x + (this.endPosition.x - this.startPosition.x) * progress;
+        this.position.y = this.startPosition.y + (this.endPosition.y - this.startPosition.y) * progress;
+
+        // Calculate the new scale factor as the projectile gets larger as it travels
+        this.scaleFactor = this.startScaleFactor + (this.endScaleFactor - this.startScaleFactor) * progress;
+
+        // Update the size of the projectile based on the scale factor 
+        this.size = this.gameEnv.innerHeight / this.scaleFactor;
+        this.width = this.size;
+        this.height = this.size;
+
+        console.log('Updated projectile position:', this.position, 'Scale factor:', this.scaleFactor);
+
+        // Call the parent update method to handle other updates
+        super.update();
     }
 
-    draw() {
-        const ctx = this.gameEnv.ctx;
-        ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
+    /**
+     * Trigger an explosion simulation when the projectile reaches the end
+     */
+    triggerExplosion() {
+        const explosionData = {
+            ...this.data,
+            id: "Explosion-" + this.data.id,
+            down: {row: 0, start: 0, columns: 1, explode: true},
+            SCALE_FACTOR: this.endScaleFactor,
+            EXPLOSION_SCALE_FACTOR: this.endScaleFactor * 5, // Adjust as needed
+            EXPLOSION_SIMULATION: { miliseconds: 1000 } // Adjust as needed
+        };
+        const explosion = newProjectileExplosion(explosionData, this.gameEnv);
+        this.canvas.style.display = "none";
+        this.gameEnv.gameObjects.push(explosion); 
+        console.log('Explosion created:', explosionData);
     }
 
+    /**
+     * Restart simulates a new projectile being projected
+     */
+    restart() {
+        this.startTime = Date.now();
+        this.delayStartTime = null;
+        this.calculateTranslatePositions();
+        this.position = { ...this.startPosition };
+        this.scaleFactor = this.startScaleFactor;
+        this.canvas.style.display = "block";
+        console.log('Projectile restarted');
+    }
+
+    /**
+     * Resize updates the positions based on the new dimensions
+     */
     resize() {
-        // Implement resize logic if needed
+        this.calculateTranslatePositions();
+        this.size = this.gameEnv.innerHeight / this.scaleFactor;
+        this.width = this.size;
+        this.height = this.size;
+        super.resize();
+        console.log('Projectile resized');
     }
 }
 

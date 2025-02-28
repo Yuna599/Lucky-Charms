@@ -8,10 +8,8 @@ class Stats {
             chatScore: `${javaURI}/rpg_answer/getChatScore/${this.personId}`,
             questionsAnswered: `${javaURI}/rpg_answer/getQuestionsAnswered/${this.personId}`
         };
-        this.strength = 0;
-        this.intelligence = 0;
-        this.stamina = 0;
         this.initStatsUI();
+        console.log('Stats initialized with personId:', this.personId);
     }
 
     /**
@@ -33,6 +31,7 @@ class Stats {
             <div>Questions Answered: <span id="questionsAnswered">0</span></div>
         `;
         document.body.appendChild(statsContainer);
+        console.log('Stats UI initialized');
     }
 
     /**
@@ -44,25 +43,10 @@ class Stats {
                 .then(response => response.json())
                 .then(data => {
                     document.getElementById(key).innerText = data ?? 0;
+                    console.log(`Fetched ${key}:`, data);
                 })
                 .catch(err => console.error(`Error fetching ${key}:`, err));
         }
-    }
-
-    increaseStat(stat, amount) {
-        if (this[stat] !== undefined) {
-            this[stat] += amount;
-        }
-    }
-
-    decreaseStat(stat, amount) {
-        if (this[stat] !== undefined) {
-            this[stat] -= amount;
-        }
-    }
-
-    getStat(stat) {
-        return this[stat] !== undefined ? this[stat] : null;
     }
 }
 

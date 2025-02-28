@@ -1,13 +1,51 @@
 import GameObject from './GameObject.js';
 
+// Define non-mutable constants as defaults
 const SCALE_FACTOR = 25; // 1/nth of the height of the canvas
 const STEP_FACTOR = 100; // 1/nth, or N steps up and across the canvas
 const ANIMATION_RATE = 1; // 1/nth of the frame rate
 const INIT_POSITION = { x: 0, y: 0 };
 
+/**
+ * Character is a dynamic class that manages the data and events for objects like player and NPCs.
+ * 
+ * The focus of this class is to handle the object's state, rendering, and key events.
+ * 
+ * This class uses a classic Java class pattern which is nice for managing object data and events.
+ * 
+ * The classic Java class pattern provides a structured way to define the properties and methods
+ * associated with the object. This approach helps encapsulate the object's state and behavior,
+ * making the code more modular and easier to maintain. By using this pattern, we can create
+ * multiple instances of the Player class, each with its own state and behavior.
+ * 
+ * @property {Object} position - The current position of the object.
+ * @property {Object} velocity - The current velocity of the object.
+ * @property {Object} scale - The scale of the object based on the game environment.
+ * @property {number} size - The size of the object.
+ * @property {number} width - The width of the object.
+ * @property {number} height - The height of the object.
+ * @property {number} xVelocity - The velocity of the object along the x-axis.
+ * @property {number} yVelocity - The velocity of the object along the y-axis.
+ * @property {Image} spriteSheet - The sprite sheet image for the object.
+ * @property {number} frameIndex - The current frame index for animation.
+ * @property {number} frameCount - The total number of frames for each direction.
+ * @property {Object} spriteData - The data for the sprite sheet.
+ * @property {number} frameCounter - Counter to control the animation rate.
+ * @method draw - Draws the object on the canvas.
+ * @method update - Updates the object's position and ensures it stays within the canvas boundaries.
+ * @method resize - Resizes the object based on the game environment.
+ * @method destroy - Removes the object from the game environment.    
+ */
 class Character extends GameObject {
-    constructor(data = null, gameEnv = null) {
+    /**
+     * The constructor method is called when a new Player object is created.
+     * 
+     * @param {Object|null} data - The sprite data for the object. If null, a default red square is used.
+     */
+    constructor(data, gameEnv) {
         super(gameEnv);
+        console.log('Character initialized with data:', data);
+        console.log('Game environment:', gameEnv);
         this.data = data;
         this.state = {
             ...this.state,
@@ -60,24 +98,32 @@ class Character extends GameObject {
         // Set the initial size and velocity of the object
         this.resize();
 
-        // Initialize strength and buff state
-        this.strength = 0;
-        this.isBuffed = false;
-        this.imageBeforeBuffed = new Image();
-        this.imageBeforeBuffed.src = 'http://127.0.0.1:4100/Lucky-Charms/navigation/images/gamify/pixil-frame-0__2_-removebg-preview.png';
-        this.imageBuffed = new Image();
-        this.imageBuffed.src = 'http://127.0.0.1:4100/Lucky-Charms/navigation/images/gamify/pixil-frame-0%20(3).png';
+        this.spriteData = data;
+        this.image = new Image();
+        this.image.src = data.src;
+        this.image.onload = () => {
+            console.log('Image loaded:', data.src);
+        };
+        this.frameIndex = 0;
+        this.tickCount = 0;
+        this.ticksPerFrame = data.ANIMATION_RATE || 0;
+        this.numberOfFrames = (data.orientation && data.orientation.columns) || 1;
     }
+
 
     /**
      * Manages the object's look, state, and movement. 
      * 
      */
     update() {
+        this.tickCount += 1;
+        if (this.tickCount > this.ticksPerFrame) {
+            this.tickCount = 0;
+            this.frameIndex = (this.frameIndex + 1) % this.numberOfFrames;
+        }
         this.draw();
-        this.collisionChecks();
-        this.move();
     }
+
 
     /**
      * Draws the object on the canvas.
@@ -85,74 +131,32 @@ class Character extends GameObject {
      * This method renders the object using the sprite sheet if provided, otherwise a red square.
      */
     draw() {
-        if (this.spriteSheet) {
-            // Sprite Sheet frame size: pixels = total pixels / total frames
-            const frameWidth = this.spriteData.pixels.width / this.spriteData.orientation.columns;
-            const frameHeight = this.spriteData.pixels.height / this.spriteData.orientation.rows;
-    
-            // Sprite Sheet direction data source (e.g., front, left, right, back)
-            const directionData = this.spriteData[this.direction];
-    
-            // Sprite Sheet x and y declarations to store coordinates of current frame
-            let frameX, frameY;
-            // Sprite Sheet x and y current frame: coordinate = (index) * (pixels)
-            frameX = (directionData.start + this.frameIndex) * frameWidth;
-            frameY = directionData.row * frameHeight;
-    
-            // Set up the canvas dimensions and styles
-            this.canvas.width = frameWidth;
-            this.canvas.height = frameHeight;
-            this.canvas.style.width = `${this.width}px`;
-            this.canvas.style.height = `${this.height}px`;
-            this.canvas.style.position = 'absolute';
-            this.canvas.style.left = `${this.position.x}px`;
-            this.canvas.style.top = `${this.gameEnv.top+this.position.y}px`;
-    
-            // Clear the canvas before drawing
-            this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-   
-            // Apply transformations for rotation and mirroring
-            if (directionData.rotate || directionData.mirror || directionData.spin) {
-                // Translate to the context to the center of the sprite
-                this.ctx.translate(this.canvas.width / 2, this.canvas.height / 2);
-                // Apply rotation transformation
-                if (directionData.rotate) {
-                    this.ctx.rotate(directionData.rotate);
-                }
-                // Apply mirror transformation
-                if (directionData.mirror) {
-                    this.ctx.scale(-1, 1); // Flip horizontally
-                }
-                if (directionData.spin) {
-                    this.ctx.rotate(Math.PI / Math.floor(Math.random() * directionData.spin + 1));
-                }
-                // Translate the context back to the upper left corner
-                this.ctx.translate(-this.canvas.width / 2, -this.canvas.height / 2);
-            }
+        const ctx = this.gameEnv.ctx;
+        const width = (this.spriteData.pixels && this.spriteData.pixels.width) / (this.spriteData.orientation?.columns || 1);
+        const height = (this.spriteData.pixels && this.spriteData.pixels.height) / (this.spriteData.orientation?.rows || 1);
+        const x = this.position.x;
+        const y = this.position.y;
+        const row = this.spriteData[this.direction]?.row || 0;
+        const column = this.frameIndex;
 
-            if (directionData.explode) {
-                this.ctx.filter = 'grayscale(50%) blur(5px)';
-            }   
-
-            // Draw the current frame of the sprite sheet
-            this.ctx.drawImage(
-                this.spriteSheet,
-                frameX, frameY, frameWidth, frameHeight, // Source rectangle
-                0, 0, this.canvas.width, this.canvas.height // Destination rectangle
+        if (this.image) {
+            ctx.drawImage(
+                this.image,
+                column * width,
+                row * height,
+                width,
+                height,
+                x,
+                y,
+                width,
+                height
             );
-            
-    
-            // Update the frame index for animation at a slower rate
-            this.frameCounter++;
-            if (this.frameCounter % this.animationRate === 0) {
-                this.frameIndex = (this.frameIndex + 1) % directionData.columns;
-            }
+            console.log('Drawing character at:', x, y, 'with size:', width, height);
         } else {
-            // Draw default red square
-            this.ctx.fillStyle = 'red';
-            this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+            console.error('Image not loaded for character:', this.spriteData.id);
         }
     }
+
 
     /**
      * Move the object and ensures it stays within the canvas boundaries.
@@ -161,6 +165,7 @@ class Character extends GameObject {
      * stays within the boundaries of the canvas.
      */
     move() {
+        console.log('Moving character with velocity:', this.velocity);
         // Update or change position according to velocity events
         this.position.x += this.velocity.x;
         this.position.y += this.velocity.y;
@@ -196,6 +201,7 @@ class Character extends GameObject {
      * It also adjusts the object's position proportionally based on the previous and current scale.
      */
     resize() {
+        console.log('Resizing character with new scale:', this.scale);
         // Calculate the new scale resulting from the window resize
         const newScale = { width: this.gameEnv.innerWidth, height: this.gameEnv.innerHeight };
 
@@ -224,46 +230,13 @@ class Character extends GameObject {
      * remove object from this.gameEnv.gameObjects array
      */
     destroy() {
+        console.log('Destroying character');
         const index = this.gameEnv.gameObjects.indexOf(this);
         if (index !== -1) {
             // Remove the canvas from the DOM
             this.canvas.parentNode.removeChild(this.canvas);
             this.gameEnv.gameObjects.splice(index, 1);
         }
-    }
-
-    /**
-     * Increases the object's strength by a specified amount.
-     * 
-     * @param {number} amount - The amount to increase the strength by.
-     */
-    increaseStrength(amount) {
-        this.strength += amount;
-        if (this.strength >= 800) {
-            this.isBuffed = true;
-            console.log("Ali is now buffed!");
-        }
-    }
-
-    /**
-     * Decreases the object's strength by a specified amount.
-     * 
-     * @param {number} amount - The amount to decrease the strength by.
-     */
-    decreaseStrength(amount) {
-        this.strength -= amount;
-        if (this.strength < 800) {
-            this.isBuffed = false;
-        }
-    }
-
-    /**
-     * Returns the current image based on the buffed state.
-     * 
-     * @returns {Image} - The current image.
-     */
-    getCurrentImage() {
-        return this.isBuffed ? this.imageBuffed : this.imageBeforeBuffed;
     }
     
 }

@@ -5,7 +5,7 @@ search_exclude: true
 permalink: /gameplan/
 ---
 ### Game Objectives:
-The level starts by Ali going to Disneyland, Finding a small kid pulling out the sword in the stone. Then he trys pulling the sword but it wouldn't move AT ALL. This motivates him to become buffed and come back to pull out the sword. 
+The game starts by Ali going to Disneyland, attempting to pull out the sword but wouldn't move AT ALL. This motivates him to become buffed and come back to pull out the sword. 
 
 The strength that he needs in order to pass the game is 800 lb worth full body pulling strength.
 For Ali to become buffed, he has to answer some questions about the lessons we've learned from the other students in the class. 

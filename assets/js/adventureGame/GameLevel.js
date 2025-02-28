@@ -3,8 +3,9 @@ import GameEnv from "./GameEnv.js";
 
 class GameLevel {
     constructor(gameControl) {
-        this.gameControl = gameControl;
-        this.gameEnv = gameControl.gameEnv;
+        this.gameEnv = new GameEnv();
+        this.gameEnv.path = gameControl.path;
+        this.gameEnv.gameControl = gameControl;
     }
 
     create(GameLevelClass) {
@@ -21,19 +22,19 @@ class GameLevel {
         window.addEventListener('resize', this.resize.bind(this));
     }
 
-    loadLevel() {
-        console.log("Loading Level...");
-        // Load the level assets and setup
-    }
-
     destroy() {
-        this.gameEnv.gameObjects = [];
+        for (let index = this.gameEnv.gameObjects.length - 1; index >= 0; index--) {
+             this.gameEnv.gameObjects[index].destroy();
+        }
         // Remove event listener for window resize
         window.removeEventListener('resize', this.resize.bind(this));
     }
 
     update() {
-        this.gameEnv.update();
+        this.gameEnv.clear();
+        for (let gameObject of this.gameEnv.gameObjects) {
+            gameObject.update();
+        }
     }
 
     resize() {
@@ -42,7 +43,6 @@ class GameLevel {
             gameObject.resize();
         }
     }
-
 }
 
 export default GameLevel;
