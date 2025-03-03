@@ -14,16 +14,12 @@ class Background {
         };
     }
 
-    /** This method draws to GameEnv context, primary background
-     * 
-     */
     draw() {
         const ctx = this.gameEnv.ctx;
         const width = this.gameEnv.canvas.width;
         const height = this.gameEnv.canvas.height;
 
         if (this.image) {
-            // Draw the background image scaled to the canvas size
             ctx.drawImage(this.image, 0, 0, width, height);
             console.log('Drawing background with size:', width, height);
         } else {
@@ -31,9 +27,6 @@ class Background {
         }
     }
 
-    /** For primary background, update is the same as draw
-     * 
-     */
     update() {
         this.draw();
     }

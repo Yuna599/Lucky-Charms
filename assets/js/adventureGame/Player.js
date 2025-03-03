@@ -15,132 +15,95 @@ const INIT_POSITION = { x: 0, y: 0 };
  * @method handleKeyDown - Handles key down events to change the object's velocity.
  * @method handleKeyUp - Handles key up events to stop the object's velocity.
  */
-class Player extends Character {
+class Player {
     /**
      * The constructor method is called when a new Player object is created.
      * 
      * @param {Object|null} data - The sprite data for the object. If null, a default red square is used.
      */
-    constructor(data = null, gameEnv = null) {
-        const aliSpriteData = {
-            id: 'Ali',
-            greeting: "Hi I am Ali, the new main character!",
-            src: `${gameEnv.path}/images/gamify/IMG_7640.png`,
-            SCALE_FACTOR: SCALE_FACTOR,
-            STEP_FACTOR: STEP_FACTOR,
-            ANIMATION_RATE: ANIMATION_RATE,
-            INIT_POSITION: INIT_POSITION,
-            pixels: { height: 384, width: 512 },
-            orientation: { rows: 3, columns: 4 },
-            down: { row: 0, start: 0, columns: 3 },
-            downRight: { row: 1, start: 0, columns: 3, rotate: Math.PI / 16 },
-            downLeft: { row: 2, start: 0, columns: 3, rotate: -Math.PI / 16 },
-            left: { row: 2, start: 0, columns: 3 },
-            right: { row: 1, start: 0, columns: 3 },
-            up: { row: 3, start: 0, columns: 3 },
-            upLeft: { row: 2, start: 0, columns: 3, rotate: Math.PI / 16 },
-            upRight: { row: 1, start: 0, columns: 3, rotate: -Math.PI / 16 },
-            hitbox: { widthPercentage: 0.45, heightPercentage: 0.2 },
-            keypress: { up: 87, left: 65, down: 83, right: 68 } // W, A, S, D
+    constructor(data, gameEnv) {
+        this.gameEnv = gameEnv;
+        this.data = data;
+        this.image = new Image();
+        this.image.src = data.src;
+        this.image.onload = () => {
+            console.log('Player image loaded:', data.src);
         };
-        super(aliSpriteData, gameEnv);
-        this.keypress = aliSpriteData.keypress;
-        this.pressedKeys = {}; // active keys array
-        this.bindMovementKeyListeners();
-        console.log('Player initialized with data:', aliSpriteData);
+        this.image.onerror = () => {
+            console.error('Failed to load player image:', data.src);
+        };
+        this.position = data.INIT_POSITION;
+        this.scaleFactor = data.SCALE_FACTOR;
+        this.stepFactor = data.STEP_FACTOR;
+        this.animationRate = data.ANIMATION_RATE;
+        this.orientation = data.orientation;
+        this.keypress = data.keypress;
+        this.currentFrame = 0;
+        this.currentDirection = 'down';
+        this.hitbox = data.hitbox;
+        this.pixels = data.pixels;
+
+        window.addEventListener('keydown', this.handleKeydown.bind(this));
     }
 
-    /**
-     * Binds key event listeners to handle object movement.
-     * 
-     * This method binds keydown and keyup event listeners to handle object movement.
-     * The .bind(this) method ensures that 'this' refers to the object object.
-     */
-    bindMovementKeyListeners() {
-        addEventListener('keydown', this.handleKeyDown.bind(this));
-        addEventListener('keyup', this.handleKeyUp.bind(this));
-        console.log('Movement key listeners bound');
-    }
-
-    handleKeyDown({ keyCode }) {
-        // capture the pressed key in the active keys array
-        this.pressedKeys[keyCode] = true;
-        // set the velocity and direction based on the newly pressed key
-        this.updateVelocityAndDirection();
-        console.log('Key down:', keyCode, 'Pressed keys:', this.pressedKeys);
-    }
-
-    /**
-     * Handles key up events to stop the player's velocity.
-     * 
-     * This method stops the player's velocity based on the key released.
-     * 
-     * @param {Object} event - The keyup event object.
-     */
-    handleKeyUp({ keyCode }) {
-        // remove the lifted key from the active keys array
-        if (keyCode in this.pressedKeys) {
-            delete this.pressedKeys[keyCode];
+    handleKeydown(event) {
+        switch (event.keyCode) {
+            case this.keypress.up:
+                this.move('up');
+                break;
+            case this.keypress.down:
+                this.move('down');
+                break;
+            case this.keypress.left:
+                this.move('left');
+                break;
+            case this.keypress.right:
+                this.move('right');
+                break;
         }
-        // adjust the velocity and direction based on the remaining keys
-        this.updateVelocityAndDirection();
-        console.log('Key up:', keyCode, 'Pressed keys:', this.pressedKeys);
     }
 
-    /**
-     * Update the player's velocity and direction based on the pressed keys.
-     */
-    updateVelocityAndDirection() {
-        this.velocity.x = 0;
-        this.velocity.y = 0;
-
-        // Multi-key movements (diagonals: upLeft, upRight, downLeft, downRight)
-        if (this.pressedKeys[this.keypress.up] && this.pressedKeys[this.keypress.left]) {
-            this.velocity.y -= this.yVelocity;
-            this.velocity.x -= this.xVelocity;
-            this.direction = 'upLeft';
-        } else if (this.pressedKeys[this.keypress.up] && this.pressedKeys[this.keypress.right]) {
-            this.velocity.y -= this.yVelocity;
-            this.velocity.x += this.xVelocity;
-            this.direction = 'upRight';
-        } else if (this.pressedKeys[this.keypress.down] && this.pressedKeys[this.keypress.left]) {
-            this.velocity.y += this.yVelocity;
-            this.velocity.x -= this.xVelocity;
-            this.direction = 'downLeft';
-        } else if (this.pressedKeys[this.keypress.down] && this.pressedKeys[this.keypress.right]) {
-            this.velocity.y += this.yVelocity;
-            this.velocity.x += this.xVelocity;
-            this.direction = 'downRight';
-        // Single key movements (left, right, up, down) 
-        } else if (this.pressedKeys[this.keypress.up]) {
-            this.velocity.y -= this.yVelocity;
-            this.direction = 'up';
-        } else if (this.pressedKeys[this.keypress.left]) {
-            this.velocity.x -= this.xVelocity;
-            this.direction = 'left';
-        } else if (this.pressedKeys[this.keypress.down]) {
-            this.velocity.y += this.yVelocity;
-            this.direction = 'down';
-        } else if (this.pressedKeys[this.keypress.right]) {
-            this.velocity.x += this.xVelocity;
-            this.direction = 'right';
+    move(direction) {
+        this.currentDirection = direction;
+        switch (direction) {
+            case 'up':
+                this.position.y -= this.stepFactor;
+                break;
+            case 'down':
+                this.position.y += this.stepFactor;
+                break;
+            case 'left':
+                this.position.x -= this.stepFactor;
+                break;
+            case 'right':
+                this.position.x += this.stepFactor;
+                break;
         }
-
-        console.log('Updated velocity:', this.velocity, 'Direction:', this.direction);
     }
 
-    /**
-     * Overrides the reaction to the collision to handle
-     *  - clearing the pressed keys array
-     *  - stopping the player's velocity
-     *  - updating the player's direction   
-     * @param {*} other - The object that the player is colliding with
-     */
-    handleCollisionReaction(other) {    
-        this.pressedKeys = {};
-        this.updateVelocityAndDirection();
-        super.handleCollisionReaction(other);
-        console.log('Collision reaction handled with:', other);
+    draw() {
+        const ctx = this.gameEnv.ctx;
+        const frameWidth = this.pixels.width / this.orientation.columns;
+        const frameHeight = this.pixels.height / this.orientation.rows;
+        const frameX = this.currentFrame * frameWidth;
+        const frameY = this.orientation[this.currentDirection].row * frameHeight;
+
+        if (this.image.complete && this.image.naturalWidth !== 0) {
+            ctx.drawImage(
+                this.image,
+                frameX, frameY, frameWidth, frameHeight,
+                this.position.x, this.position.y,
+                frameWidth / this.scaleFactor, frameHeight / this.scaleFactor
+            );
+
+            this.currentFrame = (this.currentFrame + 1) % this.orientation[this.currentDirection].columns;
+        } else {
+            console.error('Player image is not loaded or is in a broken state:', this.image.src);
+        }
+    }
+
+    update() {
+        this.draw();
     }
 }
 
