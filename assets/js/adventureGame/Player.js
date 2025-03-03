@@ -10,7 +10,7 @@ const INIT_POSITION = { x: 0, y: 0 };
  * Player is a dynamic class that manages the data and events for objects like a player 
  * 
  * This class uses a classic Java class pattern which is nice for managing object data and events.
- * 
+
  * @method bindEventListeners - Binds key event listeners to handle object movement.
  * @method handleKeyDown - Handles key down events to change the object's velocity.
  * @method handleKeyUp - Handles key up events to stop the object's velocity.
@@ -29,6 +29,7 @@ class Player {
         this.image.onload = () => {
             console.log('Player image loaded:', data.src);
         };
+<<<<<<< HEAD
         this.image.onerror = () => {
             console.error('Failed to load player image:', data.src);
         };
@@ -60,6 +61,56 @@ class Player {
             case this.keypress.right:
                 this.move('right');
                 break;
+=======
+        super(aliSpriteData, gameEnv);
+        this.xVelocity = STEP_FACTOR; // Set the horizontal movement speed
+        this.yVelocity = STEP_FACTOR; // Set the vertical movement speed
+
+        this.keypress = aliSpriteData.keypress;
+        this.pressedKeys = {}; // active keys array
+        this.bindMovementKeyListeners();
+        console.log('Player initialized with data:', aliSpriteData);
+    }
+    update() {
+        // Update position based on velocity
+        this.position.x += this.velocity.x;
+        this.position.y += this.velocity.y;
+    
+        this.draw(); // Draw the updated player
+    }
+    
+    /**
+     * Binds key event listeners to handle object movement.
+     * 
+     * This method binds keydown and keyup event listeners to handle object movement.
+     * The .bind(this) method ensures that 'this' refers to the object object.
+     */
+    bindMovementKeyListeners() {
+        addEventListener('keydown', this.handleKeyDown.bind(this));
+        addEventListener('keyup', this.handleKeyUp.bind(this));
+        console.log('Movement key listeners bound');
+    }
+
+    handleKeyDown({ keyCode }) {
+        // capture the pressed key in the active keys array
+        this.pressedKeys[keyCode] = true;
+        // set the velocity and direction based on the newly pressed key
+        this.updateVelocityAndDirection();
+        console.log('Key down:', keyCode, 'Pressed keys:', this.pressedKeys);
+    }
+
+    /**
+     * Handles key up events to stop the player's velocity.
+     * 
+     * This method stops the player's velocity based on the key released.
+     * 
+     * @param {Object} event - The keyup event object.
+     */
+    handleKeyUp({ keyCode }) {
+        // remove the lifted key from the active keys array
+        if (keyCode in this.pressedKeys) {
+            delete this.pressedKeys[keyCode];
+>>>>>>> 5a3bf00 (something)
         }
     }
 
@@ -105,6 +156,20 @@ class Player {
     update() {
         this.draw();
     }
+}
+function gameLoop() {
+    // Clear the canvas before drawing the next frame
+    gameEnv.ctx.clearRect(0, 0, canvas.width, canvas.height); // This clears the canvas
+
+    // Update and draw all game objects (Player, NPCs, etc.)
+    gameObjects.forEach(gameObject => {
+        gameObject.update(); // Make sure to call update() for both the player and NPCs
+    });
+
+    // Redraw the background (if moving)
+    gameEnv.ctx.drawImage(backgroundImage, backgroundX, backgroundY);
+
+    requestAnimationFrame(gameLoop); // Call next frame
 }
 
 export default Player;
