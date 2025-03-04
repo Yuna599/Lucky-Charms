@@ -16,7 +16,7 @@ When Ali reaches exactly 800lb or more, his character changes into buffed Ali.
 #### - Ali (Before Buffed)
 Basic idea of Ali before getting buffed:
 
-![alt text](images/gamify/pixil-frame-0__2_-removebg-preview.png)
+![alt text](images/gamify/Ali_Before_Buffed.png)
 
 #### - Ali (Buffed)
 Basic idea/picure of  buffed Ali, might be developed over time :
@@ -29,12 +29,12 @@ Basic idea/picure of  buffed Ali, might be developed over time :
 #### Gym 
 Gym is for Ali to become buffed by using benchpress, deadlifts and other weights. 
 Ali would get buffed here: 
-![alt text](images/gamify/IMG_7848.png)
+![alt text](images/gamify/gym.png)
 
 #### Disneyland(Sword in the Stone)
 After, there is a button, transporting Rachit to Disneyland to check if he has enough strength, if he doesn't, there would be a sign saying how he needs more strength, and if he has enough strength, it would let him go to the next stage.
 Ali would attempt to pull out the sword here:
-![alt text](images/gamify/IMG_7640.png)
+![alt text](images/gamify/disneyland.png)
 
 ### Game plan (Flowchart)
 ![alt text](images/gamify/IMG_7590.png)
