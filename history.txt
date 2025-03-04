@@ -1,0 +1,18 @@
+
+
+ 1136  make
+ 1137  bundle install
+ 1138  bundle exec jekyll serve
+ 1139  Failed to load resource: the server responded with a status of 404 (Not Found)Understand this errorAI\nadventureGame:1 
+ 1140  git pull
+ 1141  git commit
+ 1142  git pull
+ 1143  git pull
+ 1144  make
+ 1145  /usr/bin/python3 /Users/yunalee/.vscode/extensions/ms-python.python-2025.0.0-darwin-arm64/python_files/printEnvVariablesToFile.py /Users/yunalee/.vscode/extensions/ms-python.python-2025.0.0-darwin-arm64/python_files/deactivate/zsh/envVars.txt
+ 1146  git pull
+ 1147  make
+ 1148  make
+ 1149  bundle exec jekyll serve
+ 1150  bundle exec jekyll serve
+ 1151  history
