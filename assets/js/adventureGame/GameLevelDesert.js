@@ -14,7 +14,7 @@ class GameLevelDesert {
     let path = gameEnv.path;
 
     // Background data
-    const image_src_desert = path + "/images/gamify/desert.png"; // be sure to include the path
+    const image_src_desert = path + "/images/gamify/disneyland.png"; // be sure to include the path
     const image_data_desert = {
         name: 'desert',
         greeting: "Welcome to the desert!  It is hot and dry here, but there are many adventures to be had!",
@@ -24,7 +24,7 @@ class GameLevelDesert {
 
 
     // Player data for Chillguy
-    const sprite_src_chillguy = path + "/images/gamify/chillguy.png"; // be sure to include the path
+    const sprite_src_chillguy = path + "/images/gamify/Ali_Before_Buffed.png"; // be sure to include the path
     const CHILLGUY_SCALE_FACTOR = 5;
     const sprite_data_chillguy = {
         id: 'Chill Guy',
@@ -34,8 +34,9 @@ class GameLevelDesert {
         STEP_FACTOR: 1000,
         ANIMATION_RATE: 50,
         INIT_POSITION: { x: 0, y: height - (height/CHILLGUY_SCALE_FACTOR) }, 
-        pixels: {height: 384, width: 512},
-        orientation: {rows: 3, columns: 4 },
+        pixels: {height: 100, width: 100},
+      // pixels: {height: 384, width: 512},
+        orientation: {rows: 2, columns: 3 },
         down: {row: 0, start: 0, columns: 3 },
         downRight: {row: 1, start: 0, columns: 3, rotate: Math.PI/16 },
         downLeft: {row: 2, start: 0, columns: 3, rotate: -Math.PI/16 },
@@ -52,6 +53,7 @@ class GameLevelDesert {
     // NPC data for Tux 
     const sprite_src_tux = path + "/images/gamify/tux.png"; // be sure to include the path
     const sprite_greet_tux = "Hi I am Tux, the Linux mascot.  I am very happy to spend some linux shell time with you!";
+    
     const sprite_data_tux = {
         id: 'Tux',
         greeting: sprite_greet_tux,
