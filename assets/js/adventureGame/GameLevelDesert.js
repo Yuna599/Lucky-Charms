@@ -15,13 +15,28 @@ class GameLevelDesert {
 
     // Background data
     const image_src_desert = path + "/images/gamify/disneyland.png"; // be sure to include the path
-    const image_data_desert = {
+    const image_src_gym = path + "/images/gamify/gym.png";
+    let image_data_desert = {
         name: 'desert',
         greeting: "Welcome to the desert!  It is hot and dry here, but there are many adventures to be had!",
         src: image_src_desert,
         pixels: {height: 580, width: 1038}
     };
+    const original_image_data_desert = { ...image_data_desert };
 
+    function toggleDesertImage() {
+      if (image_data_desert.src === image_src_desert) {
+          // Switch to the Gym
+          image_data_desert.src = image_src_gym;
+          image_data_desert.name = 'gym';
+          image_data_desert.greeting = "Welcome to the gym! Time to get stronger!";
+      } else {
+        image_data_desert = { ...original_image_data_desert };
+      }
+  
+      updateBackground(image_data_desert.src);
+    }
+    
 
     // Player data for Chillguy
     const sprite_src_chillguy = path + "/images/gamify/Ali_Before_Buffed.png"; // be sure to include the path
@@ -59,7 +74,7 @@ class GameLevelDesert {
         greeting: sprite_greet_tux,
         src: sprite_src_tux,
         SCALE_FACTOR: 8,  // Adjust this based on your scaling needs
-        ANIMATION_RATE: 50,
+        ANIMATION_RATE: 30,
         pixels: {height: 100, width: 100},
         INIT_POSITION: { x: (width / 2), y: (height / 2)},
         orientation: {rows: 2, columns: 3 },
