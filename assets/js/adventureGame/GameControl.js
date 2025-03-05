@@ -31,7 +31,7 @@ class GameControl {
     start() {
         this.addExitKeyListener();
         this.transitionToLevel();
-        alert("Start")
+        alert("Hello, I have just seen a Kid pull that sword out. Then after, I have attempted to pull it out myself. But I'm too weak to pull the sword out of that sword. Can you help me buff up and get stronger enough to pull out that sword? First, talk to Doggie!")
     }
 
     /**
