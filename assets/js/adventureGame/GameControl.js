@@ -31,6 +31,7 @@ class GameControl {
     start() {
         this.addExitKeyListener();
         this.transitionToLevel();
+        alert("Start")
     }
 
     /**
