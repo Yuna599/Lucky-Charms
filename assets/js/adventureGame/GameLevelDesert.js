@@ -6,9 +6,8 @@ import Quiz from './Quiz.js';
 import GameControl from './GameControl.js';
 import GameLevelStarWars from './GameLevelStarWars.js';
 
-<<<<<<< HEAD
-class GameLevelDesert {
-  constructor(gameEnv) {
+class GameLevelDesert {}
+  constructor(gameEnv)  ; {}
     // Values dependent on this.gameEnv.create()
     let width = gameEnv.innerWidth;
     let height = gameEnv.innerHeight;
@@ -38,8 +37,6 @@ class GameLevelDesert {
       updateBackground(image_data_desert.src);
     }
 
-=======
->>>>>>> 80fd0d6 (dd)
     // Player data for Chillguy
     const sprite_src_chillguy = path + "/images/gamify/Ali_A.jpeg"; // be sure to include the path
     const CHILLGUY_SCALE_FACTOR = 5;
@@ -242,10 +239,6 @@ class GameLevelDesert {
       { class: Npc, data: sprite_data_tux },
     ];
     
+{
 
-<<<<<<< HEAD
-}
-=======
-
->>>>>>> 80fd0d6 (dd)
-export default GameLevelDesert
+} export default GameLevelDesert
