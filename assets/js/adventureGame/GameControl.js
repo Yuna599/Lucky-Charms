@@ -23,6 +23,12 @@ class GameControl {
         this.savedCanvasState = []; // Save the current levels game elements 
     }
 
+    start() {
+        this.addExitKeyListener();
+        this.transitionToLevel();
+        this.addBackgroundChangeButton
+        alert("Game start!")
+    }
     /**
      * Starts the game by 
      * 1. Adding an exit key listener
