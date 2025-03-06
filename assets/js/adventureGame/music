@@ -1,0 +1,31 @@
+// Import the Background and GameEnv
+import { Background } from './Background.js';
+import GameEnv from './GameEnv.js';
+
+// Create an audio element for background music
+const audio = new Audio('assets/audio/intro.mp3'); // Path to your MP3 file
+audio.loop = true;  // Loop the music indefinitely
+
+// Ensure audio is loaded and plays on click
+audio.oncanplaythrough = () => {
+    console.log('Audio loaded successfully');
+};
+
+audio.onerror = (error) => {
+    console.log('Audio error:', error);
+};
+
+window.addEventListener('mousedown', () => {
+    audio.play().catch(error => {
+        console.log('Audio playback failed:', error);
+    });
+
+    // Your game environment setup
+    const gameEnv = new GameEnv();
+    const background = new Background({ src: 'assets/images/disneyland.png' }, gameEnv); // Example background image
+
+    // Add the background to your game environment
+    gameEnv.addGameObject(background);
+
+    // Other game setup here
+});
