@@ -16,7 +16,7 @@ When Ali reaches exactly 800lb or more, his character changes into buffed Ali.
 #### - Ali (Before Buffed)
 Basic idea of Ali before getting buffed:
 
-![alt text](images/gamify/Ali_Before_Buffed.png)
+![alt text](images/gamify/Ali_A.jpeg)
 
 #### - Ali (Buffed)
 Basic idea/picure of  buffed Ali, might be developed over time :
