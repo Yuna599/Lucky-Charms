@@ -36,7 +36,6 @@ class GameLevelDesert {
   
       updateBackground(image_data_desert.src);
     }
-    
 
     // Player data for Chillguy
     const sprite_src_chillguy = path + "/images/gamify/Ali_A.jpeg"; // be sure to include the path
@@ -243,5 +242,4 @@ class GameLevelDesert {
   }
 
 }
-
-export default GameLevelDesert;
+export default GameLevelDesert

@@ -15,7 +15,9 @@ audio.onerror = (error) => {
     console.log('Audio error:', error);
 };
 
+// Event listener to play the audio on the first click
 window.addEventListener('mousedown', () => {
+    // Play the audio when the user clicks anywhere on the page
     audio.play().catch(error => {
         console.log('Audio playback failed:', error);
     });

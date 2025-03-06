@@ -31,7 +31,7 @@ Gym is for Ali to become buffed by using benchpress, deadlifts and other weights
 Ali would get buffed here: 
 ![alt text](images/gamify/gym.png)
 
-#### Disneyland(Sword in the Stone)
+#### Disneyland( in the Stone)
 After, there is a button, transporting Rachit to Disneyland to check if he has enough strength, if he doesn't, there would be a sign saying how he needs more strength, and if he has enough strength, it would let him go to the next stage.
 Ali would attempt to pull out the sword here:
 ![alt text](images/gamify/disneyland.png)
