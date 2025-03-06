@@ -99,14 +99,139 @@ class GameLevelDesert {
         reaction: function() {
           alert(sprite_greet_tux);
           audio.play();
-        },
-        interact: function() {
-          let quiz = new Quiz(); // Create a new Quiz instance
-          quiz.initialize();
-          quiz.openPanel(sprite_data_tux.quiz);
-          }
-    
-      };
+        //},
+        // interact: function() {
+         // let quiz = new Quiz(); // Create a new Quiz instance
+         // quiz.initialize();
+         // quiz.openPanel(sprite_data_tux.quiz);
+         startConversation();
+        ;
+        
+        function startConversation() {
+            if (!document.getElementById("dialogContainer")) {
+                createDialogBox();
+            } else {
+                updateDialog("Hello again! Do you still need my help?");
+            }
+        }
+        
+        function createDialogBox() {
+            const dialogContainer = document.createElement("div");
+            dialogContainer.id = "dialogContainer";
+        
+            Object.assign(dialogContainer.style, {
+                position: "absolute",
+                bottom: "20px",
+                left: "50%",
+                transform: "translateX(-50%)",
+                width: "400px",
+                backgroundColor: "white",
+                border: "2px solid black",
+                padding: "10px",
+                borderRadius: "10px",
+                boxShadow: "0px 4px 6px rgba(0,0,0,0.3)",
+                zIndex: "1000",
+                textAlign: "center"
+            });
+        
+            const dialogText = document.createElement("p");
+            dialogText.id = "dialogText";
+            dialogText.innerText = sprite_greet_tux;
+            dialogContainer.appendChild(dialogText);
+        
+            const buttonContainer = document.createElement("div");
+            buttonContainer.id = "buttonContainer";
+            dialogContainer.appendChild(buttonContainer);
+        
+            document.body.appendChild(dialogContainer);
+        
+            updateChoices([
+                { text: "How can I pull it out?", next: "pullSword" },
+                { text: "Who are you?", next: "whoAreYou" }
+            ]);
+        }
+        
+        function updateDialog(newText) {
+            document.getElementById("dialogText").innerText = newText;
+        }
+        
+        function updateChoices(choices) {
+            const buttonContainer = document.getElementById("buttonContainer");
+            buttonContainer.innerHTML = ""; 
+        
+            choices.forEach(choice => {
+                const button = document.createElement("button");
+                button.innerText = choice.text;
+                button.style.margin = "5px";
+                button.style.padding = "10px";
+                button.style.border = "none";
+                button.style.cursor = "pointer";
+                button.style.backgroundColor = "black";
+                button.style.color = "white";
+                button.style.borderRadius = "5px";
+        
+                button.addEventListener("click", () => handleChoice(choice.next));
+                buttonContainer.appendChild(button);
+            });
+        }
+        
+        function handleChoice(next) {
+            if (next === "pullSword") {
+                updateDialog("The sword is stuck! You need strength and courage.");
+                updateChoices([
+                    { text: "Where can I find strength?", next: "findStrength" },
+                    { text: "Where can I find courage?", next: "findCourage" }
+                ]);
+            } else if (next === "whoAreYou") {
+                updateDialog("I am Doggie, the Guardian of the Sword!");
+                updateChoices([
+                    { text: "Can you help me?", next: "pullSword" },
+                    { text: "Why do you guard the sword?", next: "guardSword" }
+                ]);
+            } else if (next === "findStrength") {
+                updateDialog("You can train at the gym to build strength.");
+                updateChoices([
+                    { text: "Take me there!", next: "goToGym" },
+                    { text: "Thanks, Doggie!", next: "end" }
+                ]);
+            } else if (next === "findCourage") {
+                updateDialog("Courage comes from within, and facing your fears.");
+                updateChoices([
+                    { text: "I'm ready to pull the sword!", next: "pullSword" },
+                    { text: "I need more time.", next: "end" }
+                ]);
+            } else if (next === "guardSword") {
+                updateDialog("This sword holds great power. It must be wielded by the worthy.");
+                updateChoices([
+                    { text: "Am I worthy?", next: "pullSword" },
+                    { text: "Who was the last person to try?", next: "lastWarrior" }
+                ]);
+            } else if (next === "lastWarrior") {
+                updateDialog("The last warrior failed. He lacked patience.");
+                updateChoices([
+                    { text: "I won't fail!", next: "pullSword" },
+                    { text: "This is too much pressure!", next: "end" }
+                ]);
+            } else if (next === "goToGym") {
+                updateDialog("Let's go! Follow me!");
+        
+                setTimeout(() => {
+                    toggleDesertImage(); // Instantly change the background to the gym
+                    setTimeout(() => {
+                        document.getElementById("dialogContainer").remove();
+                    }, 1000);
+                }, 1000);
+            } else if (next === "end") {
+                updateDialog("Come back if you need help!");
+                setTimeout(() => {
+                    document.getElementById("dialogContainer").remove();
+                }, 1500);
+                
+            }
+        }
+        }}
+         // }
+         // };
 
     // List of objects defnitions for this level
     this.classes = [
