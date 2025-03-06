@@ -24,22 +24,53 @@ class GameControl {
     }
 
     start() {
-        this.addExitKeyListener();
-        this.transitionToLevel();
-        this.addBackgroundChangeButton
-        alert("Game start!")
+        // Step 1: Create a "Click to Start" button
+        var startButton = document.createElement("button");
+        startButton.innerHTML = "Click to Start"; // Button text
+        startButton.id = "start-button"; // Button ID (optional, for styling or identification)
+        
+        // Optionally, style the button
+        startButton.style.padding = "10px 20px";
+        startButton.style.backgroundColor = "#4CAF50";
+        startButton.style.color = "white";
+        startButton.style.border = "none";
+        startButton.style.cursor = "pointer";
+    
+        // Step 2: Append the button to the page
+        document.body.appendChild(startButton);
+    
+        // Step 3: Add event listener to the button
+        startButton.addEventListener("click", () => {
+            // When the button is clicked, remove it from the page
+            startButton.remove();
+    
+            // Step 4: Call your game functions
+            this.addExitKeyListener();
+            this.transitionToLevel();
+            this.addBackgroundChangeButton();
+    
+            // Step 5: Play the music
+            const audio = new Audio('https://www.youtube.com/watch?v=DNZUKm0ApEM'); // Test with a known URL
+            audio.play().then(() => {
+                console.log("Audio is playing!");
+            }).catch((error) => {
+                console.error("Error playing audio:", error);
+            });
+            
+            
+    
+            // Step 6: Show the alert message
+            alert(`
+                Hello, I have just seen a Kid pull that sword out. 
+                Then after, I have attempted to pull it out myself. 
+                But I'm too weak to pull the sword out of that sword. 
+                Can you help me buff up and get stronger enough to pull out that sword? 
+                First, talk to Doggie!
+            `);
+        });
     }
-    /**
-     * Starts the game by 
-     * 1. Adding an exit key listener
-     * 2. Transitioning to the first level
-     */
-    start() {
-        this.addExitKeyListener();
-        this.transitionToLevel();
-        this.addBackgroundChangeButton();
-        alert("Hello, I have just seen a Kid pull that sword out. Then after, I have attempted to pull it out myself. But I'm too weak to pull the sword out of that sword. Can you help me buff up and get stronger enough to pull out that sword? First, talk to Doggie!")
-    }
+    
+    
 
     addBackgroundChangeButton() {
         // Ensure the gameContainer exists before creating the button
