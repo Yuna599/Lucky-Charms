@@ -1,0 +1,169 @@
+import GameObject from './GameObject.js';
+
+// Define non-mutable constants as defaults
+const SCALE_FACTOR = 25; 
+const STEP_FACTOR = 100;
+const ANIMATION_RATE = 1;
+const INIT_POSITION = { x: 0, y: 0 };
+
+class Character extends GameObject {
+    constructor(data = null, gameEnv = null) {
+        super(gameEnv);
+        this.data = data;
+        this.state = {
+            ...this.state,
+            animation: 'idle',
+            direction: 'right',
+            isDying: false,
+            isFinishing: false,
+        };
+
+        // Create canvas element
+        this.canvas = document.createElement("canvas");
+        this.canvas.id = data.id || "default";
+        this.canvas.width = data.pixels?.width || 0;
+        this.canvas.height = data.pixels?.height || 0;
+        this.hitbox = data?.hitbox || {};
+        this.ctx = this.canvas.getContext('2d');
+        document.getElementById("gameContainer").appendChild(this.canvas);
+
+        // Set initial object properties 
+        this.x = 0;
+        this.y = 0;
+        this.frame = 0;
+        
+        // Initialize the object's scale based on the game environment
+        this.scale = { width: this.gameEnv.innerWidth, height: this.gameEnv.innerHeight };
+        
+        // Check if sprite data is provided
+        if (data && data.src) {
+            this.scaleFactor = data.SCALE_FACTOR || SCALE_FACTOR;
+            this.stepFactor = data.STEP_FACTOR || STEP_FACTOR;
+            this.animationRate = data.ANIMATION_RATE || ANIMATION_RATE;
+            this.position = data.INIT_POSITION || INIT_POSITION;
+    
+            // Load the sprite sheet (for the dog)
+            this.spriteSheet = new Image();
+            this.spriteSheet.src = "assets/images/doggie.png"; // Make sure this is the correct path to the dog image
+
+            // Initialize animation properties
+            this.frameIndex = 0; 
+            this.frameCounter = 0;
+            this.direction = 'down'; 
+            this.spriteData = data;
+        } else {
+            throw new Error('Sprite data is required');
+        }
+
+        // Initialize the object's position and velocity
+        this.velocity = { x: 0, y: 0 };
+
+        // Set the initial size and velocity of the object
+        this.resize();
+    }
+
+    update() {
+        this.draw();
+        this.collisionChecks();
+        this.move();
+    }
+
+    draw() {
+        if (this.spriteSheet) {
+            const frameWidth = this.spriteData.pixels.width / this.spriteData.orientation.columns;
+            const frameHeight = this.spriteData.pixels.height / this.spriteData.orientation.rows;
+    
+            const directionData = this.spriteData[this.direction];
+    
+            let frameX, frameY;
+            frameX = (directionData.start + this.frameIndex) * frameWidth;
+            frameY = directionData.row * frameHeight;
+    
+            this.canvas.width = frameWidth;
+            this.canvas.height = frameHeight;
+            this.canvas.style.width = `${this.width}px`;
+            this.canvas.style.height = `${this.height}px`;
+            this.canvas.style.position = 'absolute';
+            this.canvas.style.left = `${this.position.x}px`;
+            this.canvas.style.top = `${this.gameEnv.top+this.position.y}px`;
+    
+            this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+   
+            if (directionData.rotate || directionData.mirror || directionData.spin) {
+                this.ctx.translate(this.canvas.width / 2, this.canvas.height / 2);
+                if (directionData.rotate) {
+                    this.ctx.rotate(directionData.rotate);
+                }
+                if (directionData.mirror) {
+                    this.ctx.scale(-1, 1);
+                }
+                if (directionData.spin) {
+                    this.ctx.rotate(Math.PI / Math.floor(Math.random() * directionData.spin + 1));
+                }
+                this.ctx.translate(-this.canvas.width / 2, -this.canvas.height / 2);
+            }
+
+            if (directionData.explode) {
+                this.ctx.filter = 'grayscale(50%) blur(5px)';
+            }
+
+            this.ctx.drawImage(
+                this.spriteSheet,
+                frameX, frameY, frameWidth, frameHeight, 
+                0, 0, this.canvas.width, this.canvas.height 
+            );
+            
+            this.frameCounter++;
+            if (this.frameCounter % this.animationRate === 0) {
+                this.frameIndex = (this.frameIndex + 1) % directionData.columns;
+            }
+        } else {
+            this.ctx.fillStyle = 'red';
+            this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        }
+    }
+
+    move() {
+        this.position.x += this.velocity.x;
+        this.position.y += this.velocity.y;
+
+        if (this.position.y + this.height > this.gameEnv.innerHeight) {
+            this.position.y = this.gameEnv.innerHeight - this.height;
+            this.velocity.y = 0;
+        }
+        if (this.position.y < 0) {
+            this.position.y = 0;
+            this.velocity.y = 0;
+        }
+        if (this.position.x + this.width > this.gameEnv.innerWidth) {
+            this.position.x = this.gameEnv.innerWidth - this.width;
+            this.velocity.x = 0;
+        }
+        if (this.position.x < 0) {
+            this.position.x = 0;
+            this.velocity.x = 0;
+        }
+    }
+
+    resize() {
+        const newScale = { width: this.gameEnv.innerWidth, height: this.gameEnv.innerHeight };
+        this.position.x = (this.position.x / this.scale.width) * newScale.width;
+        this.position.y = (this.position.y / this.scale.height) * newScale.height;
+        this.scale = newScale;
+        this.size = this.scale.height / this.scaleFactor;
+        this.xVelocity = this.scale.width / this.stepFactor;
+        this.yVelocity = this.scale.height / this.stepFactor;
+        this.width = this.size;
+        this.height = this.size;
+    }
+
+    destroy() {
+        const index = this.gameEnv.gameObjects.indexOf(this);
+        if (index !== -1) {
+            this.canvas.parentNode.removeChild(this.canvas);
+            this.gameEnv.gameObjects.splice(index, 1);
+        }
+    }
+}
+
+export default Character;
