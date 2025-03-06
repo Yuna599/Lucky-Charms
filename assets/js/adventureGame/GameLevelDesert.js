@@ -67,18 +67,18 @@ class GameLevelDesert {
 
     // NPC data for Tux 
     const sprite_src_tux = path + "/images/gamify/npc.png"; // be sure to include the path
-    const sprite_greet_tux = "Hello I'm Doggie, I can help you pull out this sword!";
+    const sprite_greet_tux = "Hello, I can help you pull out this sword!";
     const audio = new Audio(path + '/assets/audio/sword.mp3'); // Replace with your audio file URL
     const sprite_data_tux = {
         id: 'Tux',
         greeting: sprite_greet_tux,
         src: sprite_src_tux,
-        SCALE_FACTOR: 8,  // Adjust this based on your scaling needs
-        ANIMATION_RATE: 30,
+        SCALE_FACTOR: 5,  // Adjust this based on your scaling needs
+        ANIMATION_RATE: 50,
         pixels: {height: 100, width: 100},
         INIT_POSITION: { x: (width / 2), y: (height / 2)},
         orientation: {rows: 2, columns: 3 },
-        down: {row: 5, start: 0, columns: 3 },  // This is the stationary npc, down is default 
+        down: {row: 2, start: 0, columns: 3 },  // This is the stationary npc, down is default 
         hitbox: { widthPercentage: 0.1, heightPercentage: 0.2 },
         // Linux command quiz
         quiz: { 
