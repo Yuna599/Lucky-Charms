@@ -189,9 +189,9 @@ class GameLevelDesert {
                     { text: "Why do you guard the sword?", next: "guardSword" }
                 ]);
             } else if (next === "findStrength") {
-                updateDialog("You can train at the gym to build strength.");
+                updateDialog("You can buff up and attempt to pull the sword out.");
                 updateChoices([
-                    { text: "Take me there!", next: "goToGym" },
+                    { text: "Can I try pulling out the sword?", next: "goToGym" },
                     { text: "Thanks, Doggie!", next: "end" }
                 ]);
             } else if (next === "findCourage") {
@@ -213,7 +213,7 @@ class GameLevelDesert {
                     { text: "This is too much pressure!", next: "end" }
                 ]);
             } else if (next === "goToGym") {
-                updateDialog("Let's go! Follow me!");
+                updateDialog("Oh.. but It seems like you don't have enough luck.. Try next time!");
         
                 setTimeout(() => {
                     toggleDesertImage(); // Instantly change the background to the gym
