@@ -51,11 +51,12 @@ class GameControl {
     
             // Step 5: Play the music
             const audio = new Audio('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3'); // Test with a known URL
-            audio.play().then(() => {
-            console.log("Audio is playing!");
-                }).catch((error) => {
-            console.error("Error playing audio:", error);
+audio.play().then(() => {
+    console.log("Audio is playing!");
+}).catch((error) => {
+    console.error("Error playing audio:", error);
 });
+
 
             
 
