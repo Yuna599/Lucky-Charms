@@ -39,7 +39,7 @@ class GameLevelDesert {
     
 
     // Player data for Chillguy
-    const sprite_src_chillguy = path + "/images/gamify/Ali_Before_Buffed.png"; // be sure to include the path
+    const sprite_src_chillguy = path + "/images/gamify/Ali_A.jpeg"; // be sure to include the path
     const CHILLGUY_SCALE_FACTOR = 5;
     const sprite_data_chillguy = {
         id: 'Chill Guy',
@@ -49,9 +49,9 @@ class GameLevelDesert {
         STEP_FACTOR: 1000,
         ANIMATION_RATE: 50,
         INIT_POSITION: { x: 0, y: height - (height/CHILLGUY_SCALE_FACTOR) }, 
-        pixels: {height: 100, width: 100},
+        pixels: {height: 1120, width: 734},
       // pixels: {height: 384, width: 512},
-        orientation: {rows: 2, columns: 3 },
+        orientation: {rows: 4, columns: 3 },
         down: {row: 0, start: 0, columns: 3 },
         downRight: {row: 1, start: 0, columns: 3, rotate: Math.PI/16 },
         downLeft: {row: 2, start: 0, columns: 3, rotate: -Math.PI/16 },
