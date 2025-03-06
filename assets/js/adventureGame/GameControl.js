@@ -50,13 +50,15 @@ class GameControl {
             this.addBackgroundChangeButton();
     
             // Step 5: Play the music
-            const audio = new Audio('https://freemusicarchive.org/music/Dazie_Mae/Last_Jazz_in_Paris/01-1518105-Dazie_Mae-When_Paris_is_Singing/'); // Test with a known URL
-            audio.play().then(() => {
-                console.log("Audio is playing!");
-            }).catch((error) => {
-                console.error("Error playing audio:", error);
-            });
+            const audio = new Audio('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3'); // Test with a known URL
+audio.play().then(() => {
+    console.log("Audio is playing!");
+}).catch((error) => {
+    console.error("Error playing audio:", error);
+});
+
             
+
             
     
             // Step 6: Show the alert message
