@@ -140,14 +140,48 @@ audio.play().then(() => {
      * 3. Starting the game loop
      */ 
     transitionToLevel() {
-        const GameLevelClass = this.levelClasses[this.currentLevelIndex];
-        this.currentLevel = new GameLevel(this);
-        this.currentLevel.create(GameLevelClass);
-        this.gameLoop();
+        const fadeOverlay = document.createElement('div');
+        fadeOverlay.style.position = 'fixed';
+        fadeOverlay.style.top = '0';
+        fadeOverlay.style.left = '0';
+        fadeOverlay.style.width = '100%';
+        fadeOverlay.style.height = '100%';
+        fadeOverlay.style.backgroundColor = 'black';
+        fadeOverlay.style.opacity = '0';
+        fadeOverlay.style.transition = 'opacity 1s ease-in-out';
+        fadeOverlay.style.display = 'flex';
+        fadeOverlay.style.alignItems = 'center';
+        fadeOverlay.style.justifyContent = 'center';
+        
+        const loadingText = document.createElement('div');
+        loadingText.textContent = 'Loading...';
+        loadingText.style.color = 'white';
+        loadingText.style.fontSize = '2rem';
+        loadingText.style.fontFamily = 'Arial, sans-serif';
+        fadeOverlay.appendChild(loadingText);
+        
+        document.body.appendChild(fadeOverlay);
+    
+        // Fade to black
+        requestAnimationFrame(() => {
+            fadeOverlay.style.opacity = '1';
+        });
+    
+        setTimeout(() => {
+            // Switch levels when screen is black
+            const GameLevelClass = this.levelClasses[this.currentLevelIndex];
+            this.currentLevel = new GameLevel(this);
+            this.currentLevel.create(GameLevelClass);
+    
+            // Fade back in
+            fadeOverlay.style.opacity = '0';
+            setTimeout(() => document.body.removeChild(fadeOverlay), 1000);
+            
+            // Start game loop after transition
+            this.gameLoop();
+        }, 1000); // Wait for fade-out duration
     }
-    updateBackground(imageSrc) {
-        document.getElementById("backgroundElementId").src = imageSrc;
-    }
+    
     /**
      * The main game loop 
      * 1. Updates the current level
