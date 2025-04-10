@@ -1,0 +1,60 @@
+{
+ "cells": [
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "vscode": {
+     "languageId": "yaml"
+    }
+   },
+   "outputs": [],
+   "source": [
+    "---\n",
+    "layout: post\n",
+    "title: After Cybersecurity lessons \n",
+    "description: Cybersecurity Takeaways after the lesson from the expert panels\n",
+    "categories: [Extra lesson Takeaways]\n",
+    "permalink: /Cybersecurity\n",
+    "author: Yuna Lee\n",
+    "toc: true\n",
+    "comments: true\n",
+    "---"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Takeaways \n",
+    "What I learned: \n",
+    "\n",
+    "Cybersecurity is important because hackers steals and uses the imformations that people uses in different companies. By having cybersecurity, you can keep people from getting informations released to outside places. There are lots of real-world threats these days from the hackers. \n",
+    "zero day:\n",
+    "hacker might make a pull of a coding lines that might hack all the computers that has axcess to the pull.\n",
+    "\n",
+    "I wasn't sure If I'm actually going to do computer later on but one of the panels said that he still doesn't like computer but he got along with it which gave me hope. \n",
+    "\n",
+    "\n",
+    "\n",
+    "What I think I should do after: "
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Image\n",
+    "as a proof...\n",
+    "\n"
+   ]
+  }
+ ],
+ "metadata": {
+  "language_info": {
+   "name": "python"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 2
+}
