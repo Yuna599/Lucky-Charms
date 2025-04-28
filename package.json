@@ -1,22 +1,42 @@
 {
-  "name": "lucky-charms",
-  "version": "1.0.0",
+  "devDependencies": {
+    "autoprefixer": "^10.4.21",
+    "postcss": "^8.5.3",
+    "tailwindcss": "^4.1.4"
+  },
+  "name": "portfolio_2025",
   "description": "Nighthawk Pages is a project designed to support students in their Computer Science and Software Engineering education. It offers a wide range of resources including tech talks, code examples, and educational blogs.",
+  "version": "1.0.0",
   "main": "index.js",
-
+  "dependencies": {
+    "@tailwindcss/vite": "^4.1.4",
+    "browserslist": "^4.24.4",
+    "caniuse-lite": "^1.0.30001715",
+    "electron-to-chromium": "^1.5.139",
+    "escalade": "^3.2.0",
+    "fraction.js": "^4.3.7",
+    "nanoid": "^3.3.11",
+    "node-releases": "^2.0.19",
+    "normalize-range": "^0.1.2",
+    "picocolors": "^1.1.1",
+    "postcss-value-parser": "^4.2.0",
+    "source-map-js": "^1.2.1",
+    "update-browserslist-db": "^1.1.3"
+  },
   "scripts": {
-  "start": "node index.js"
-}
-
+    "dev": "tailwindcss -i ./src/input.css -o ./dist/output.css --watch",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Yuna599/Lucky-Charms.git"
+    "url": "git+https://github.com/TeamOverworld/portfolio_2025.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/Yuna599/Lucky-Charms/issues"
+    "url": "https://github.com/TeamOverworld/portfolio_2025/issues"
   },
-  "homepage": "https://github.com/Yuna599/Lucky-Charms#readme"
+  "homepage": "https://github.com/TeamOverworld/portfolio_2025#readme"
 }
+
