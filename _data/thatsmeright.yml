@@ -1,0 +1,23 @@
+Title: "Enemy Movements"
+Description: "A description and explanation of an example that makes the enemy wander around a certain area of your screen, bouncing off inivisible walls."
+Topics:
+  - title: "Enemy Movement Demo"
+    image: "/gamify/creepa.png"
+    link: "/gamify/creepa"
+    alt: "Creeper"
+    keyPoints:
+      - "Bouncing off walls"
+      - "Calculated movement"
+      - "Enemy hitbox"
+    subtitle: "Example: Overworld's Creeper Enemy"
+    description: "In our demo, you can see that there is a specific area that the creeper moves in. It bounces off of these invisible boundary walls. The background was made specifically for the Creeper, the boundaries are not based off of the background."
+  - title: "Guide to Enemy Movement"
+    image: "/gamify/movementex.png"
+    link: "/gamify/movementex"
+    alt: "movementex"
+    keyPoints:
+      - "Placing walls based on the area you want"
+      - "Flipping the sprite when it hits a wall"
+      - "Making it look like that one idle screen"
+    subtitle: "Enemy Movement suggestions / requirements"
+    description: "Now that you have seen an example of what your hack for this lesson should look like, we'll go over some key details that are required for success with the hacks for this lesson."
