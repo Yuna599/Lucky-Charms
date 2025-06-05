@@ -1,5 +1,6 @@
 // GameControl.js
 import GameLevel from "./GameLevel.js";
+import Intro from "./Intro.js";
 
 class GameControl {
     /**
@@ -21,59 +22,20 @@ class GameControl {
         this.exitKeyListener = this.handleExitKey.bind(this);
         this.gameOver = null; // Callback for when the game is over 
         this.savedCanvasState = []; // Save the current levels game elements 
+        this.intro = new Intro(this); // Initialize Intro with GameControl reference
     }
 
     start() {
-        // Step 1: Create a "Click to Start" button
-        var startButton = document.createElement("button");
-        startButton.innerHTML = "Click to Start"; // Button text
-        startButton.id = "start-button"; // Button ID (optional, for styling or identification)
-        
-        // Optionally, style the button
-        startButton.style.padding = "10px 20px";
-        startButton.style.backgroundColor = "#4CAF50";
-        startButton.style.color = "white";
-        startButton.style.border = "none";
-        startButton.style.cursor = "pointer";
-    
-        // Step 2: Append the button to the page
-        document.body.appendChild(startButton);
-    
-        // Step 3: Add event listener to the button
-        startButton.addEventListener("click", () => {
-            // When the button is clicked, remove it from the page
-            startButton.remove();
-    
-            // Step 4: Call your game functions
-            this.addExitKeyListener();
-            this.transitionToLevel();
-            this.addBackgroundChangeButton();
-    
-            // Step 5: Play the music
-            const audio = new Audio('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3'); // Test with a known URL
-audio.play().then(() => {
-    console.log("Audio is playing!");
-}).catch((error) => {
-    console.error("Error playing audio:", error);
-});
-
-
-            
-
-            
-    
-            // Step 6: Show the alert message
-            alert(`
-                Hello, I have just seen a Kid pull that sword out. 
-                Then after, I have attempted to pull it out myself. 
-                But I'm too weak to pull the sword out of that sword. 
-                Can you help me buff up and get stronger enough to pull out that sword? 
-                First, talk to Doggie!
-            `);
-        });
+        this.intro.showStartButton(); // Delegate start button logic to Intro
     }
-    
-    
+
+    showConversationModal() {
+        this.intro.showConversationModal(); // Delegate conversation modal logic to Intro
+    }
+
+    showResponse(responseText) {
+        this.intro.showResponse(responseText); // Delegate response modal logic to Intro
+    }
 
     addBackgroundChangeButton() {
         // Ensure the gameContainer exists before creating the button
