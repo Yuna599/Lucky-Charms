@@ -1,3 +1,5 @@
+
+
 class Intro {
     constructor(gameControl) {
         this.gameControl = gameControl; // Reference to GameControl

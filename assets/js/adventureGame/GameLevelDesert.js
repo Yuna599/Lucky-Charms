@@ -2,7 +2,7 @@
 import Background from './Background.js';
 import Player from './Player.js';
 import Npc from './Npc.js';
-import Quiz from './Quiz.js';
+import GameLevelGym from './GameLevelGym.js';
 import GameControl from './GameControl.js';
 import GameLevelStarWars from './GameLevelStarWars.js';
 
@@ -202,7 +202,7 @@ class GameLevelDesert {
       }
 
     // Add Employee NPC data
-    const sprite_src_employee = path + "/images/gamify/npc4.png"; // Ensure the path is correct
+    const sprite_src_employee = path + "/images/gamify/employee.png"; // Ensure the path is correct
     const sprite_greet_employee = "Hello! How can I help you? The path to the gym is the door of the castle on the left!";
     const sprite_data_employee = {
       id: 'Employee',
@@ -210,9 +210,9 @@ class GameLevelDesert {
       src: sprite_src_employee,
       SCALE_FACTOR: 4, // Starting scale factor
       ANIMATION_RATE: 100,
-      pixels: { height: 301, width: 801 },
-      INIT_POSITION: { x: 1200, y: 235 }, // Position of the Employee NPC
-      orientation: { rows: 1, columns: 4 },
+      pixels: { height: 500, width: 500 },
+      INIT_POSITION: { x: 800, y: 235 }, // Position of the Employee NPC
+      orientation: { rows: 1, columns: 1 },
       down: { row: 0, start: 0, columns: 1 },
       hitbox: { widthPercentage: 0.1, heightPercentage: 0.2 },
 
@@ -324,13 +324,204 @@ class GameLevelDesert {
 
     // Debugging: Ensure the correct object is being modified
     console.log("Initial Creeper Object:", sprite_data_creeper);
-
+    const sprite_src_endportal = path + "/images/gamify/computer.png";
+    const sprite_greet_endportal = "Teleport to the End? Press E";
+    const sprite_data_endportal = {
+        id: 'End Portal',
+        greeting: sprite_greet_endportal,
+        src: sprite_src_endportal,
+        SCALE_FACTOR: 6,
+        ANIMATION_RATE: 100,
+        pixels: {width: 521, height: 479},
+        INIT_POSITION: { x: (width * 2 / 5), y: (height * 1 / 10)},
+        orientation: {rows: 1, columns: 1 },
+        down: {row: 0, start: 0, columns: 1 },
+        hitbox: { widthPercentage: 0.1, heightPercentage: 0.2 },
+        // Add dialogues array for random messages
+        dialogues: [
+            "The End dimension awaits brave explorers.",
+            "Through this portal lies a realm of floating islands and strange creatures.",
+            "The Enderman guards ancient treasures. Who knows what else lurks beyond this portal?",
+            "Many have entered. Few have returned.",
+            "The void calls to you. Will you answer?",
+            "The End is not truly the end, but a new beginning.",
+            "Strange things await you beyond this portal..",
+            "Prepare yourself. The journey beyond won't be easy."
+        ],
+        
+        interact: function() {
+            // Clear any existing dialogue first to prevent duplicates
+            if (this.dialogueSystem && this.dialogueSystem.isDialogueOpen()) {
+                this.dialogueSystem.closeDialogue();
+            }
+            
+            // Create a new dialogue system if needed
+            if (!this.dialogueSystem) {
+                this.dialogueSystem = new DialogueSystem();
+            }
+            
+            // Show portal dialogue with buttons
+            this.dialogueSystem.showDialogue(
+                "Do you wish to enter The End dimension?",
+                "End Portal",
+                this.spriteData.src
+            );
+            
+            // Add buttons directly to the dialogue
+            this.dialogueSystem.addButtons([
+                {
+                    text: "Enter Portal",
+                    primary: true,
+                    action: () => {
+                        this.dialogueSystem.closeDialogue();
+                        
+                        // Clean up the current game state
+                        if (gameEnv && gameEnv.gameControl) {
+                            // Store reference to the current game control
+                            const gameControl = gameEnv.gameControl;
+                            
+                            // Create fade overlay for transition
+                            const fadeOverlay = document.createElement('div');
+                            Object.assign(fadeOverlay.style, {
+                                position: 'fixed',
+                                top: '0',
+                                left: '0',
+                                width: '100%',
+                                height: '100%',
+                                backgroundColor: '#000',
+                                opacity: '0',
+                                transition: 'opacity 1s ease-in-out',
+                                zIndex: '9999'
+                            });
+                            document.body.appendChild(fadeOverlay);
+                            
+                            console.log("Starting End level transition...");
+                            
+                            // Fade in
+                            requestAnimationFrame(() => {
+                                fadeOverlay.style.opacity = '1';
+                                
+                                // After fade in, transition to End level
+                                setTimeout(() => {
+                                    // Clean up current level properly
+                                    if (gameControl.currentLevel) {
+                                        // Properly destroy the current level
+                                        console.log("Destroying current level...");
+                                        gameControl.currentLevel.destroy();
+                                        
+                                        // Force cleanup of any remaining canvases
+                                        const gameContainer = document.getElementById('gameContainer');
+                                        const oldCanvases = gameContainer.querySelectorAll('canvas:not(#gameCanvas)');
+                                        oldCanvases.forEach(canvas => {
+                                            console.log("Removing old canvas:", canvas.id);
+                                            canvas.parentNode.removeChild(canvas);
+                                        });
+                                    }
+                                    
+                                    console.log("Setting up End level...");
+                                    
+                                    // IMPORTANT: Store the original level classes for return journey
+                                    gameControl._originalLevelClasses = gameControl.levelClasses;
+                                    
+                                    // Change the level classes to GameLevelEnd
+                                    gameControl.levelClasses = [GameLevelEnd];
+                                    gameControl.currentLevelIndex = 0;
+                                    
+                                    // Make sure game is not paused
+                                    gameControl.isPaused = false;
+                                    
+                                    // Start the End level with the same control
+                                    console.log("Transitioning to End level...");
+                                    gameControl.transitionToLevel();
+                                    
+                                    // Fade out overlay
+                                    setTimeout(() => {
+                                        fadeOverlay.style.opacity = '0';
+                                        setTimeout(() => {
+                                            document.body.removeChild(fadeOverlay);
+                                        }, 1000);
+                                    }, 500);
+                                }, 1000);
+                            });
+                        }
+                    }
+                },
+                {
+                    text: "Not Ready",
+                    action: () => {
+                        this.dialogueSystem.closeDialogue();
+                    }
+                }
+            ]);
+        }
+    }
+        
+    window.addEventListener("keydown", (event) => {
+      if (event.key === "E" || event.key === "e") {
+        // Check if the player is near the Employee NPC
+        if (checkCollision(sprite_data_chillguy, sprite_data_endportal)) {
+          sprite_data_employee.interact(); // Trigger the interaction
+        }
+      }
+    });
+    const sprite_src_robot = path + "/images/gamify/robot.png";
+    const sprite_greet_robot = "Hi I am Robot, the Jupyter Notebook mascot. I am very happy to spend some linux shell time with you!";
+    const sprite_data_robot = {
+        id: 'Robot',
+        greeting: sprite_greet_robot,
+        src: sprite_src_robot,
+        SCALE_FACTOR: 10,
+        ANIMATION_RATE: 100,
+        pixels: {height: 316, width: 627},
+        INIT_POSITION: { x: (width * 3 / 4), y: (height * 1 / 4)},
+        orientation: {rows: 3, columns: 6 },
+        down: {row: 1, start: 0, columns: 6 },
+        hitbox: { widthPercentage: 0.1, heightPercentage: 0.2 },
+        // Add dialogues array for random messages
+        dialogues: [
+            "Jupyter Notebooks let you mix code, text, and visualizations.",
+            "The name Jupyter comes from Julia, Python, and R - popular data science languages.",
+            "Interactive computing makes data exploration so much more fun!",
+            "I can help you analyze and visualize your data.",
+            "Notebooks are perfect for data storytelling and sharing insights.",
+            "Many scientists use me for reproducible research.",
+            "Press Shift+Enter to run a cell in Jupyter Notebook.",
+            "You can export notebooks to many formats, like HTML and PDF."
+        ],
+        reaction: function() {
+            // Use dialogue system instead of alert
+            if (this.dialogueSystem) {
+                this.showReactionDialogue();
+            } else {
+                console.log(sprite_greet_robot);
+            }
+        },
+        interact: function() {
+            // KEEP ORIGINAL GAME-IN-GAME FUNCTIONALITY
+            // Set a primary game reference from the game environment
+            let primaryGame = gameEnv.gameControl;
+            // Define the game in game level
+            let levelArray = [GameLevelGym];
+            // Define a new GameControl instance with the MeteorBlaster level
+            let gameInGame = new GameControl(gameEnv.game, levelArray);
+            // Pause the primary game 
+            primaryGame.pause();
+            // Start the game in game
+            gameInGame.start();
+            // Setup "callback" function to allow transition from game in game to the underlying game
+            gameInGame.gameOver = function() {
+                // Call .resume on primary game
+                primaryGame.resume();
+            }
+        }
+    };
     // Add Employee NPC to the list of objects for this level
     this.classes = [
       { class: Background, data: image_data_desert },
       { class: Player, data: sprite_data_chillguy },
       { class: Npc, data: sprite_data_creeper },
       { class: Npc, data: sprite_data_employee },
+      { class: Npc, data: sprite_data_robot}
     ];
 
     // Start the game loop

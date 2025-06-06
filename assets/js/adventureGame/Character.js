@@ -161,6 +161,11 @@ class Character extends GameObject {
                 this.ctx.translate(-this.canvas.width / 2, -this.canvas.height / 2);
             }
 
+            if (this.spriteData.mirror) {
+                this.ctx.translate(this.canvas.width, 0); // Move context to the right edge
+                this.ctx.scale(-1, 1); // Flip horizontally
+            }
+
             if (directionData.explode) {
                 this.ctx.filter = 'grayscale(50%) blur(5px)';
             }   
