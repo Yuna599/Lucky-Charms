@@ -33,6 +33,9 @@ class GameObject {
             collisionEvents: [],
             movement: { up: true, down: true, left: true, right: true },
         };
+
+        // Ensure sprite sheets are validated during initialization
+        this.initializeSprites();
     }
 
     /**
@@ -216,6 +219,31 @@ class GameObject {
                     this.velocity.x = 0;
                 }
             }
+
+            // Comment out or remove this line to suppress the log
+            // console.log("KABOOM!!");
+        }
+    }
+
+    /**
+     * Validates the sprite source to ensure it is loaded correctly.
+     * @param {Object} spriteData - The sprite data containing the source and ID.
+     */
+    validateSpriteSource(spriteData) {
+        const img = new Image();
+        img.src = spriteData.src;
+        img.onerror = () => {
+            console.error(`Sprite sheet for ${spriteData.id} is not loaded or is in a broken state.`);
+            spriteData.src = ""; // Reset the source to prevent further errors
+        };
+    }
+
+    /**
+     * Initializes sprites by validating their sources.
+     */
+    initializeSprites() {
+        if (this.spriteData) {
+            this.validateSpriteSource(this.spriteData);
         }
     }
 }

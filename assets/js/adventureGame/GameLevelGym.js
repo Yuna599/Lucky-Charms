@@ -64,7 +64,8 @@ class GameLevelGym {
       height: 320,
     };
 
-    const sprite_src_desertportal = path + "/images/gamify/desertportal.png"; // Reverted path
+
+    const sprite_src_desertportal = path + "/images/gamify/npc4.png"; // Reverted path
     const sprite_greet_desertportal = "Teleport to the Desert? Press E";
     const sprite_data_desertportal = {
       id: 'Desert Portal',
@@ -78,6 +79,11 @@ class GameLevelGym {
       down: { row: 0, start: 0, columns: 1 },
       hitbox: { widthPercentage: 0.1, heightPercentage: 0.2 },
       interact: function () {
+        if (!this.image || !this.image.complete) {
+          console.warn("Desert Portal sprite not loaded, skipping interaction.");
+          return;
+        }
+
         const transitionOverlay = document.createElement("div");
         transitionOverlay.style.position = "fixed";
         transitionOverlay.style.top = "0";
@@ -106,6 +112,26 @@ class GameLevelGym {
           }, 1000);
         }, 1000);
       },
+      draw: function (ctx) {
+        if (!this.image || !this.image.complete || this.image.naturalWidth === 0) {
+          console.warn("Desert Portal sprite not loaded or is in a broken state, skipping draw.");
+          return;
+        }
+        ctx.drawImage(this.image, this.INIT_POSITION.x, this.INIT_POSITION.y, this.width, this.height);
+      },
+    };
+
+    // Load Desert Portal image properly before using it
+    const desertPortalImage = new Image();
+    desertPortalImage.src = sprite_src_desertportal;
+
+    desertPortalImage.onload = () => {
+      sprite_data_desertportal.image = desertPortalImage;
+      console.log("Desert Portal image loaded.");
+    };
+
+    desertPortalImage.onerror = () => {
+      console.error("Failed to load Desert Portal image:", desertPortalImage.src);
     };
 
     // Add event listener for interaction (pressing 'E')

@@ -5,6 +5,7 @@ import Npc from './Npc.js';
 import GameLevelGym from './GameLevelGym.js';
 import GameControl from './GameControl.js';
 import GameLevelStarWars from './GameLevelStarWars.js';
+import DialogueSystem from './DialogueSystem.js'; // Ensure DialogueSystem is imported
 
 class GameLevelDesert {
   constructor(gameEnv) {
@@ -24,12 +25,20 @@ class GameLevelDesert {
     const original_image_data_desert = { ...image_data_desert };
 
     function updateBackground(src) {
-      const backgroundElement = document.getElementById("background");
-      if (backgroundElement) {
-        backgroundElement.style.backgroundImage = `url(${src})`;
-      } else {
-        console.error("Background element not found!");
+      let backgroundElement = document.getElementById("background");
+      if (!backgroundElement) {
+        // Create the background element if it doesn't exist
+        backgroundElement = document.createElement("div");
+        backgroundElement.id = "background";
+        backgroundElement.style.position = "absolute";
+        backgroundElement.style.top = "0";
+        backgroundElement.style.left = "0";
+        backgroundElement.style.width = "100%";
+        backgroundElement.style.height = "100%";
+        backgroundElement.style.zIndex = "-1"; // Ensure it is behind other elements
+        document.body.appendChild(backgroundElement);
       }
+      backgroundElement.style.backgroundImage = `url(${src})`;
     }
 
     function toggleDesertImage() {
@@ -78,7 +87,7 @@ class GameLevelDesert {
       greeting: "Hi I am Chill Guy, the desert wanderer. I am looking for wisdom and adventure!",
       src: sprite_src_chillguy,
       SCALE_FACTOR: CHILLGUY_SCALE_FACTOR,
-      STEP_FACTOR: 1000,
+      STEP_FACTOR: 100,
       ANIMATION_RATE: 80,
       INIT_POSITION: { x: 0, y: height - (height / CHILLGUY_SCALE_FACTOR) },
       pixels: { height: 320, width: 120 },
@@ -203,16 +212,46 @@ class GameLevelDesert {
           setTimeout(() => {
             this.isAnimating = false;
           }, 1000);
+        },
+        draw: function(ctx) {
+          if (!this.image || !this.image.complete) {
+            console.warn("Unicorn sprite not loaded, skipping draw.");
+            return;
+          }
+          ctx.drawImage(this.image, this.INIT_POSITION.x, this.INIT_POSITION.y, this.width, this.height);
         }
       };
-      // Set intervals to update position and play animation  
-      setInterval(() => {
-        sprite_data_unicorn.updatePosition();
-      }, 100);
-      setInterval(() => {
-        sprite_data_unicorn.playAnimation();
-      }, 1000);
 
+    // Load unicorn image properly before using it
+    const unicornImage = new Image();
+    unicornImage.src = sprite_src_unicorn;
+
+    unicornImage.onload = () => {
+      sprite_data_unicorn.image = unicornImage;
+      console.log("Unicorn image loaded.");
+    };
+
+    // Set intervals to update position and play animation  
+    setInterval(() => {
+      sprite_data_unicorn.updatePosition();
+    }, 100);
+    setInterval(() => {
+      sprite_data_unicorn.playAnimation();
+    }, 1000);
+
+    function growUnicorn(unicorn) {
+      unicorn.SCALE_FACTOR += 0.5; // Increase the scale factor
+      unicorn.width = unicorn.pixels.width * unicorn.SCALE_FACTOR; // Update width
+      unicorn.height = unicorn.pixels.height * unicorn.SCALE_FACTOR; // Update height
+
+      const spriteElement = document.getElementById(unicorn.id);
+      if (spriteElement) {
+        spriteElement.style.width = `${unicorn.width}px`;
+        spriteElement.style.height = `${unicorn.height}px`;
+      }
+
+      console.log(`Unicorn grew! New size: ${unicorn.width}x${unicorn.height}`);
+    }
 
     // Add Employee NPC data
     const sprite_src_employee = path + "/images/gamify/employee.png"; // Ensure the path is correct
@@ -288,80 +327,33 @@ class GameLevelDesert {
       },
     };
 
-    // Add event listener for interaction (pressing 'E')
-    window.addEventListener("keydown", (event) => {
-      if (event.key === "E" || event.key === "e") {
-        // Check if the player is near the Employee NPC
-        if (checkCollision(sprite_data_chillguy, sprite_data_employee)) {
-          sprite_data_employee.interact(); // Trigger the interaction
-        }
-      }
-    });
-
-    // Canvas-based game loop
-    const canvas = document.getElementById('gameCanvas');
-    const context = canvas.getContext('2d');
-
-    function gameLoop() {
-      context.clearRect(0, 0, canvas.width, canvas.height);
-
-      // Draw player
-      context.fillStyle = "blue";
-      context.fillRect(sprite_data_chillguy.x, sprite_data_chillguy.y, sprite_data_chillguy.width, sprite_data_chillguy.height);
-
-      // Draw unicorn using updated width and height based on SCALE_FACTOR
-      const unicornDrawWidth = sprite_data_unicorn.width; // Use updated width
-      const unicornDrawHeight = sprite_data_cunicorn.height; // Use updated height
-
-      context.fillStyle = "green";
-      context.fillRect(sprite_data_unicorn.x, sprite_data_unicorn.y, unicornDrawWidth, unicornDrawHeight);
-
-      console.log(" Drawing unicorn with size:", unicornDrawWidth, unicornDrawHeight);
-
-      // Draw Employee NPC
-      context.fillStyle = "yellow";
-      context.fillRect(
-        sprite_data_employee.INIT_POSITION.x,
-        sprite_data_employee.INIT_POSITION.y,
-        sprite_data_employee.pixels.width * sprite_data_employee.SCALE_FACTOR,
-        sprite_data_employee.pixels.height * sprite_data_employee.SCALE_FACTOR
-      );
-
-      // Check for collision with unicorn
-      if (checkCollision(sprite_data_chillguy, sprite_data_unicorn)) {
-        growUnicorn(sprite_data_unicorn);
-      }
-
-      requestAnimationFrame(gameLoop);
-    }
-
-    // Debugging: Ensure the correct object is being modified
-    console.log("Initial Unicorn Object:", sprite_data_unicorn);
-    const sprite_src_endportal = path + "/images/gamify/computer.png";
-    const sprite_greet_endportal = "Teleport to the End? Press E";
-    const sprite_data_endportal = {
-        id: 'End Portal',
-        greeting: sprite_greet_endportal,
-        src: sprite_src_endportal,
-        SCALE_FACTOR: 6,
+    // Define sprite_data_chickenj before validation
+    const sprite_src_chickenj = path + "/images/gamify/robot.png";
+    const sprite_greet_chickenj = "FOLLOW THAT CHICKEN JOCKEY. ( Press E )";
+    const sprite_data_chickenj = {
+        id: 'Chicken Jockey',
+        greeting: sprite_greet_chickenj,
+        src: sprite_src_chickenj,
+        SCALE_FACTOR: 9,
         ANIMATION_RATE: 100,
-        pixels: {width: 521, height: 479},
-        INIT_POSITION: { x: (width * 2 / 5), y: (height * 1 / 10)},
-        orientation: {rows: 1, columns: 1 },
-        down: {row: 0, start: 0, columns: 1 },
+        pixels: { width: 150, height: 255 },
+        INIT_POSITION: { x: (width * 1 / 6), y: (height * 1 / 10) }, // Moved more to the left
+        orientation: { rows: 1, columns: 1 },
+        down: { row: 0, start: 0, columns: 1 },
         hitbox: { widthPercentage: 0.1, heightPercentage: 0.2 },
         // Add dialogues array for random messages
         dialogues: [
-            "The End dimension awaits brave explorers.",
-            "Through this portal lies a realm of floating islands and strange creatures.",
-            "The Enderman guards ancient treasures. Who knows what else lurks beyond this portal?",
-            "Many have entered. Few have returned.",
-            "The void calls to you. Will you answer?",
-            "The End is not truly the end, but a new beginning.",
-            "Strange things await you beyond this portal..",
-            "Prepare yourself. The journey beyond won't be easy."
+            "BAWK BAWK BAWK BAWK BAWK?!?!?!?",
+            "GRRRRRRRR!!",
+            "I'm placing blocks and stuff cuz im in freaking minceraftttt",
+            "BAWAKKKKK!",
+            "You want to fight the chicken?",
+            "CHICKEN JOCKEEEYYYY"
         ],
-        
+        reaction: function() {
+            // Don't show any reaction dialogue - this prevents the first alert
+            // The interact function will handle all dialogue instead
+        },
         interact: function() {
             // Clear any existing dialogue first to prevent duplicates
             if (this.dialogueSystem && this.dialogueSystem.isDialogueOpen()) {
@@ -375,15 +367,15 @@ class GameLevelDesert {
             
             // Show portal dialogue with buttons
             this.dialogueSystem.showDialogue(
-                "Do you wish to enter The End dimension?",
-                "End Portal",
+                "Do you follow the Chicken Jockey?",
+                "Chicken Jockey",
                 this.spriteData.src
             );
             
             // Add buttons directly to the dialogue
             this.dialogueSystem.addButtons([
                 {
-                    text: "Enter Portal",
+                    text: "Sure!",
                     primary: true,
                     action: () => {
                         this.dialogueSystem.closeDialogue();
@@ -408,7 +400,7 @@ class GameLevelDesert {
                             });
                             document.body.appendChild(fadeOverlay);
                             
-                            console.log("Starting End level transition...");
+                            console.log("You walk after the Chicken Jockey...");
                             
                             // Fade in
                             requestAnimationFrame(() => {
@@ -431,20 +423,20 @@ class GameLevelDesert {
                                         });
                                     }
                                     
-                                    console.log("Setting up End level...");
+                                    console.log("You walk after the Chicken Jockey...");
                                     
                                     // IMPORTANT: Store the original level classes for return journey
                                     gameControl._originalLevelClasses = gameControl.levelClasses;
                                     
-                                    // Change the level classes to GameLevelEnd
-                                    gameControl.levelClasses = [GameLevelEnd];
+                                    
+                                    gameControl.levelClasses = [GameLevelGym];
                                     gameControl.currentLevelIndex = 0;
                                     
                                     // Make sure game is not paused
                                     gameControl.isPaused = false;
                                     
                                     // Start the End level with the same control
-                                    console.log("Transitioning to End level...");
+                                    console.log("You walk after the Chicken Jockey...");
                                     gameControl.transitionToLevel();
                                     
                                     // Fade out overlay
@@ -468,15 +460,7 @@ class GameLevelDesert {
             ]);
         }
     }
-        
-    window.addEventListener("keydown", (event) => {
-      if (event.key === "E" || event.key === "e") {
-        // Check if the player is near the Employee NPC
-        if (checkCollision(sprite_data_chillguy, sprite_data_endportal)) {
-          sprite_data_employee.interact(); // Trigger the interaction
-        }
-      }
-    });
+
     const sprite_src_robot = path + "/images/gamify/robot.png";
     const sprite_greet_robot = "Hi I am Robot, the Jupyter Notebook mascot. I am very happy to spend some linux shell time with you!";
     const sprite_data_robot = {
@@ -528,19 +512,61 @@ class GameLevelDesert {
             }
         }
     };
+
+    // Load Robot image properly before using it
+    const robotImage = new Image();
+    robotImage.src = sprite_src_robot;
+
+    robotImage.onload = () => {
+      sprite_data_robot.image = robotImage;
+      console.log("Robot image loaded.");
+    };
+
+    robotImage.onerror = () => {
+      console.error("Failed to load Robot image:", robotImage.src);
+    };
+
+    // Add a guard clause in the draw function to prevent drawing until the image is loaded
+    sprite_data_robot.draw = function(ctx) {
+      if (!this.image || !this.image.complete) {
+        console.warn("Robot sprite not loaded, skipping draw.");
+        return;
+      }
+      ctx.drawImage(this.image, this.INIT_POSITION.x, this.INIT_POSITION.y, this.width, this.height);
+    };
+
+    // Validate sprite sources after all definitions
+    this.validateSpriteSource(sprite_data_chillguy);
+    this.validateSpriteSource(sprite_data_unicorn);
+    this.validateSpriteSource(sprite_data_employee);
+    this.validateSpriteSource(sprite_data_chickenj);
+    this.validateSpriteSource(sprite_data_robot);
+
     // Add Employee NPC to the list of objects for this level
     this.classes = [
       { class: Background, data: image_data_desert },
       { class: Player, data: sprite_data_chillguy },
       { class: Npc, data: sprite_data_unicorn },
       { class: Npc, data: sprite_data_employee },
-      { class: Npc, data: sprite_data_robot}
+      { class: Npc, data: sprite_data_chickenj },
+      { class: Npc, data: sprite_data_robot }
     ];
 
-    // Start the game loop
-    requestAnimationFrame(gameLoop);
+    // Start Unicorn position updates
+    setInterval(() => {
+      sprite_data_unicorn.updatePosition();
+    }, 100);
   }
 
+  // Define validateSpriteSource function as a class method
+  validateSpriteSource(spriteData) {
+    const img = new Image();
+    img.src = spriteData.src;
+    img.onerror = () => {
+      console.error(`Sprite sheet for ${spriteData.id} is not loaded or is in a broken state.`);
+      spriteData.src = ""; // Reset the source to prevent further errors
+    };
+  }
 }
 
 export default GameLevelDesert;
