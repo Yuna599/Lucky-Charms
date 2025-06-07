@@ -88,7 +88,7 @@ class Character extends GameObject {
             // Initialize animation properties
             this.frameIndex = 0; // index reference to current frame
             this.frameCounter = 0; // count each frame rate refresh
-            this.direction = 'down'; // Initial direction
+            this.direction = data?.direction || 'down'; // Set default direction to 'down'
         }
 
         // Initialize the object's position and velocity
@@ -145,8 +145,15 @@ class Character extends GameObject {
      */
     drawSprite() {
         if (!this.spriteSheet || !this.spriteSheet.complete || this.spriteSheet.naturalWidth === 0) {
-            console.error(`Sprite sheet for ${this.canvas.id} is in a broken state, skipping draw.`);
-            return; // Prevent drawing if the image is broken
+            console.error(`Sprite sheet for ${this.canvas.id} is not ready or in a broken state, skipping draw.`);
+            this.drawDefaultSquare(); // Fallback to default square
+            return;
+        }
+
+        // Ensure `this.direction` is valid and fallback to 'down' if undefined
+        if (!this.direction || !this.spriteData[this.direction]) {
+            console.warn(`Sprite data for direction "${this.direction}" is undefined. Falling back to 'down'.`);
+            this.direction = 'down';
         }
 
         // Calculate the frame dimensions

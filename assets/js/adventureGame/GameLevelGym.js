@@ -8,6 +8,28 @@ import Npc from "./Npc.js"; // Ensure proper import
 console.log("Resolved Player path:", Player);
 console.log("Resolved Character path:", Character);
 
+function checkCollision(sprite1, sprite2) {
+    const rect1 = {
+        x: sprite1.INIT_POSITION.x,
+        y: sprite1.INIT_POSITION.y,
+        width: sprite1.pixels.width,
+        height: sprite1.pixels.height,
+    };
+    const rect2 = {
+        x: sprite2.INIT_POSITION.x,
+        y: sprite2.INIT_POSITION.y,
+        width: sprite2.pixels.width,
+        height: sprite2.pixels.height,
+    };
+
+    return (
+        rect1.x < rect2.x + rect2.width &&
+        rect1.x + rect1.width > rect2.x &&
+        rect1.y < rect2.y + rect2.height &&
+        rect1.y + rect1.height > rect2.y
+    );
+}
+
 class GameLevelGym {
   constructor(gameEnv) {
     this.gameEnv = gameEnv;
@@ -131,7 +153,8 @@ class GameLevelGym {
     };
 
     desertPortalImage.onerror = () => {
-      console.error("Failed to load Desert Portal image:", desertPortalImage.src);
+      console.error(`Failed to load Desert Portal image: ${desertPortalImage.src}`);
+      sprite_data_desertportal.src = ""; // Reset the source to prevent further errors
     };
 
     // Add event listener for interaction (pressing 'E')

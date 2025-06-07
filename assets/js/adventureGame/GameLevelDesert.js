@@ -56,10 +56,18 @@ class GameLevelDesert {
 
     // Parallax effect
     function applyParallax() {
-      const backgroundElement = document.getElementById("background");
+      let backgroundElement = document.getElementById("background");
       if (!backgroundElement) {
-        console.error("Background element not found!");
-        return;
+        // Create the background element if it doesn't exist
+        backgroundElement = document.createElement("div");
+        backgroundElement.id = "background";
+        backgroundElement.style.position = "absolute";
+        backgroundElement.style.top = "0";
+        backgroundElement.style.left = "0";
+        backgroundElement.style.width = "100%";
+        backgroundElement.style.height = "100%";
+        backgroundElement.style.zIndex = "-1"; // Ensure it is behind other elements
+        document.body.appendChild(backgroundElement);
       }
 
       window.addEventListener("scroll", () => {

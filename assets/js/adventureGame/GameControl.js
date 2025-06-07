@@ -1,4 +1,6 @@
+// GameControl.js
 import GameLevel from "./GameLevel.js";
+import Intro from "./Intro.js";
 
 class GameControl {
     /**
@@ -17,50 +19,50 @@ class GameControl {
         this.currentLevelIndex = 0;
         this.gameLoopCounter = 0;
         this.isPaused = false;
-        this.nextLevelKeyListener = this.handleNextLevelKey.bind(this);
+        this.exitKeyListener = this.handleExitKey.bind(this);
         this.gameOver = null; // Callback for when the game is over 
         this.savedCanvasState = []; // Save the current levels game elements 
-        
-        // Capture all global interactions for cleaning up during transitions
-        this.globalInteractionHandlers = new Set();
+        this.intro = new Intro(this); // Initialize Intro with GameControl reference
     }
 
-    
     start() {
-        this.addExitKeyListener();
-        this.transitionToLevel();
+        this.intro.showStartButton(); // Delegate start button logic to Intro
+    }
+
+    showConversationModal() {
+        this.intro.showConversationModal(); // Delegate conversation modal logic to Intro
+    }
+
+    showResponse(responseText) {
+        this.intro.showResponse(responseText); // Delegate response modal logic to Intro
     }
 
     /**
-     * Register a global interaction handler that will be cleaned up during transitions
-     * @param {Object} handler - Object with handleKeyDownBound and handleKeyUpBound methods
+     * Switch the background between Disneyland and Gym
      */
-    registerInteractionHandler(handler) {
-        if (handler) {
-            this.globalInteractionHandlers.add(handler);
+    changeBackground() {
+        const DISNEYLAND_BG = `${this.path}/images/gamify/disneyland.png`;
+        const GYM_BG = `${this.path}/images/gamify/gym.png`;
+
+        // Check current background and switch
+        if (this.gameContainer.style.backgroundImage.includes("disneyland.png")) {
+            this.updateBackground(GYM_BG); // Switch to Gym
+        } else {
+            this.updateBackground(DISNEYLAND_BG); // Switch to Disneyland
         }
     }
 
     /**
-     * Unregister a global interaction handler
-     * @param {Object} handler - Handler to remove
+     * Update the background image of the game container
+     * @param {string} imageSrc - The new background image path
      */
-    unregisterInteractionHandler(handler) {
-        if (handler) {
-            this.globalInteractionHandlers.delete(handler);
+    updateBackground(imageSrc) {
+        if (this.gameContainer) {
+            // Set the new background image for the game container
+            this.gameContainer.style.backgroundImage = `url(${imageSrc})`;
+        } else {
+            console.error("Game container is not defined.");
         }
-    }
-
-    /**
-     * Clean up all registered global interaction handlers
-     */
-    cleanupInteractionHandlers() {
-        this.globalInteractionHandlers.forEach(handler => {
-            if (handler.removeInteractKeyListeners) {
-                handler.removeInteractKeyListeners();
-            }
-        });
-        this.globalInteractionHandlers.clear();
     }
 
     /**
@@ -70,32 +72,68 @@ class GameControl {
      * 3. Starting the game loop
      */ 
     transitionToLevel() {
-        // Clean up any lingering interaction handlers
-        this.cleanupInteractionHandlers();
-
-        const GameLevelClass = this.levelClasses[this.currentLevelIndex];
-        this.currentLevel = new GameLevel(this);
-        this.currentLevel.create(GameLevelClass);
-        this.gameLoop();
+        const fadeOverlay = document.createElement('div');
+        fadeOverlay.style.position = 'fixed';
+        fadeOverlay.style.top = '0';
+        fadeOverlay.style.left = '0';
+        fadeOverlay.style.width = '100%';
+        fadeOverlay.style.height = '100%';
+        fadeOverlay.style.backgroundColor = 'black';
+        fadeOverlay.style.opacity = '0';
+        fadeOverlay.style.transition = 'opacity 1s ease-in-out';
+        fadeOverlay.style.display = 'flex';
+        fadeOverlay.style.alignItems = 'center';
+        fadeOverlay.style.justifyContent = 'center';
+        
+        const loadingText = document.createElement('div');
+        loadingText.textContent = 'Loading...';
+        loadingText.style.color = 'white';
+        loadingText.style.fontSize = '2rem';
+        loadingText.style.fontFamily = 'Arial, sans-serif';
+        fadeOverlay.appendChild(loadingText);
+        
+        document.body.appendChild(fadeOverlay);
+    
+        // Fade to black
+        requestAnimationFrame(() => {
+            fadeOverlay.style.opacity = '1';
+        });
+    
+        setTimeout(() => {
+            // Switch levels when screen is black
+            const GameLevelClass = this.levelClasses[this.currentLevelIndex];
+            this.currentLevel = new GameLevel(this);
+            this.currentLevel.create(GameLevelClass);
+    
+            // Fade back in
+            fadeOverlay.style.opacity = '0';
+            setTimeout(() => document.body.removeChild(fadeOverlay), 1000);
+            
+            // Start game loop after transition
+            this.gameLoop();
+        }, 1000); // Wait for fade-out duration
     }
-
+    
     /**
      * The main game loop 
+     * 1. Updates the current level
+     * 2. Handles the level start
+     * 3. Requests the next frame
      */
     gameLoop() {
+        // Stop the game loop if the game is over
+        if (this.currentLevel.gameOver || this.isPaused) {
+            console.log("Game loop stopped: Game is over or paused.");
+            return;
+        }
+
         // If the level is not set to continue, handle the level end condition 
         if (!this.currentLevel.continue) {
             this.handleLevelEnd();
             return;
         }
-        // If the game level is paused, stop the game loop
-        if (this.isPaused) {
-            return;
-        }
-        // Level updates
         this.currentLevel.update();
         this.handleInLevelLogic();
-        // Recurse at frame rate speed
         requestAnimationFrame(this.gameLoop.bind(this));
     }
 
@@ -125,12 +163,7 @@ class GameControl {
         } else {
             alert("All levels completed.");
         }
-        
-        // Clean up any lingering interaction handlers
-        this.cleanupInteractionHandlers();
-        
         this.currentLevel.destroy();
-        
         // Call the gameOver callback if it exists
         if (this.gameOver) {
             this.gameOver();
@@ -144,17 +177,12 @@ class GameControl {
      * Exit key handler to end the current level
      * @param {*} event - The keydown event object
      */
-    handleNextLevelKey(event) {
-        if (event.key.toLowerCase() === 't' || event.key.toLowerCase() === 'escape') {
-            if (this.currentLevelIndex < this.levelClasses.length - 1) {
-                console.log("Hotkey 't' pressed: Transitioning to next level.");
-                this.currentLevel.continue = false;
-            } else {
-                alert("🎉 You're on the final level! There are no more levels to transition to.");
-            }
+    handleExitKey(event) {
+        if (event.key === 'Escape') {
+            this.currentLevel.continue = false;
         }
     }
-    
+
     // Helper method to add exit key listener
     addExitKeyListener() {
         document.addEventListener('keydown', this.exitKeyListener);
@@ -190,7 +218,7 @@ class GameControl {
 
     // Helper method to restore the hidden canvas item to be visible
     showCanvasState() {
-        const gameContainer = document.getElementById('gameContainer');
+        const gameContainer = document.getElementById("yourButtonId").addEventListener("click", toggleDesertImage);
         this.savedCanvasState.forEach(hidden_canvas => {
             const canvas = document.getElementById(hidden_canvas.id);
             if (canvas) {
@@ -212,9 +240,6 @@ class GameControl {
         this.removeExitKeyListener();
         this.saveCanvasState();
         this.hideCanvasState();
-        
-        // Also clean up interaction handlers
-        this.cleanupInteractionHandlers();
      }
 
      /**
