@@ -1,262 +1,211 @@
-// DialogueSystem.js - Fixed version that addresses both issues
-// 1. Unique instances for each NPC to prevent button conflicts
-// 2. Works with Eye of Ender collection
-
 class DialogueSystem {
   constructor(options = {}) {
-    // Default dialogue arrays
     this.dialogues = options.dialogues || [
       "You've come far, traveler. The skies whisper your name.",
       "The End holds secrets only the brave dare uncover.",
       "Retrieve the elytra and embrace your destiny!"
     ];
-    
+
     this.id = options.id || "dialogue_" + Math.random().toString(36).substr(2, 9);
-    
     this.lastShownIndex = -1;
-    
     this.dialogueBox = null;
     this.dialogueText = null;
     this.closeBtn = null;
-    
-    // Sound effect option
-    this.enableSound = options.enableSound !== undefined ? options.enableSound : false;
-    this.soundUrl = options.soundUrl || "./sounds/dialogue.mp3";
-    this.sound = this.enableSound ? new Audio(this.soundUrl) : null;
-    
-    // Create the dialogue box
-    this.createDialogueBox();
-    
-    // Keep track of whether the dialogue is currently open
     this.isOpen = false;
+    
+    // Optional sound
+    this.sound = options.sound;
+
+    this.createDialogueBox();
   }
 
   createDialogueBox() {
-    // Create the main dialogue container with unique ID
     this.dialogueBox = document.createElement("div");
-    this.dialogueBox.id = "custom-dialogue-box-" + this.id;
-    
-    // Set styles for the dialogue box
+    this.dialogueBox.id = "dialogue-box-" + this.id;
+
     Object.assign(this.dialogueBox.style, {
       position: "fixed",
       bottom: "100px",
       left: "50%",
       transform: "translateX(-50%)",
-      padding: "20px",
-      maxWidth: "80%",
-      background: "rgba(0, 0, 0, 0.85)",
-      color: "#00FFFF",
-      fontFamily: "'Press Start 2P', cursive, monospace",
-      fontSize: "14px",
-      textAlign: "center",
-      border: "2px solid #4a86e8",
-      borderRadius: "12px",
+      padding: "20px 30px",
+      maxWidth: "90%",
+      background: "rgba(255, 255, 255, 0.15)",
+      border: "1px solid rgba(255, 255, 255, 0.3)",
+      borderRadius: "16px",
+      color: "#fff",
+      fontFamily: "'Segoe UI', sans-serif",
+      fontSize: "16px",
+      backdropFilter: "blur(10px)",
+      boxShadow: "0 8px 32px rgba(31, 38, 135, 0.37)",
+      textAlign: "left",
+      display: "none",
       zIndex: "9999",
-      boxShadow: "0 0 20px rgba(0, 255, 255, 0.7)",
+      transition: "opacity 0.3s ease"
+    });
+
+    // Avatar
+    const avatar = document.createElement("div");
+    avatar.id = "dialogue-avatar-" + this.id;
+    Object.assign(avatar.style, {
+      width: "60px",
+      height: "60px",
+      borderRadius: "8px",
+      backgroundSize: "cover",
+      backgroundPosition: "center",
+      marginRight: "15px",
+      flexShrink: "0",
       display: "none"
     });
 
-    // Create the avatar container for character portraits
-    const avatarContainer = document.createElement("div");
-    avatarContainer.id = "dialogue-avatar-" + this.id;
-    Object.assign(avatarContainer.style, {
-      width: "50px",
-      height: "50px",
-      marginRight: "15px",
-      backgroundSize: "contain",
-      backgroundRepeat: "no-repeat",
-      backgroundPosition: "center",
-      display: "none" // Hidden by default
-    });
-
-    // Create the header with character name
-    const speakerName = document.createElement("div");
-    speakerName.id = "dialogue-speaker-" + this.id;
-    Object.assign(speakerName.style, {
+    // Speaker
+    const speaker = document.createElement("div");
+    speaker.id = "dialogue-speaker-" + this.id;
+    Object.assign(speaker.style, {
       fontWeight: "bold",
-      color: "#4a86e8",
-      marginBottom: "10px",
-      fontSize: "16px"
+      fontSize: "18px",
+      color: "#ffcc70",
+      marginBottom: "5px"
     });
 
-    // Create the text content area
+    // Text
     this.dialogueText = document.createElement("div");
     this.dialogueText.id = "dialogue-text-" + this.id;
-    Object.assign(this.dialogueText.style, {
-      marginBottom: "15px",
-      lineHeight: "1.5"
+    this.dialogueText.style.lineHeight = "1.5";
+
+    // Text container
+    const textBox = document.createElement("div");
+    textBox.appendChild(speaker);
+    textBox.appendChild(this.dialogueText);
+
+    const contentWrapper = document.createElement("div");
+    Object.assign(contentWrapper.style, {
+      display: "flex",
+      alignItems: "center",
+      gap: "15px",
+      marginBottom: "10px"
     });
 
-    // Create close button
+    contentWrapper.appendChild(avatar);
+    contentWrapper.appendChild(textBox);
+
+    // Close button
     this.closeBtn = document.createElement("button");
-    this.closeBtn.innerText = "Close";
+    this.closeBtn.innerText = "×";
     Object.assign(this.closeBtn.style, {
-      marginTop: "15px",
-      padding: "10px 20px",
-      background: "#4a86e8",
+      position: "absolute",
+      top: "10px",
+      right: "15px",
+      fontSize: "24px",
       color: "#fff",
+      background: "transparent",
       border: "none",
-      borderRadius: "5px",
       cursor: "pointer",
-      fontFamily: "'Press Start 2P', cursive, monospace",
-      fontSize: "12px"
+      lineHeight: "1"
     });
-    
-    // Add click handler
-    this.closeBtn.onclick = () => {
-      this.closeDialogue();
-    };
+    this.closeBtn.onclick = () => this.closeDialogue();
 
-    // Create content container to hold text and avatar side by side
-    const contentContainer = document.createElement("div");
-    contentContainer.style.display = "flex";
-    contentContainer.style.alignItems = "flex-start";
-    contentContainer.style.marginBottom = "10px";
-    contentContainer.appendChild(avatarContainer);
-    
-    // Create text container for speaker + dialogue
-    const textContainer = document.createElement("div");
-    textContainer.style.flexGrow = "1";
-    textContainer.appendChild(speakerName);
-    textContainer.appendChild(this.dialogueText);
-    contentContainer.appendChild(textContainer);
-
-    // Assemble the dialogue box
-    this.dialogueBox.appendChild(contentContainer);
+    // Build box
+    this.dialogueBox.appendChild(contentWrapper);
     this.dialogueBox.appendChild(this.closeBtn);
-    
-    // Add to the document
+
     document.body.appendChild(this.dialogueBox);
-    
-    // Also listen for Escape key to close dialogue
+
     document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape" && this.isOpen) {
-        this.closeDialogue();
-      }
+      if (e.key === "Escape" && this.isOpen) this.closeDialogue();
     });
   }
 
-  // Show a specific dialogue message
   showDialogue(message, speaker = "", avatarSrc = null) {
-    // Set the content (with unique element IDs)
     const speakerElement = document.getElementById("dialogue-speaker-" + this.id);
+    const avatarElement = document.getElementById("dialogue-avatar-" + this.id);
+
     if (speakerElement) {
       speakerElement.textContent = speaker;
       speakerElement.style.display = speaker ? "block" : "none";
     }
-    
-    // Set avatar if provided
-    const avatarElement = document.getElementById("dialogue-avatar-" + this.id);
+
     if (avatarElement) {
       if (avatarSrc) {
-        avatarElement.style.backgroundImage = `url('${avatarSrc}')`;
         avatarElement.style.display = "block";
+        avatarElement.style.backgroundImage = `url(${avatarSrc})`;
       } else {
         avatarElement.style.display = "none";
       }
     }
-    
-    // Set the dialogue text directly
+
     this.dialogueText.textContent = message;
-    
-    // Show the dialogue box
     this.dialogueBox.style.display = "block";
-    
-    // Play sound effect if enabled
+    this.dialogueBox.style.opacity = "1";
+    this.isOpen = true;
+
     if (this.sound) {
       this.sound.currentTime = 0;
-      this.sound.play().catch(e => console.log("Sound play error:", e));
+      this.sound.play().catch(() => {});
     }
-    
-    this.isOpen = true;
-    
-    // Return the dialogue box element for custom button addition
+
     return this.dialogueBox;
   }
 
-  // Show a random dialogue from the dialogues array
   showRandomDialogue(speaker = "", avatarSrc = null) {
-    if (this.dialogues.length === 0) return;
-    
-    // Pick a random index that's different from the last one
-    let randomIndex;
-    if (this.dialogues.length > 1) {
-      do {
-        randomIndex = Math.floor(Math.random() * this.dialogues.length);
-      } while (randomIndex === this.lastShownIndex);
-    } else {
-      randomIndex = 0; // Only one dialogue available
-    }
-    
-    // Store the current index to avoid repetition next time
-    this.lastShownIndex = randomIndex;
-    
-    // Show the dialogue
-    const randomDialogue = this.dialogues[randomIndex];
-    return this.showDialogue(randomDialogue, speaker, avatarSrc);
+    if (!this.dialogues.length) return;
+
+    let i;
+    do {
+      i = Math.floor(Math.random() * this.dialogues.length);
+    } while (i === this.lastShownIndex && this.dialogues.length > 1);
+
+    this.lastShownIndex = i;
+    return this.showDialogue(this.dialogues[i], speaker, avatarSrc);
   }
 
-  // Close the dialogue box
   closeDialogue() {
     if (!this.isOpen) return;
-    
-    // Hide the dialogue box
-    this.dialogueBox.style.display = "none";
-    this.isOpen = false;
-    
-    // Remove any custom buttons
-    const buttonContainers = this.dialogueBox.querySelectorAll('div[style*="display: flex"]');
-    buttonContainers.forEach(container => {
-      // Skip the main content container
-      if (container.contains(document.getElementById("dialogue-avatar-" + this.id))) {
-        return;
-      }
-      container.remove();
-    });
+    this.dialogueBox.style.opacity = "0";
+    setTimeout(() => {
+      this.dialogueBox.style.display = "none";
+      this.isOpen = false;
+    }, 300);
   }
 
-  // Check if dialogue is currently open
   isDialogueOpen() {
     return this.isOpen;
   }
-  
-  // Add buttons to the dialogue
-  addButtons(buttons) {
-      if (!this.isOpen || !buttons || !Array.isArray(buttons) || buttons.length === 0) return;
-      
-      const buttonContainer = document.createElement('div');
-      buttonContainer.style.display = 'flex';
-      buttonContainer.style.justifyContent = 'space-between';
-      buttonContainer.style.marginTop = '10px';
-      
-      // Add each button
-      buttons.forEach(button => {
-          if (!button || !button.text) return;
-          
-          const btn = document.createElement('button');
-          btn.textContent = button.text;
-          btn.style.padding = '8px 15px';
-          btn.style.background = button.primary ? '#4a86e8' : '#666';
-          btn.style.color = 'white';
-          btn.style.border = 'none';
-          btn.style.borderRadius = '5px';
-          btn.style.cursor = 'pointer';
-          btn.style.marginRight = '10px';
-          
-          // Add click handler
-          btn.onclick = () => {
-              if (button.action && typeof button.action === 'function') {
-                  button.action();
-              }
-          };
-          
-          buttonContainer.appendChild(btn);
+
+  addButtons(buttons = []) {
+    if (!this.isOpen || !buttons.length) return;
+
+    const btnContainer = document.createElement("div");
+    btnContainer.style.marginTop = "15px";
+    btnContainer.style.display = "flex";
+    btnContainer.style.gap = "10px";
+
+    buttons.forEach(({ text, action, primary }) => {
+      const btn = document.createElement("button");
+      btn.textContent = text;
+      Object.assign(btn.style, {
+        padding: "10px 15px",
+        borderRadius: "6px",
+        border: "none",
+        cursor: "pointer",
+        background: primary ? "#00bcd4" : "#555",
+        color: "#fff",
+        fontWeight: "bold",
+        fontSize: "14px",
+        transition: "all 0.2s ease"
       });
-      
-      // Insert before the close button
-      if (buttonContainer.children.length > 0) {
-          this.dialogueBox.insertBefore(buttonContainer, this.closeBtn);
-      }
+
+      btn.onmouseover = () => (btn.style.opacity = "0.85");
+      btn.onmouseout = () => (btn.style.opacity = "1");
+
+      btn.onclick = () => {
+        if (typeof action === "function") action();
+      };
+
+      btnContainer.appendChild(btn);
+    });
+
+    this.dialogueBox.appendChild(btnContainer);
   }
 }
 

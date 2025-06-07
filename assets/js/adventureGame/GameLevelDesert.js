@@ -56,18 +56,10 @@ class GameLevelDesert {
 
     // Parallax effect
     function applyParallax() {
-      let backgroundElement = document.getElementById("background");
+      const backgroundElement = document.getElementById("background");
       if (!backgroundElement) {
-        // Create the background element if it doesn't exist
-        backgroundElement = document.createElement("div");
-        backgroundElement.id = "background";
-        backgroundElement.style.position = "absolute";
-        backgroundElement.style.top = "0";
-        backgroundElement.style.left = "0";
-        backgroundElement.style.width = "100%";
-        backgroundElement.style.height = "100%";
-        backgroundElement.style.zIndex = "-1"; // Ensure it is behind other elements
-        document.body.appendChild(backgroundElement);
+        console.error("Background element not found!");
+        return;
       }
 
       window.addEventListener("scroll", () => {
@@ -220,32 +212,15 @@ class GameLevelDesert {
           setTimeout(() => {
             this.isAnimating = false;
           }, 1000);
-        },
-        draw: function(ctx) {
-          if (!this.image || !this.image.complete) {
-            console.warn("Unicorn sprite not loaded, skipping draw.");
-            return;
-          }
-          ctx.drawImage(this.image, this.INIT_POSITION.x, this.INIT_POSITION.y, this.width, this.height);
         }
       };
-
-    // Load unicorn image properly before using it
-    const unicornImage = new Image();
-    unicornImage.src = sprite_src_unicorn;
-
-    unicornImage.onload = () => {
-      sprite_data_unicorn.image = unicornImage;
-      console.log("Unicorn image loaded.");
-    };
-
-    // Set intervals to update position and play animation  
-    setInterval(() => {
-      sprite_data_unicorn.updatePosition();
-    }, 100);
-    setInterval(() => {
-      sprite_data_unicorn.playAnimation();
-    }, 1000);
+      // Set intervals to update position and play animation  
+      setInterval(() => {
+        sprite_data_unicorn.updatePosition();
+      }, 100);
+      setInterval(() => {
+        sprite_data_unicorn.playAnimation();
+      }, 1000);
 
     function growUnicorn(unicorn) {
       unicorn.SCALE_FACTOR += 0.5; // Increase the scale factor
@@ -519,28 +494,6 @@ class GameLevelDesert {
                 primaryGame.resume();
             }
         }
-    };
-
-    // Load Robot image properly before using it
-    const robotImage = new Image();
-    robotImage.src = sprite_src_robot;
-
-    robotImage.onload = () => {
-      sprite_data_robot.image = robotImage;
-      console.log("Robot image loaded.");
-    };
-
-    robotImage.onerror = () => {
-      console.error("Failed to load Robot image:", robotImage.src);
-    };
-
-    // Add a guard clause in the draw function to prevent drawing until the image is loaded
-    sprite_data_robot.draw = function(ctx) {
-      if (!this.image || !this.image.complete) {
-        console.warn("Robot sprite not loaded, skipping draw.");
-        return;
-      }
-      ctx.drawImage(this.image, this.INIT_POSITION.x, this.INIT_POSITION.y, this.width, this.height);
     };
 
     // Validate sprite sources after all definitions

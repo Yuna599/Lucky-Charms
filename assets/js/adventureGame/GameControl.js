@@ -1,6 +1,7 @@
 // GameControl.js
 import GameLevel from "./GameLevel.js";
-import Intro from "./Intro.js";
+import Intro from "./Intro.js"; // Ensure Intro class is imported
+import GameLevelDesert from "./GameLevelDesert.js"; // Import GameLevelDesert
 
 class GameControl {
     /**
@@ -22,11 +23,19 @@ class GameControl {
         this.exitKeyListener = this.handleExitKey.bind(this);
         this.gameOver = null; // Callback for when the game is over 
         this.savedCanvasState = []; // Save the current levels game elements 
-        this.intro = new Intro(this); // Initialize Intro with GameControl reference
+        this.intro = new Intro(this); // Ensure Intro instance is initialized
     }
 
     start() {
-        this.intro.showStartButton(); // Delegate start button logic to Intro
+        if (this.levelClasses[this.currentLevelIndex] === GameLevelDesert) {
+            if (!this.intro) {
+                console.error("Intro instance is not initialized.");
+                return;
+            }
+            this.intro.showStartButton(); // Show intro only for GameLevelDesert
+        } else {
+            this.transitionToLevel(); // Directly transition to other levels
+        }
     }
 
     showConversationModal() {

@@ -4,6 +4,8 @@ import Character from "./Character.js";
 import Quiz from "./Quiz.js";
 import GameLevelDesert from "./GameLevelDesert.js";
 import Npc from "./Npc.js"; // Ensure proper import
+import GameLevelMinesweeper from "./GameLevelMinesweeper.js"; // Add this import
+import GameControl from "./GameControl.js"; // Ensure GameControl is imported
 
 console.log("Resolved Player path:", Player);
 console.log("Resolved Character path:", Character);
@@ -100,76 +102,190 @@ class GameLevelGym {
       orientation: { rows: 1, columns: 1 },
       down: { row: 0, start: 0, columns: 1 },
       hitbox: { widthPercentage: 0.1, heightPercentage: 0.2 },
-      interact: function () {
-        if (!this.image || !this.image.complete) {
-          console.warn("Desert Portal sprite not loaded, skipping interaction.");
-          return;
+      dialogues: [
+        "Minesweeper is all about logic and probability.",
+        "The numbers tell you how many mines are adjacent to that square.",
+        "Use right-click to flag squares you think contain mines.",
+        "The first click is always safe in modern Minesweeper.",
+        "Minesweeper was first included with Windows 3.1 in 1992.",
+        "The world record for expert Minesweeper is under 40 seconds!",
+        "Looking for patterns is key to solving Minesweeper efficiently.",
+        "Sometimes you have to make an educated guess - that's part of the game."
+    ],
+    reaction: function() {
+        // Use dialogue system instead of alert
+        if (this.dialogueSystem) {
+            this.showReactionDialogue();
+        } else {
+            console.log(sprite_greet_desertportal);
+        }
+    },
+    interact: function() {
+        if (typeof GameControl === "undefined") {
+            console.error("GameControl is not defined. Ensure it is properly imported.");
+            return;
         }
 
-        const transitionOverlay = document.createElement("div");
-        transitionOverlay.style.position = "fixed";
-        transitionOverlay.style.top = "0";
-        transitionOverlay.style.left = "0";
-        transitionOverlay.style.width = "100%";
-        transitionOverlay.style.height = "100%";
-        transitionOverlay.style.backgroundColor = "black";
-        transitionOverlay.style.opacity = "0";
-        transitionOverlay.style.zIndex = "1000";
-        transitionOverlay.style.transition = "opacity 1s ease-in-out";
-        document.body.appendChild(transitionOverlay);
+        let primaryGame = gameEnv.gameControl;
+        let levelArray = [GameLevelMinesweeper];
+        let gameInGame = new GameControl(gameEnv.game, levelArray);
+        primaryGame.pause();
+        gameInGame.start();
+        gameInGame.gameOver = function() {
+            primaryGame.resume();
+        };
+    }
+};
+const sprite_src_endship = path + "/images/gamify/computer.png";
+    const sprite_greet_endship = "Find the elytra";
 
-        setTimeout(() => {
-          transitionOverlay.style.opacity = "1";
-        }, 100);
+    // Store a reference to the dialogueSystem for use in sprite data
+    const dialogueSystem = this.dialogueSystem;
 
-        setTimeout(() => {
-          const desertLevel = new GameLevelDesert(gameEnv); // Initialize the desert level
-          gameEnv.gameControl.levelClasses = [GameLevelDesert]; // Set the desert level in the level classes
-          gameEnv.gameControl.currentLevelIndex = 0; // Reset the level index
-          gameEnv.gameControl.transitionToLevel(); // Transition to the desert level
+    const sprite_data_endship = {
+        id: 'Endship',
+        greeting: sprite_greet_endship,
+        src: sprite_src_endship,
+        SCALE_FACTOR: 5,
+        ANIMATION_RATE: 100,
+        pixels: {height: 521, width: 479},
+        INIT_POSITION: { x: (width / 2), y: (height / 2) },
+        orientation: {rows: 1, columns: 1 },
+        down: {row: 0, start: 0, columns: 1 },
+        hitbox: { widthPercentage: 0.1, heightPercentage: 0.2 },
+        zIndex: 10,  // Same z-index as player
+        dialogues: [
+            "Expolore the new terrain?",
+            "I love villager life!",
+            "Roblox is not better than Minecraft!",
+        ],
+        reaction: function() {
+            // Don't show any reaction dialogue - this prevents the first alert
+            // The interact function will handle all dialogue instead
+        },
+        interact: function() {
+            // Clear any existing dialogue first to prevent duplicates
+            if (this.dialogueSystem && this.dialogueSystem.isDialogueOpen()) {
+                this.dialogueSystem.closeDialogue();
+            }
+            
+            // Create a new dialogue system if needed
+            if (!this.dialogueSystem) {
+                this.dialogueSystem = new DialogueSystem();
+            }
+            
+            // Show portal dialogue with buttons
+            this.dialogueSystem.showDialogue(
+                "Do you wish to explore the plains?",
+                "Plains Biome?",
+                this.spriteData.src
+            );
+            
+            // Add buttons directly to the dialogue
+            this.dialogueSystem.addButtons([
+                {
+                    text: "Mountainous Plains",
+                    primary: true,
+                    action: () => {
+                        this.dialogueSystem.closeDialogue();
+                        
+                        // Clean up the current game state
+                        if (gameEnv && gameEnv.gameControl) {
+                            // Store reference to the current game control
+                            const gameControl = gameEnv.gameControl;
+                            
+                            // Create fade overlay for transition
+                            const fadeOverlay = document.createElement('div');
+                            Object.assign(fadeOverlay.style, {
+                                position: 'fixed',
+                                top: '0',
+                                left: '0',
+                                width: '100%',
+                                height: '100%',
+                                backgroundColor: '#000',
+                                opacity: '0',
+                                transition: 'opacity 1s ease-in-out',
+                                zIndex: '9999'
+                            });
+                            document.body.appendChild(fadeOverlay);
+                            
+                            console.log("Starting New level transition...");
+                            
+                            // Fade in
+                            requestAnimationFrame(() => {
+                                fadeOverlay.style.opacity = '1';
+                                
+                                // After fade in, transition to End level
+                                setTimeout(() => {
+                                    // Clean up current level properly
+                                    if (gameControl.currentLevel) {
+                                        // Properly destroy the current level
+                                        console.log("Destroying current level...");
+                                        gameControl.currentLevel.destroy();
+                                        
+                                        // Force cleanup of any remaining canvases
+                                        const gameContainer = document.getElementById('gameContainer');
+                                        const oldCanvases = gameContainer.querySelectorAll('canvas:not(#gameCanvas)');
+                                        oldCanvases.forEach(canvas => {
+                                            console.log("Removing old canvas:", canvas.id);
+                                            canvas.parentNode.removeChild(canvas);
+                                        });
+                                    }
+                                    
+                                    console.log("Setting up Platformer...");
+                                    
+                                    // IMPORTANT: Store the original level classes for return journey
+                                    gameControl._originalLevelClasses = gameControl.levelClasses;
+                                    
+                                    // Set the new level class to Platformer
+                                    window.location.href = "/finale/gamify/platformer"; // PLEASE WORK
 
-          transitionOverlay.style.opacity = "0";
-          setTimeout(() => {
-            transitionOverlay.remove();
-          }, 1000);
-        }, 1000);
-      },
-      draw: function (ctx) {
-        if (!this.image || !this.image.complete || this.image.naturalWidth === 0) {
-          console.warn("Desert Portal sprite not loaded or is in a broken state, skipping draw.");
-          return;
+                                    
+                                    // Make sure game is not paused
+                                    gameControl.isPaused = false;
+                                    
+                                    // Start the End level with the same control
+                                    console.log("Transitioning to Platformer...");
+                                    gameControl.transitionToLevel();
+                                    
+                                    // Fade out overlay
+                                    setTimeout(() => {
+                                        fadeOverlay.style.opacity = '0';
+                                        setTimeout(() => {
+                                            document.body.removeChild(fadeOverlay);
+                                        }, 1000);
+                                    }, 500);
+                                }, 1000);
+                            });
+                        }
+                    }
+                },
+                {
+                    text: "Not Ready",
+                    action: () => {
+                        this.dialogueSystem.closeDialogue();
+                    }
+                }
+            ]);
         }
-        ctx.drawImage(this.image, this.INIT_POSITION.x, this.INIT_POSITION.y, this.width, this.height);
-      },
-    };
-
-    // Load Desert Portal image properly before using it
-    const desertPortalImage = new Image();
-    desertPortalImage.src = sprite_src_desertportal;
-
-    desertPortalImage.onload = () => {
-      sprite_data_desertportal.image = desertPortalImage;
-      console.log("Desert Portal image loaded.");
-    };
-
-    desertPortalImage.onerror = () => {
-      console.error(`Failed to load Desert Portal image: ${desertPortalImage.src}`);
-      sprite_data_desertportal.src = ""; // Reset the source to prevent further errors
-    };
+    }
 
     // Add event listener for interaction (pressing 'E')
     window.addEventListener("keydown", (event) => {
-      if (event.key === "E" || event.key === "e") {
-        if (checkCollision(sprite_data_chillguy, sprite_data_desertportal)) {
-          sprite_data_desertportal.interact(); // Trigger the interaction
+        if (event.key === "E" || event.key === "e") {
+            if (checkCollision(sprite_data_chillguy, sprite_data_desertportal)) {
+                sprite_data_desertportal.interact(); // Trigger interaction for Desert Portal
+            } else if (checkCollision(sprite_data_chillguy, sprite_data_endship)) {
+                sprite_data_endship.interact(); // Trigger interaction for Endship
+            }
         }
-      }
     });
 
     this.classes = [
       { class: GameEnvBackground, data: image_data_gym },
       { class: Player, data: sprite_data_chillguy },
-      { class: Npc, data: sprite_data_desertportal },
+      { class: Npc, data: sprite_data_desertportal},
+     { class: Npc, data: sprite_data_endship },
     ];
 
     this.createScoreDisplay();

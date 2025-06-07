@@ -1,6 +1,7 @@
 import GameControl from './GameControl.js';
 import GameLevelDesert from './GameLevelDesert.js'; // Import GameLevelDesert
 import GameLevelGym from './GameLevelGym.js'; // Import GameLevelGym
+import GameLevelMinesweeper from './GameLevelMinesweeper.js';
 
 class Game {
     constructor(environment) {
@@ -18,7 +19,8 @@ class Game {
         this.levels = [
             GameLevelDesert,
             GameLevelGym,
-            // Add other levels here
+            GameLevelMinesweeper,
+            
         ];
         this.gameControl = new GameControl(this, this.levels);
         this.gameControl.start();
