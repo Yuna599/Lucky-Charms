@@ -37,36 +37,6 @@ class GameControl {
         this.intro.showResponse(responseText); // Delegate response modal logic to Intro
     }
 
-    addBackgroundChangeButton() {
-        // Ensure the gameContainer exists before creating the button
-        if (!this.gameContainer) {
-            console.error("Game container is not initialized.");
-            return;
-        }
-
-        // Create a new button element
-        const button = document.createElement("button");
-        button.innerText = "Go to the gym";
-        button.id = "changeBackgroundButton";
-
-        // Style the button
-        button.style.position = "absolute";
-        button.style.top = "10px";
-        button.style.right = "10px";
-        button.style.padding = "10px";
-        button.style.backgroundColor = "black";
-        button.style.color = "white";
-        button.style.border = "none";
-        button.style.cursor = "pointer";
-        button.style.fontSize = "16px";
-
-        // Append the button to the game container
-        this.gameContainer.appendChild(button);
-
-        // Add event listener to change background
-        button.addEventListener("click", this.changeBackground.bind(this));
-    }
-
     /**
      * Switch the background between Disneyland and Gym
      */

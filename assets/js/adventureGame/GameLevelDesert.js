@@ -100,106 +100,119 @@ class GameLevelDesert {
       height: 320,
     };
 
-    // NPC data for creeper
-    const sprite_src_creeper = path + "/images/gamify/octocat.png"; // Ensure the path is correct
-    const sprite_greet_creeper = "KABOOM!!";
-    const sprite_data_creeper = {
-        id: 'Creeper',
-        greeting: sprite_greet_creeper,
-        src: sprite_src_creeper,
+    // NPC data for unicorn
+    const sprite_src_unicorn = path + "/images/gamify/image.png"; // Ensure the path is correct
+    const sprite_greet_unicorn = "KABOOM!!";
+    const sprite_data_unicorn = {
+        id: 'Unicorn',
+        greeting: sprite_greet_unicorn,
+        src: sprite_src_unicorn,
         SCALE_FACTOR: 4, // Starting scale factor is 4ling needs
         ANIMATION_RATE: 500,
-        pixels: {height: 301, width: 801},
+        pixels: {height: 500, width: 500},
         INIT_POSITION: { x: 100, y: 100 },
-        orientation: {rows: 1, columns: 4 },
+        orientation: {rows: 1, columns: 1 },
         down: {row: 0, start: 0, columns: 1 },
-        right: {row: 0, start: 0, columns: 3 },
-        left: {row: 0, start: 0, columns: 4 },
-        up: {row: 0, start: 0, columns: 2 },  // This is the stationary npc, down is default 
+        right: {row: 0, start: 0, columns: 1 },
+        left: {row: 0, start: 0, columns: 1 },
+        up: {row: 0, start: 0, columns: 1 },  // This is the stationary npc, down is default 
         hitbox: { widthPercentage: 0.1, heightPercentage: 0.2 },
 
-        walkingArea: {
-          xMin: width / 10, //left boundary
-          xMax: (width * 5 / 7), //right boundary 
-          yMin: height / 4, //top boundary 
-          yMax: (height * 8 / 15) //bottom boundary
-        },
-
-        speed : 20,
-        direction: { x: 1, y: 1 },
-
+        
+          //walking area creates the box where the Shark can walk in 
+          walkingArea: {
+            xMin: width / 5, //left boundary
+            xMax: (width * 3 / 5), //right boundary 
+            yMin: height / 4, //top boundary 
+            yMax: (height * 3 / 5) //bottom boundary
+          },
+        speed: 10,
+        direction: { x: 1, y: 1 }, 
         updatePosition: function () {
-          console.log(`Creeper position: (${this.INIT_POSITION.x}, ${this.INIT_POSITION.y})`);
-          this.INIT_POSITION.x += this.direction.x * this.speed; // Update x position based on direction and speed
-          this.INIT_POSITION.y += this.direction.y * this.speed; // Update y position based on direction and speed
-
+          this.INIT_POSITION.x += this.direction.x * this.speed;
+          this.INIT_POSITION.y += this.direction.y * this.speed;
           if (this.INIT_POSITION.x <= this.walkingArea.xMin) {
             this.INIT_POSITION.x = this.walkingArea.xMin;
-            this.direction.x = 1; 
+            this.direction.x = 1;
           }
           if (this.INIT_POSITION.x >= this.walkingArea.xMax) {
             this.INIT_POSITION.x = this.walkingArea.xMax;
-            this.direction.x = -1; 
+            this.direction.x = -1;
           }
           if (this.INIT_POSITION.y <= this.walkingArea.yMin) {
             this.INIT_POSITION.y = this.walkingArea.yMin;
-            this.direction.y = 1; 
+            this.direction.y = 1;
           }
           if (this.INIT_POSITION.y >= this.walkingArea.yMax) {
             this.INIT_POSITION.y = this.walkingArea.yMax;
-            this.direction.y = -1; 
+            this.direction.y = -1;
+          }
+          const spriteElement = document.getElementById(this.id);
+          if (spriteElement) { 
+            spriteElement.style.transform = this.direction.x === -1 ? "scaleX(-1)" : "scaleX(1)";
+            spriteElement.style.left = this.INIT_POSITION.x + 'px';
+            spriteElement.style.top = this.INIT_POSITION.y + 'px'; // Update position of the shark sprite
           }
         },
-
-        reaction: function () {
-          alert(sprite_greet_creeper); 
-        },
-        x: 100,
-        y: 100,
-        width: 801,
-        height: 301,
+        // Splash Animation
+        // This function creates a splash animation when the shark moves
+        isAnimating: false,
+        playAnimation: function () {
+          if (this.isAnimating) return;
+          this.isAnimating = true;
+        
+          const spriteElement = document.getElementById(this.id);
+          if (!spriteElement) return;
+        
+          const particleCount = 20;
+        
+          for (let i = 0; i < particleCount; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'splash-particle';
+        
+            particle.style.position = 'absolute';
+            particle.style.left = `${spriteElement.offsetLeft + spriteElement.offsetWidth / 3}px`;
+            particle.style.top = `${spriteElement.offsetTop + spriteElement.offsetHeight / 3}px`;
+            particle.style.width = '6px';
+            particle.style.height = '6px';
+            particle.style.borderRadius = '50%';
+            particle.style.backgroundColor = 'aqua';
+            particle.style.pointerEvents = 'none';
+            particle.style.zIndex = 1000;
+            particle.style.opacity = 1;
+            particle.style.transition = 'transform 1s ease-out, opacity 1s ease-out';
+        
+            // Animate outward
+            const angle = Math.random() * 2 * Math.PI;
+            const distance = 60 + Math.random() * 40;
+            const x = Math.cos(angle) * distance;
+            const y = Math.sin(angle) * distance;
+        
+            document.body.appendChild(particle);
+            requestAnimationFrame(() => {
+              particle.style.transform = `translate(${x}px, ${y}px)`;
+              particle.style.opacity = 0;
+            });
+        
+            // Cleanup after animation
+            setTimeout(() => {
+              particle.remove();
+            }, 1000);
+          }
+        
+          setTimeout(() => {
+            this.isAnimating = false;
+          }, 1000);
+        }
       };
-
+      // Set intervals to update position and play animation  
       setInterval(() => {
-        sprite_data_creeper.updatePosition(); 
-      }, 100); // update position every 100 milliseconds 
+        sprite_data_unicorn.updatePosition();
+      }, 100);
+      setInterval(() => {
+        sprite_data_unicorn.playAnimation();
+      }, 1000);
 
-      function checkCollision(player, npc) {
-        if (!player || !npc) {
-          console.log("Player or NPC is undefined.");
-          return false;
-        }
-
-        // Calculate collision based on positions and dimensions
-        const isColliding = !(
-          player.x + player.width <= npc.INIT_POSITION.x || // Player's right edge is left of NPC's left edge
-          player.x >= npc.INIT_POSITION.x + npc.pixels.width * npc.SCALE_FACTOR || // Player's left edge is right of NPC's right edge
-          player.y + player.height <= npc.INIT_POSITION.y || // Player's bottom edge is above NPC's top edge
-          player.y >= npc.INIT_POSITION.y + npc.pixels.height * npc.SCALE_FACTOR // Player's top edge is below NPC's bottom edge
-        );
-
-        return isColliding;
-      }
-
-      function growCreeper(creeper) {
-        const maxScaleFactor = 10; // Define a maximum scale factor to prevent infinite growth
-
-        console.log(" Current scale factor:", creeper.SCALE_FACTOR);
-
-        // Increase the scale factor by 1 if not at maximum
-        if (creeper.SCALE_FACTOR < maxScaleFactor) {
-          creeper.SCALE_FACTOR += 1;
-          console.log(" Scale factor incremented to:", creeper.SCALE_FACTOR);
-
-          // Update the creeper's width and height based on the new scale factor
-          creeper.width = creeper.pixels.width * creeper.SCALE_FACTOR;
-          creeper.height = creeper.pixels.height * creeper.SCALE_FACTOR;
-
-          console.log(" Updated size:", creeper.width, creeper.height);
-        } else {
-          console.log(" Scale factor already at maximum:", creeper.SCALE_FACTOR);
-        }
-      }
 
     // Add Employee NPC data
     const sprite_src_employee = path + "/images/gamify/employee.png"; // Ensure the path is correct
@@ -296,14 +309,14 @@ class GameLevelDesert {
       context.fillStyle = "blue";
       context.fillRect(sprite_data_chillguy.x, sprite_data_chillguy.y, sprite_data_chillguy.width, sprite_data_chillguy.height);
 
-      // Draw creeper using updated width and height based on SCALE_FACTOR
-      const creeperDrawWidth = sprite_data_creeper.width; // Use updated width
-      const creeperDrawHeight = sprite_data_creeper.height; // Use updated height
+      // Draw unicorn using updated width and height based on SCALE_FACTOR
+      const unicornDrawWidth = sprite_data_unicorn.width; // Use updated width
+      const unicornDrawHeight = sprite_data_cunicorn.height; // Use updated height
 
       context.fillStyle = "green";
-      context.fillRect(sprite_data_creeper.x, sprite_data_creeper.y, creeperDrawWidth, creeperDrawHeight);
+      context.fillRect(sprite_data_unicorn.x, sprite_data_unicorn.y, unicornDrawWidth, unicornDrawHeight);
 
-      console.log(" Drawing creeper with size:", creeperDrawWidth, creeperDrawHeight);
+      console.log(" Drawing unicorn with size:", unicornDrawWidth, unicornDrawHeight);
 
       // Draw Employee NPC
       context.fillStyle = "yellow";
@@ -314,16 +327,16 @@ class GameLevelDesert {
         sprite_data_employee.pixels.height * sprite_data_employee.SCALE_FACTOR
       );
 
-      // Check for collision with Creeper
-      if (checkCollision(sprite_data_chillguy, sprite_data_creeper)) {
-        growCreeper(sprite_data_creeper);
+      // Check for collision with unicorn
+      if (checkCollision(sprite_data_chillguy, sprite_data_unicorn)) {
+        growUnicorn(sprite_data_unicorn);
       }
 
       requestAnimationFrame(gameLoop);
     }
 
     // Debugging: Ensure the correct object is being modified
-    console.log("Initial Creeper Object:", sprite_data_creeper);
+    console.log("Initial Unicorn Object:", sprite_data_unicorn);
     const sprite_src_endportal = path + "/images/gamify/computer.png";
     const sprite_greet_endportal = "Teleport to the End? Press E";
     const sprite_data_endportal = {
@@ -519,7 +532,7 @@ class GameLevelDesert {
     this.classes = [
       { class: Background, data: image_data_desert },
       { class: Player, data: sprite_data_chillguy },
-      { class: Npc, data: sprite_data_creeper },
+      { class: Npc, data: sprite_data_unicorn },
       { class: Npc, data: sprite_data_employee },
       { class: Npc, data: sprite_data_robot}
     ];

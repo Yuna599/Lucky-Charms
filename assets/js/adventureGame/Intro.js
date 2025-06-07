@@ -1,5 +1,3 @@
-
-
 class Intro {
     constructor(gameControl) {
         this.gameControl = gameControl; // Reference to GameControl
@@ -31,7 +29,6 @@ class Intro {
             startButton.remove();
             this.gameControl.addExitKeyListener();
             this.gameControl.transitionToLevel();
-            this.gameControl.addBackgroundChangeButton();
 
             const audio = new Audio('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3');
             audio.play().catch((error) => console.error("Error playing audio:", error));
@@ -41,6 +38,12 @@ class Intro {
     }
 
     showConversationModal() {
+        // Prevent duplicate modals
+        if (document.getElementById("conversation-modal")) {
+            console.warn("Conversation modal already exists.");
+            return;
+        }
+
         // Create the modal container
         const modal = document.createElement("div");
         modal.id = "conversation-modal";
