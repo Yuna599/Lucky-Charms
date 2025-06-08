@@ -24,6 +24,7 @@ class GameControl {
         this.gameOver = null; // Callback for when the game is over 
         this.savedCanvasState = []; // Save the current levels game elements 
         this.intro = new Intro(this); // Ensure Intro instance is initialized
+        this.interactionHandlers = []; // Add interaction handlers array
     }
 
     start() {
@@ -121,6 +122,8 @@ class GameControl {
             // Start game loop after transition
             this.gameLoop();
         }, 1000); // Wait for fade-out duration
+
+        this.cleanupInteractionHandlers(); // Ensure interaction handlers are cleaned up during transitions
     }
     
     /**
@@ -264,6 +267,30 @@ class GameControl {
         this.addExitKeyListener();
         this.showCanvasState();
         this.gameLoop();
+    }
+
+    /**
+     * Register an interaction handler
+     * @param {Function} handler - The interaction handler to register
+     */
+    registerInteractionHandler(handler) {
+        this.interactionHandlers.push(handler); // Register interaction handler
+    }
+
+    /**
+     * Unregister an interaction handler
+     * @param {Function} handler - The interaction handler to unregister
+     */
+    unregisterInteractionHandler(handler) {
+        this.interactionHandlers = this.interactionHandlers.filter(h => h !== handler); // Unregister interaction handler
+    }
+
+    /**
+     * Clean up all interaction handlers
+     */
+    cleanupInteractionHandlers() {
+        this.interactionHandlers.forEach(handler => handler.destroy()); // Clean up all handlers
+        this.interactionHandlers = [];
     }
 }
 

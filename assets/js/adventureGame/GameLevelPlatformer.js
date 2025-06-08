@@ -1,4 +1,7 @@
 import Background from "./Background.js";
+import Collectible from "./Collectible.js";
+import GameObject from "./GameObject.js";
+import GameControl from "./GameControl.js";
 
 class GameLevelPlatformer {
   constructor(gameEnv) {
@@ -17,12 +20,62 @@ class GameLevelPlatformer {
     const gravity = 0.5;
     const friction = 0.8;
 
+    const collectibles = []; // Declare collectibles array
+
+    // Define sprite_data_eye before using it
+    const sprite_src_eye = gameEnv.path + "/images/gamify/gym3.png";
+
+    // Load the image manually and assign it to sprite_data_eye
+    const eyeImage = new Image();
+    eyeImage.src = sprite_src_eye;
+
+    const sprite_data_eye = {
+      id: 'Eye of Ender',
+      greeting: "Press E to collect the Eye of Ender!",
+      src: sprite_src_eye,
+      image: eyeImage, // Assign the loaded image
+      SCALE_FACTOR: 3,
+      pixels: { width: 32, height: 32 },
+      INIT_POSITION: {
+        x: (Math.random() * (width - 100)) + 50,
+        y: (Math.random() * (height - 300)) + 100
+      },
+      orientation: { rows: 1, columns: 1 },
+      down: { row: 0, start: 0, columns: 1 },
+      hitbox: { widthPercentage: 0.3, heightPercentage: 0.3 },
+      zIndex: 10,
+      dialogues: [
+        "You found an Eye of Ender!",
+        "It pulses with ancient energy."
+      ],
+      interact: function () {
+        this.collected = true;
+
+        const index = collectibles.indexOf(this);
+        if (index !== -1) collectibles.splice(index, 1);
+
+        console.log("Eye of Ender collected!");
+      }
+    };
+
+    // Ensure classes is properly defined
+    this.classes = [
+      { class: Background, data: { src: gameEnv.path + "/images/gamify/gim.png" } },
+      { class: Collectible, data: sprite_data_eye }
+    ];
+
+    function spawnCollectible() {
+      const eye = new Collectible(sprite_data_eye, gameEnv);
+      collectibles.push(eye);
+      gameEnv.gameObjects.push(eye); // Track all game objects
+    }
+
     // Player sprite setup
     const sprite_src_player = gameEnv.path + "/images/gamify/pixilart.png";
     const playerImage = new Image();
     playerImage.src = sprite_src_player;
 
-    const PLAYER_SCALE_FACTOR = 3;
+    const PLAYER_SCALE_FACTOR = 1.5;
 
     const sprite_data_player = {
       id: "Player",
@@ -47,37 +100,35 @@ class GameLevelPlatformer {
       keypress: { up: 87, left: 65, down: 83, right: 68 },
     };
 
-    const frameWidth = sprite_data_player.pixels.width / sprite_data_player.orientation.columns;
-    const frameHeight = sprite_data_player.pixels.height / sprite_data_player.orientation.rows;
+// Player object
+const frameWidth = sprite_data_player.pixels.width / sprite_data_player.orientation.columns;
+const frameHeight = sprite_data_player.pixels.height / sprite_data_player.orientation.rows;
 
-    const player = {
-      x: sprite_data_player.INIT_POSITION.x,
-      y: sprite_data_player.INIT_POSITION.y,
-      width: frameWidth * 1.5 , // Increase width further
-      height: frameHeight * 1.5, // Increase height further
-      velocityX: 0,
-      velocityY: 0,
-      speed: 4,
-      jumpPower: -12,
-      onGround: false,
-      frameX: 0,
-      frameY: sprite_data_player.down.row,
-      frameCounter: 0,
-      facing: "right", // Add facing property to track direction
-    };
+const player = {
+  x: 100,
+  y: 0,
+  width: frameWidth * 1.5,
+  height: frameHeight * 1.5,
+  velocityX: 0,
+  velocityY: 0,
+  speed: 4,
+  jumpPower: -12,
+  onGround: false,
+  frameX: 0,
+  frameY: sprite_data_player.down.row,
+  frameCounter: 0,
+  flashRed: false,
+  flashTimer: 0
+};
 
-    // Platform data
-    const platforms = [
-      { x: 0, y: height - 50, width: width, height: 50 },
-      { x: 200, y: height - 150, width: 100, height: 10 },
-      { x: 400, y: height - 250, width: 150, height: 10 },
-      { x: 600, y: height - 350, width: 100, height: 10 },
-    ];
-
-    // Ensure classes is properly defined
-    this.classes = [
-      { class: Background, data: { src: gameEnv.path + "/images/gamify/gim.png" } }
-    ];
+// Platform data
+const platforms = [
+  { x: 0, y: 350, width: 1500, height: 500 }, // Extended ground platform width
+  { x: 200, y: 280, width: 100, height: 10 },
+  { x: 400, y: 220, width: 150, height: 10 },
+  { x: 600, y: 150, width: 100, height: 10 },
+  { x: 550, y: 250, width: 150, height: 10 } // New platform added
+];
 
     // Key tracking
     const keys = {};
@@ -88,37 +139,34 @@ class GameLevelPlatformer {
     const backgroundImage = new Image();
     backgroundImage.src = gameEnv.path + "/images/gamify/gim.png"; // Background image source
 
-    // Game loop
-    const update = () => {
+    function update() {
       // Movement input
       if (keys["ArrowRight"] || keys["KeyD"]) {
         player.velocityX = player.speed;
         player.frameY = sprite_data_player.right.row;
-        player.facing = "right"; // Update facing direction
       } else if (keys["ArrowLeft"] || keys["KeyA"]) {
         player.velocityX = -player.speed;
         player.frameY = sprite_data_player.left.row;
-        player.facing = "left"; // Update facing direction
       } else {
         player.velocityX *= friction;
       }
-
+    
       // Jumping
       if ((keys["ArrowUp"] || keys["KeyW"] || keys["Space"]) && player.onGround) {
         player.velocityY = player.jumpPower;
         player.onGround = false;
       }
-
+    
       // Gravity
       player.velocityY += gravity;
-
+    
       // Position update
       player.x += player.velocityX;
       player.y += player.velocityY;
-
+    
       // Platform collision
       player.onGround = false;
-      platforms.forEach((platform) => {
+      platforms.forEach(platform => {
         if (
           player.x < platform.x + platform.width &&
           player.x + player.width > platform.x &&
@@ -132,7 +180,7 @@ class GameLevelPlatformer {
           }
         }
       });
-
+    
       // Stay inside canvas
       if (player.x < 0) player.x = 0;
       if (player.x + player.width > canvas.width) {
@@ -140,11 +188,15 @@ class GameLevelPlatformer {
       }
 
       // Animate sprite
-      player.frameCounter++;
-      if (player.frameCounter >= sprite_data_player.ANIMATION_RATE) {
-        player.frameX = (player.frameX + 1) % sprite_data_player.right.columns;
-        player.frameCounter = 0;
-      }
+  player.frameCounter++;
+  if (player.frameCounter >= sprite_data_player.ANIMATION_RATE) {
+    player.frameX = (player.frameX + 1) % sprite_data_player.right.columns;
+    player.frameCounter = 0;
+  }
+
+
+      // Update collectibles
+      collectibles.forEach((collectible) => collectible.update());
 
       draw();
       requestAnimationFrame(update);
@@ -199,7 +251,25 @@ class GameLevelPlatformer {
       // Optional: Draw hitbox
       ctx.strokeStyle = "red";
       ctx.strokeRect(player.x, player.y, player.width, player.height);
+
+      // Draw Eye of Ender if not collected
+      collectibles.forEach((collectible) => {
+        const img = collectible.spriteData.image;
+
+        // Only draw if the image is loaded
+        if (img instanceof HTMLImageElement && img.complete) {
+          ctx.drawImage(
+            img,
+            collectible.spriteData.INIT_POSITION.x,
+            collectible.spriteData.INIT_POSITION.y,
+            collectible.spriteData.pixels.width * collectible.spriteData.SCALE_FACTOR,
+            collectible.spriteData.pixels.height * collectible.spriteData.SCALE_FACTOR
+          );
+        }
+      });
     };
+
+    spawnCollectible(); // Spawn the first collectible
 
     // Ensure proper game loop initialization
     playerImage.onload = () => {
