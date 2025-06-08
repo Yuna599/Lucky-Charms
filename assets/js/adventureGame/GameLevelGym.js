@@ -8,6 +8,8 @@ import GameLevelMinesweeper from "./GameLevelMinesweeper.js"; // Add this import
 import GameControl from "./GameControl.js"; // Ensure GameControl is imported
 import DialogueSystem from "./DialogueSystem.js"; // Ensure DialogueSystem is imported
 import PlatformerGame from "./PlatformerGame.js"; // Ensure PlatformerGame is imported
+import GameLevelFallDown from './GameLevelFallDown.js'; // Ensure GameLevelFallDown is imported
+import GameLevelPlatformer from './GameLevelPlatformer.js'; // Ensure GameLevelPlatformer is imported
 
 console.log("Resolved Player path:", Player);
 console.log("Resolved Character path:", Character);
@@ -90,62 +92,75 @@ class GameLevelGym {
     };
 
 
-    const sprite_src_desertportal = path + "/images/gamify/npc4.png"; // Reverted path
+    const sprite_src_desertportal = path + "/images/gamify/gym2.png"; // Reverted path
     const sprite_greet_desertportal = "Teleport to the Desert? Press E";
     const sprite_data_desertportal = {
       id: 'Desert Portal',
       greeting: sprite_greet_desertportal,
       src: sprite_src_desertportal,
-      SCALE_FACTOR: 6,
+      SCALE_FACTOR: 3,
       ANIMATION_RATE: 100,
-      pixels: { width: 521, height: 479 },
+      pixels: { width: 500, height: 500 },
       INIT_POSITION: { x: (width * 2 / 5), y: (height * 1 / 10) },
       orientation: { rows: 1, columns: 1 },
       down: { row: 0, start: 0, columns: 1 },
       hitbox: { widthPercentage: 0.1, heightPercentage: 0.2 },
       dialogues: [
-        "Minesweeper is all about logic and probability.",
-        "The numbers tell you how many mines are adjacent to that square.",
-        "Use right-click to flag squares you think contain mines.",
-        "The first click is always safe in modern Minesweeper.",
-        "Minesweeper was first included with Windows 3.1 in 1992.",
-        "The world record for expert Minesweeper is under 40 seconds!",
-        "Looking for patterns is key to solving Minesweeper efficiently.",
-        "Sometimes you have to make an educated guess - that's part of the game."
-    ],
-    reaction: function() {
-        // Use dialogue system instead of alert
-        if (this.dialogueSystem) {
-            this.showReactionDialogue();
-        } else {
-            console.log(sprite_greet_desertportal);
-        }
-    },
-    interact: function() {
-        if (typeof GameControl === "undefined") {
-            console.error("GameControl is not defined. Ensure it is properly imported.");
-            return;
+        "Are you ready to play the falling object game?",
+        "Catch the falling objects to score points!",
+        "Press E to start the game."
+      ],
+      interact: function () {
+        if (!this.dialogueSystem) {
+          this.dialogueSystem = new DialogueSystem(); // Initialize DialogueSystem
         }
 
-        let primaryGame = gameEnv.gameControl;
-        let levelArray = [GameLevelFallDown];
-        let gameInGame = new GameControl(gameEnv.game, levelArray);
-        primaryGame.pause();
-        gameInGame.start();
-        gameInGame.gameOver = function() {
-            primaryGame.resume();
-        };
-    }
-};
-const sprite_src_endship = path + "/images/gamify/computer.png";
+        this.dialogueSystem.showDialogue(
+          "Do you want to play the falling object game?",
+          "Falling Object Game",
+          this.src
+        );
+
+        this.dialogueSystem.addButtons([
+          {
+            text: "Yes",
+            primary: true,
+            action: () => {
+              this.dialogueSystem.closeDialogue();
+              const primaryGame = gameEnv.gameControl;
+
+              // Pause the current game level
+              primaryGame.pause();
+
+              // Start GameLevelFallDown
+              const fallingGameControl = new GameControl(gameEnv.game, [GameLevelFallDown]);
+              fallingGameControl.start();
+
+              // Resume GameLevelGym after GameLevelFallDown ends
+              fallingGameControl.gameOver = function () {
+                primaryGame.resume();
+              };
+            }
+          },
+          {
+            text: "No",
+            action: () => {
+              this.dialogueSystem.closeDialogue();
+            }
+          }
+        ]);
+      }
+    };
+
+    const sprite_src_endship = path + "/images/gamify/gym1.png";
 
     const sprite_data_endship = {
         id: 'Endship',
         greeting: "Find the elytra",
         src: sprite_src_endship,
-        SCALE_FACTOR: 5,
+        SCALE_FACTOR: 3,
         ANIMATION_RATE: 100,
-        pixels: { height: 521, width: 479 },
+        pixels: { height: 500, width: 500 },
         INIT_POSITION: { x: (width / 2), y: (height / 2) },
         orientation: { rows: 1, columns: 1 },
         down: { row: 0, start: 0, columns: 1 },
@@ -207,11 +222,12 @@ const sprite_src_endship = path + "/images/gamify/computer.png";
         }
     });
 
+    // Ensure classes is properly defined
     this.classes = [
       { class: GameEnvBackground, data: image_data_gym },
       { class: Player, data: sprite_data_chillguy },
-      { class: Npc, data: sprite_data_desertportal},
-     { class: Npc, data: sprite_data_endship },
+      { class: Npc, data: sprite_data_desertportal },
+      { class: Npc, data: sprite_data_endship }
     ];
 
     this.createScoreDisplay();

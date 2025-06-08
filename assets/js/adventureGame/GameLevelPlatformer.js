@@ -366,10 +366,12 @@ returnButton.onclick = () => {
   window.location.href = '/gamify/adventureGame'; // ← change this if your main game file is different
 };
 
-
-
 document.body.appendChild(returnButton);
 // === ✅ End of game button ===
 
+class GameLevelPlatformer {
+  // Define the class structure if needed
+}
 
-// export default Platformer;
+// Export the class as default
+export default GameLevelPlatformer;

@@ -503,7 +503,7 @@ class GameLevelDesert {
     this.validateSpriteSource(sprite_data_chickenj);
     this.validateSpriteSource(sprite_data_robot);
 
-    // Add Employee NPC to the list of objects for this level
+    // Ensure classes is properly defined
     this.classes = [
       { class: Background, data: image_data_desert },
       { class: Player, data: sprite_data_chillguy },

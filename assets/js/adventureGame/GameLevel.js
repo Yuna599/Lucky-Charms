@@ -4,6 +4,7 @@ import GameEnv from "./GameEnv.js";
 class GameLevel {
     constructor(gameControl) {
         this.gameEnv = new GameEnv();
+        this.gameObjectClasses = []; // Ensure gameObjectClasses is initialized as an array
         // Set properties for easy access within game objects
         this.gameEnv.game = gameControl.game;
         this.gameEnv.path = gameControl.path;
@@ -16,12 +17,21 @@ class GameLevel {
         this.continue = true;
         this.gameEnv.create();
         this.gameLevel = new GameLevelClass(this.gameEnv);
-        this.gameObjectClasses = this.gameLevel.classes;
+
+        // Ensure gameLevel.classes is valid before assigning
+        if (Array.isArray(this.gameLevel.classes)) {
+            this.gameObjectClasses = this.gameLevel.classes;
+        } else {
+            console.error("gameLevel.classes must be an array or is undefined.");
+            this.gameObjectClasses = []; // Fallback to an empty array
+        }
+
         for (let gameObjectClass of this.gameObjectClasses) {
             if (!gameObjectClass.data) gameObjectClass.data = {};
             let gameObject = new gameObjectClass.class(gameObjectClass.data, this.gameEnv);
             this.gameEnv.gameObjects.push(gameObject);
         }
+
         // Add event listener for window resize
         window.addEventListener('resize', this.resize.bind(this));
     }

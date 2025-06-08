@@ -1,105 +1,123 @@
-const player = document.getElementById("player");
-const fallingObject = document.getElementById("fallingObject");
-const scoreDisplay = document.getElementById("score");
+class GameLevelFallDown {
+  constructor() {
+    let gameArea = document.getElementById("gameArea");
+    if (!gameArea) {
+      gameArea = document.createElement("div");
+      gameArea.id = "gameArea";
+      gameArea.style.position = "relative";
+      gameArea.style.width = "400px";
+      gameArea.style.height = "500px";
+      gameArea.style.margin = "0 auto";
+      gameArea.style.backgroundImage = "url('/Lucky-Charms/images/gamify/gymbackground.png')"; // Gym background
+      gameArea.style.backgroundSize = "cover";
+      gameArea.style.backgroundPosition = "center";
+      gameArea.style.border = "2px solid #333";
+      gameArea.style.overflow = "hidden";
+      document.body.appendChild(gameArea);
+    }
 
-if (!player || !fallingObject) {
-    console.error("Required game elements are missing. Ensure 'player' and 'fallingObject' exist in the DOM.");
-    return;
-}
+    let player = document.getElementById("player");
+    let fallingObject = document.getElementById("fallingObject");
+    let scoreDisplay = document.getElementById("score");
 
-let score = 0;
-let playerX = 170;
-let objectY = 0;
-let objectX = Math.random() * 380;
+    // Dynamically create missing DOM elements inside gameArea
+    if (!player) {
+      player = document.createElement("div");
+      player.id = "player";
+      player.style.position = "absolute";
+      player.style.width = "60px";
+      player.style.height = "20px";
+      player.style.backgroundColor = "#007bff";
+      player.style.bottom = "10px";
+      player.style.left = "170px";
+      gameArea.appendChild(player);
+    }
 
-// Apply inline styles dynamically
-function applyStyles() {
-  document.body.style.fontFamily = "Arial, sans-serif";
-  document.body.style.textAlign = "center";
-  document.body.style.backgroundColor = "#f0f8ff";
+    if (!fallingObject) {
+      fallingObject = document.createElement("div");
+      fallingObject.id = "fallingObject";
+      fallingObject.style.position = "absolute";
+      fallingObject.style.width = "40px";
+      fallingObject.style.height = "40px";
+      fallingObject.style.backgroundImage = "url('/Lucky-Charms/images/gamify/gym3.png')"; // Falling object image
+      fallingObject.style.backgroundSize = "contain";
+      fallingObject.style.backgroundRepeat = "no-repeat";
+      fallingObject.style.backgroundPosition = "center";
+      fallingObject.style.top = "0px";
+      fallingObject.style.left = "50%";
+      gameArea.appendChild(fallingObject);
+    }
 
-  const gameArea = document.getElementById("gameArea");
-  if (gameArea) {
-    gameArea.style.width = "400px";
-    gameArea.style.height = "500px";
-    gameArea.style.margin = "0 auto";
-    gameArea.style.backgroundColor = "#e0e0e0";
-    gameArea.style.position = "relative";
-    gameArea.style.border = "2px solid #333";
-    gameArea.style.overflow = "hidden";
-  }
+    if (!scoreDisplay) {
+      scoreDisplay = document.createElement("div");
+      scoreDisplay.id = "score";
+      scoreDisplay.textContent = "Score: 0";
+      scoreDisplay.style.position = "absolute";
+      scoreDisplay.style.top = "10px";
+      scoreDisplay.style.left = "50%";
+      scoreDisplay.style.transform = "translateX(-50%)";
+      scoreDisplay.style.fontSize = "1.2em";
+      scoreDisplay.style.color = "#fff";
+      scoreDisplay.style.backgroundColor = "rgba(0, 0, 0, 0.5)";
+      scoreDisplay.style.padding = "5px 10px";
+      scoreDisplay.style.borderRadius = "5px";
+      gameArea.appendChild(scoreDisplay);
+    }
 
-  const player = document.getElementById("player");
-  if (player) {
-    player.style.width = "60px";
-    player.style.height = "20px";
-    player.style.backgroundColor = "#007bff";
-    player.style.position = "absolute";
-    player.style.bottom = "10px";
-    player.style.left = "170px";
-  }
+    let score = 0;
+    let playerX = 170;
+    let objectY = 0;
+    let objectX = Math.random() * 360;
 
-  const fallingObject = document.getElementById("fallingObject");
-  if (fallingObject) {
-    fallingObject.style.width = "20px";
-    fallingObject.style.height = "20px";
-    fallingObject.style.backgroundColor = "red";
-    fallingObject.style.position = "absolute";
-    fallingObject.style.top = "0px";
-    fallingObject.style.left = "50%";
-  }
+    function movePlayer(event) {
+      if (event.key === "ArrowLeft" && playerX > 0) {
+        playerX -= 20;
+      } else if (event.key === "ArrowRight" && playerX < 340) {
+        playerX += 20;
+      }
+      player.style.left = `${playerX}px`;
+    }
 
-  const score = document.getElementById("score");
-  if (score) {
-    score.style.fontSize = "1.2em";
-    score.style.marginTop = "10px";
-  }
-}
+    function resetObject() {
+      objectY = 0;
+      objectX = Math.random() * 360;
+      fallingObject.style.left = `${objectX}px`;
+    }
 
-// Call the function to apply styles
-applyStyles();
+    function gameLoop() {
+      objectY += 4;
+      fallingObject.style.top = `${objectY}px`;
 
-function movePlayer(event) {
-  if (event.key === "ArrowLeft" && playerX > 0) {
-    playerX -= 20;
-  } else if (event.key === "ArrowRight" && playerX < 340) {
-    playerX += 20;
-  }
-  player.style.left = `${playerX}px`;
-}
+      const objectBottom = objectY + 40;
+      const playerTop = 480;
+      const playerBottom = 500;
 
-function resetObject() {
-  objectY = 0;
-  objectX = Math.random() * 380;
-  fallingObject.style.left = `${objectX}px`;
-}
+      if (
+        objectBottom >= playerTop &&
+        objectY <= playerBottom &&
+        objectX + 40 >= playerX &&
+        objectX <= playerX + 60
+      ) {
+        score++;
+        if (scoreDisplay) {
+          scoreDisplay.textContent = `Score: ${score}`;
+        } else {
+          console.error("Score display element is missing.");
+        }
+        resetObject();
+      }
 
-function gameLoop() {
-  objectY += 4;
-  fallingObject.style.top = `${objectY}px`;
+      if (objectY > 500) {
+        resetObject();
+      }
 
-  const objectBottom = objectY + 20;
-  const playerTop = 480;
-  const playerBottom = 500;
+      requestAnimationFrame(gameLoop);
+    }
 
-  if (
-    objectBottom >= playerTop &&
-    objectY <= playerBottom &&
-    objectX + 20 >= playerX &&
-    objectX <= playerX + 60
-  ) {
-    score++;
-    scoreDisplay.textContent = `Score: ${score}`;
+    document.addEventListener("keydown", movePlayer);
     resetObject();
+    gameLoop();
   }
-
-  if (objectY > 500) {
-    resetObject();
-  }
-
-  requestAnimationFrame(gameLoop);
 }
 
-document.addEventListener("keydown", movePlayer);
-resetObject();
-gameLoop();
+export default GameLevelFallDown;
