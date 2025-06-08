@@ -1,14 +1,14 @@
-import GameEnvBackground from "./GameEnvBackground.js";
-import Player from "./Player.js";
-import Character from "./Character.js";
-import Quiz from "./Quiz.js";
-import GameLevelDesert from "./GameLevelDesert.js";
-import Npc from "./Npc.js"; // Ensure proper import
-import GameLevelMinesweeper from "./GameLevelMinesweeper.js"; // Add this import
-import GameControl from "./GameControl.js"; // Ensure GameControl is imported
-import DialogueSystem from "./DialogueSystem.js"; // Ensure DialogueSystem is imported
-import PlatformerGame from "./PlatformerGame.js"; // Ensure PlatformerGame is imported
-import GameLevelFallDown from './GameLevelFallDown.js'; // Ensure GameLevelFallDown is imported
+import GameEnvBackground from "../adventureGame/GameEnvBackground.js";
+import Player from "../adventureGame/Player.js";
+import Character from "../adventureGame/Character.js";
+import Quiz from "../adventureGame/Quiz.js";
+import GameLevelDesert from "../adventureGame/GameLevelDesert.js";
+import Npc from "../adventureGame/Npc.js"; // Ensure proper import
+import GameLevelMinesweeper from "../adventureGame/GameLevelMinesweeper.js"; // Add this import
+import GameControl from "../adventureGame/GameControl.js"; // Ensure GameControl is imported
+import DialogueSystem from "../adventureGame/DialogueSystem.js"; // Ensure DialogueSystem is imported
+import PlatformerGame from "../adventureGame/PlatformerGame.js"; // Ensure PlatformerGame is imported
+import GameLevelFallDown from '../adventureGame/GameLevelFallDown.js'; // Ensure GameLevelFallDown is imported
 import GameLevelPlatformer from './GameLevelPlatformer.js'; // Ensure GameLevelPlatformer is imported
 
 console.log("Resolved Player path:", Player);
@@ -151,6 +151,138 @@ class GameLevelGym {
         ]);
       }
     };
+    const sprite_src_gymportal = path + "/images/gamify/gym3.png";
+    const sprite_greet_gymportal = "FOLLOW THAT CHICKEN JOCKEY. ( Press E )";
+    const sprite_data_gymportal = {
+        id: 'Chicken Jockey',
+        greeting: sprite_greet_gymportal,
+        src: sprite_src_gymportal,
+        SCALE_FACTOR: 3,
+        ANIMATION_RATE: 100,
+        pixels: { width: 500, height: 500 },
+        INIT_POSITION: { x: (width * 1 / 6), y: (height * 1 / 10) }, // Moved more to the left
+        orientation: { rows: 1, columns: 1 },
+        down: { row: 0, start: 0, columns: 1 },
+        hitbox: { widthPercentage: 0.1, heightPercentage: 0.2 },
+        // Add dialogues array for random messages
+        dialogues: [
+            "BAWK BAWK BAWK BAWK BAWK?!?!?!?",
+            "GRRRRRRRR!!",
+            "I'm placing blocks and stuff cuz im in freaking minceraftttt",
+            "BAWAKKKKK!",
+            "You want to fight the chicken?",
+            "CHICKEN JOCKEEEYYYY"
+        ],
+        reaction: function() {
+            // Don't show any reaction dialogue - this prevents the first alert
+            // The interact function will handle all dialogue instead
+        },
+        interact: function() {
+            // Clear any existing dialogue first to prevent duplicates
+            if (this.dialogueSystem && this.dialogueSystem.isDialogueOpen()) {
+                this.dialogueSystem.closeDialogue();
+            }
+            
+            // Create a new dialogue system if needed
+            if (!this.dialogueSystem) {
+                this.dialogueSystem = new DialogueSystem();
+            }
+            
+            // Show portal dialogue with buttons
+            this.dialogueSystem.showDialogue(
+                "Do you follow the Chicken Jockey?",
+                "Chicken Jockey",
+                this.spriteData.src
+            );
+            
+            // Add buttons directly to the dialogue
+            this.dialogueSystem.addButtons([
+                {
+                    text: "Sure!",
+                    primary: true,
+                    action: () => {
+                        this.dialogueSystem.closeDialogue();
+                        
+                        // Clean up the current game state
+                        if (gameEnv && gameEnv.gameControl) {
+                            // Store reference to the current game control
+                            const gameControl = gameEnv.gameControl;
+                            
+                            // Create fade overlay for transition
+                            const fadeOverlay = document.createElement('div');
+                            Object.assign(fadeOverlay.style, {
+                                position: 'fixed',
+                                top: '0',
+                                left: '0',
+                                width: '100%',
+                                height: '100%',
+                                backgroundColor: '#000',
+                                opacity: '0',
+                                transition: 'opacity 1s ease-in-out',
+                                zIndex: '9999'
+                            });
+                            document.body.appendChild(fadeOverlay);
+                            
+                            console.log("You walk after the Chicken Jockey...");
+                            
+                            // Fade in
+                            requestAnimationFrame(() => {
+                                fadeOverlay.style.opacity = '1';
+                                
+                                // After fade in, transition to End level
+                                setTimeout(() => {
+                                    // Clean up current level properly
+                                    if (gameControl.currentLevel) {
+                                        // Properly destroy the current level
+                                        console.log("Destroying current level...");
+                                        gameControl.currentLevel.destroy();
+                                        
+                                        // Force cleanup of any remaining canvases
+                                        const gameContainer = document.getElementById('gameContainer');
+                                        const oldCanvases = gameContainer.querySelectorAll('canvas:not(#gameCanvas)');
+                                        oldCanvases.forEach(canvas => {
+                                            console.log("Removing old canvas:", canvas.id);
+                                            canvas.parentNode.removeChild(canvas);
+                                        });
+                                    }
+                                    
+                                    console.log("You walk after the Chicken Jockey...");
+                                    
+                                    // IMPORTANT: Store the original level classes for return journey
+                                    gameControl._originalLevelClasses = gameControl.levelClasses;
+                                    
+                                    
+                                    gameControl.levelClasses = [GameLevelPlatformer];
+                                    gameControl.currentLevelIndex = 0;
+                                    
+                                    // Make sure game is not paused
+                                    gameControl.isPaused = false;
+                                    
+                                    // Start the End level with the same control
+                                    console.log("You walk after the Chicken Jockey...");
+                                    gameControl.transitionToLevel();
+                                    
+                                    // Fade out overlay
+                                    setTimeout(() => {
+                                        fadeOverlay.style.opacity = '0';
+                                        setTimeout(() => {
+                                            document.body.removeChild(fadeOverlay);
+                                        }, 1000);
+                                    }, 500);
+                                }, 1000);
+                            });
+                        }
+                    }
+                },
+                {
+                    text: "Not Ready",
+                    action: () => {
+                        this.dialogueSystem.closeDialogue();
+                    }
+                }
+            ]);
+        }
+    }
 
     const sprite_src_endship = path + "/images/gamify/gym1.png";
 
@@ -227,7 +359,8 @@ class GameLevelGym {
       { class: GameEnvBackground, data: image_data_gym },
       { class: Player, data: sprite_data_chillguy },
       { class: Npc, data: sprite_data_desertportal },
-      { class: Npc, data: sprite_data_endship }
+      { class: Npc, data: sprite_data_endship },
+      { class: Npc, data: sprite_data_gymportal }
     ];
 
     this.createScoreDisplay();

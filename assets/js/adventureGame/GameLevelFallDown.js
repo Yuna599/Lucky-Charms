@@ -68,6 +68,7 @@ class GameLevelFallDown {
     let playerX = 370; // Adjusted for wider gameArea
     let objectY = 0;
     let objectX = Math.random() * 760; // Adjusted for wider gameArea
+    let isPaused = false;
 
     function movePlayer(event) {
       if (event.key === "ArrowLeft" && playerX > 0) {
@@ -84,7 +85,31 @@ class GameLevelFallDown {
       fallingObject.style.left = `${objectX}px`;
     }
 
+    function endGame() {
+      isPaused = true; // Stop the game loop
+      const gameOverMessage = document.createElement("div");
+      gameOverMessage.textContent = "Game Over! You reached a score of 5!";
+      gameOverMessage.style.position = "absolute";
+      gameOverMessage.style.top = "50%";
+      gameOverMessage.style.left = "50%";
+      gameOverMessage.style.transform = "translate(-50%, -50%)";
+      gameOverMessage.style.color = "#fff";
+      gameOverMessage.style.fontSize = "24px";
+      gameOverMessage.style.backgroundColor = "rgba(0, 0, 0, 0.8)";
+      gameOverMessage.style.padding = "20px";
+      gameOverMessage.style.borderRadius = "10px";
+      gameOverMessage.style.textAlign = "center";
+      gameOverMessage.style.zIndex = "10000";
+      document.body.appendChild(gameOverMessage);
+
+      setTimeout(() => {
+        window.location.href = "/Lucky-Charms/gamify/gym.html"; // Redirect back to GameLevelGym
+      }, 2000); // Wait for 2 seconds before redirecting
+    }
+
     function gameLoop() {
+      if (isPaused) return; // Stop the game loop if paused
+
       objectY += 4;
       fallingObject.style.top = `${objectY}px`;
 
@@ -105,6 +130,11 @@ class GameLevelFallDown {
           console.error("Score display element is missing.");
         }
         resetObject();
+
+        if (score >= 5) {
+          endGame(); // End the game when score reaches 5
+          return;
+        }
       }
 
       if (objectY > 600) { // Adjusted for taller gameArea
@@ -113,6 +143,28 @@ class GameLevelFallDown {
 
       requestAnimationFrame(gameLoop);
     }
+
+    // Create a physical button element
+    const pauseButton = document.createElement("button");
+    pauseButton.textContent = "Pause and Restart Gym";
+    pauseButton.style.position = "absolute";
+    pauseButton.style.top = "20px";
+    pauseButton.style.right = "20px";
+    pauseButton.style.padding = "10px 15px";
+    pauseButton.style.backgroundColor = "#111";
+    pauseButton.style.color = "#fff";
+    pauseButton.style.border = "2px solid white";
+    pauseButton.style.fontFamily = "monospace";
+    pauseButton.style.fontSize = "14px";
+    pauseButton.style.cursor = "pointer";
+    pauseButton.style.zIndex = "10000";
+
+    pauseButton.onclick = () => {
+      isPaused = true; // Pause the game
+      window.location.href = "/Lucky-Charms/gamify/gym.html"; // Redirect to Gym Game
+    };
+
+    document.body.appendChild(pauseButton);
 
     document.addEventListener("keydown", movePlayer);
     resetObject();

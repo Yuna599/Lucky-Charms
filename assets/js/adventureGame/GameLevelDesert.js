@@ -107,6 +107,17 @@ class GameLevelDesert {
       y: height - (height / CHILLGUY_SCALE_FACTOR),
       width: 120,
       height: 320,
+      dyingAnimation: function () {
+        const playerElement = document.getElementById(this.id);
+        if (playerElement) {
+          playerElement.style.transition = "opacity 1s ease-out";
+          playerElement.style.opacity = "0"; // Fade out the player
+          setTimeout(() => {
+            playerElement.remove(); // Remove the player element after animation
+            restartGame();
+          }, 1000); // Wait for the animation to complete
+        }
+      }
     };
 
     // NPC data for unicorn
@@ -495,6 +506,45 @@ class GameLevelDesert {
             }
         }
     };
+
+    function checkCollision(player, npc) {
+      const playerRect = {
+        x: player.x,
+        y: player.y,
+        width: player.width,
+        height: player.height
+      };
+      const npcRect = {
+        x: npc.INIT_POSITION.x,
+        y: npc.INIT_POSITION.y,
+        width: npc.pixels.width / npc.SCALE_FACTOR,
+        height: npc.pixels.height / npc.SCALE_FACTOR
+      };
+
+      return (
+        playerRect.x < npcRect.x + npcRect.width &&
+        playerRect.x + playerRect.width > npcRect.x &&
+        playerRect.y < npcRect.y + npcRect.height &&
+        playerRect.y + playerRect.height > npcRect.y
+      );
+    }
+
+    function restartGame() {
+      window.location.reload(); // Reload the page to restart the game
+    }
+
+    function gameLoop() {
+      // Check collision between player and unicorn
+      if (checkCollision(sprite_data_chillguy, sprite_data_unicorn)) {
+        console.log("Collision detected! Player is dying...");
+        sprite_data_chillguy.dyingAnimation();
+      }
+
+      requestAnimationFrame(gameLoop);
+    }
+
+    // Start the game loop
+    gameLoop();
 
     // Validate sprite sources after all definitions
     this.validateSpriteSource(sprite_data_chillguy);

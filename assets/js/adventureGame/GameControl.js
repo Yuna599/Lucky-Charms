@@ -143,7 +143,8 @@ class GameControl {
         }
         this.currentLevel.update();
         this.handleInLevelLogic();
-        requestAnimationFrame(this.gameLoop.bind(this));
+        // Ensure requestAnimationFrame is called with the correct argument
+        requestAnimationFrame(() => this.gameLoop());
     }
 
     /**

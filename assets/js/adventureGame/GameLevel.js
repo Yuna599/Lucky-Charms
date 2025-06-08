@@ -22,8 +22,14 @@ class GameLevel {
         if (Array.isArray(this.gameLevel.classes)) {
             this.gameObjectClasses = this.gameLevel.classes;
         } else {
-            console.error("gameLevel.classes must be an array or is undefined.");
+            console.warn("gameLevel.classes is undefined or not an array. Defaulting to an empty array.");
             this.gameObjectClasses = []; // Fallback to an empty array
+        }
+
+        if (this.gameObjectClasses.length === 0) {
+            console.error("No game objects defined for this level. Ensure the level class defines 'classes'.");
+            console.error("GameLevelClass:", GameLevelClass.name);
+            console.error("gameLevel.classes:", this.gameLevel.classes);
         }
 
         for (let gameObjectClass of this.gameObjectClasses) {
