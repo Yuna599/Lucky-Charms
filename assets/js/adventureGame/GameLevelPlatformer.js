@@ -35,9 +35,14 @@ class GameLevelPlatformer {
       pixels: { height: 320, width: 120 },
       orientation: { rows: 4, columns: 3 },
       down: { row: 0, start: 0, columns: 3 },
-      left: { row: 1, start: 0, columns: 3 },
-      right: { row: 2, start: 0, columns: 3 },
+      downRight: { row: 1, start: 0, columns: 3, rotate: Math.PI / 16 },
+      downLeft: { row: 2, start: 0, columns: 3, rotate: -Math.PI / 16 },
+      left: { row: 2, start: 0, columns: 3 },   // Swapped with 'right'
+      right: { row: 1, start: 0, columns: 3 },  // Swapped with 'left'
       up: { row: 3, start: 0, columns: 3 },
+      upLeft: { row: 2, start: 0, columns: 3, rotate: Math.PI / 16 },
+      upRight: { row: 1, start: 0, columns: 3, rotate: -Math.PI / 16 },
+      idle: { row: 0, start: 0, columns: 1 },
       hitbox: { widthPercentage: 0.45, heightPercentage: 0.2 },
       keypress: { up: 87, left: 65, down: 83, right: 68 },
     };
@@ -48,8 +53,8 @@ class GameLevelPlatformer {
     const player = {
       x: sprite_data_player.INIT_POSITION.x,
       y: sprite_data_player.INIT_POSITION.y,
-      width: frameWidth / (PLAYER_SCALE_FACTOR - 1), // Increase width further
-      height: frameHeight / (PLAYER_SCALE_FACTOR - 1), // Increase height further
+      width: frameWidth * 1.5 , // Increase width further
+      height: frameHeight * 1.5, // Increase height further
       velocityX: 0,
       velocityY: 0,
       speed: 4,
@@ -58,6 +63,7 @@ class GameLevelPlatformer {
       frameX: 0,
       frameY: sprite_data_player.down.row,
       frameCounter: 0,
+      facing: "right", // Add facing property to track direction
     };
 
     // Platform data
@@ -88,9 +94,11 @@ class GameLevelPlatformer {
       if (keys["ArrowRight"] || keys["KeyD"]) {
         player.velocityX = player.speed;
         player.frameY = sprite_data_player.right.row;
+        player.facing = "right"; // Update facing direction
       } else if (keys["ArrowLeft"] || keys["KeyA"]) {
         player.velocityX = -player.speed;
         player.frameY = sprite_data_player.left.row;
+        player.facing = "left"; // Update facing direction
       } else {
         player.velocityX *= friction;
       }
@@ -146,37 +154,58 @@ class GameLevelPlatformer {
     const draw = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      // Draw background first
+      // Draw background
       ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
 
-      // Draw platforms on top of the background
+      // Draw platforms
       ctx.fillStyle = "green";
       platforms.forEach((p) => ctx.fillRect(p.x, p.y, p.width, p.height));
 
-      // Draw player sprite
-      ctx.drawImage(
-        playerImage,
-        player.frameX * frameWidth,
-        player.frameY * frameHeight,
-        frameWidth,
-        frameHeight,
-        player.x,
-        player.y,
-        player.width,
-        player.height
-      );
+      ctx.save(); // Save canvas state
 
-      // Optional: Debug hitboxes
+      // If facing right, flip the sprite
+      if (player.facing === "right") {
+        ctx.translate(player.x + player.width / 2, player.y + player.height / 2);
+        ctx.scale(-1, 1); // Flip horizontally
+        ctx.drawImage(
+          playerImage,
+          player.frameX * frameWidth,
+          player.frameY * frameHeight,
+          frameWidth,
+          frameHeight,
+          -player.width / 2,
+          -player.height / 2,
+          player.width,
+          player.height
+        );
+      } else {
+        // Normal draw (left-facing or idle)
+        ctx.translate(player.x + player.width / 2, player.y + player.height / 2);
+        ctx.drawImage(
+          playerImage,
+          player.frameX * frameWidth,
+          player.frameY * frameHeight,
+          frameWidth,
+          frameHeight,
+          -player.width / 2,
+          -player.height / 2,
+          player.width,
+          player.height
+        );
+      }
+
+      ctx.restore(); // Restore canvas state
+
+      // Optional: Draw hitbox
       ctx.strokeStyle = "red";
       ctx.strokeRect(player.x, player.y, player.width, player.height);
     };
 
-    // Start the game loop only after the image is ready
+    // Ensure proper game loop initialization
     playerImage.onload = () => {
       update();
     };
 
-    // Debugging for image load failure
     playerImage.onerror = () => {
       console.error("Failed to load player sprite:", playerImage.src);
     };

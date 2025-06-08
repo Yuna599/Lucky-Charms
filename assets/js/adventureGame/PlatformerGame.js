@@ -10,8 +10,8 @@ class PlatformerGame {
         this.player = {
             x: 100,
             y: 0,
-            width: 50,
-            height: 50,
+            width: 50, // Increased width
+            height: 80, // Increased height
             velocityX: 0,
             velocityY: 0,
             speed: 4,
