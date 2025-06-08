@@ -6,6 +6,8 @@ import GameLevelDesert from "./GameLevelDesert.js";
 import Npc from "./Npc.js"; // Ensure proper import
 import GameLevelMinesweeper from "./GameLevelMinesweeper.js"; // Add this import
 import GameControl from "./GameControl.js"; // Ensure GameControl is imported
+import DialogueSystem from "./DialogueSystem.js"; // Ensure DialogueSystem is imported
+import PlatformerGame from "./PlatformerGame.js"; // Ensure PlatformerGame is imported
 
 console.log("Resolved Player path:", Player);
 console.log("Resolved Character path:", Character);
@@ -19,8 +21,7 @@ function checkCollision(sprite1, sprite2) {
     };
     const rect2 = {
         x: sprite2.INIT_POSITION.x,
-        y: sprite2.INIT_POSITION.y,
-        width: sprite2.pixels.width,
+        y: sprite2.pixels.width,
         height: sprite2.pixels.height,
     };
 
@@ -137,138 +138,63 @@ class GameLevelGym {
     }
 };
 const sprite_src_endship = path + "/images/gamify/computer.png";
-    const sprite_greet_endship = "Find the elytra";
-
-    // Store a reference to the dialogueSystem for use in sprite data
-    const dialogueSystem = this.dialogueSystem;
 
     const sprite_data_endship = {
         id: 'Endship',
-        greeting: sprite_greet_endship,
+        greeting: "Find the elytra",
         src: sprite_src_endship,
         SCALE_FACTOR: 5,
         ANIMATION_RATE: 100,
-        pixels: {height: 521, width: 479},
+        pixels: { height: 521, width: 479 },
         INIT_POSITION: { x: (width / 2), y: (height / 2) },
-        orientation: {rows: 1, columns: 1 },
-        down: {row: 0, start: 0, columns: 1 },
+        orientation: { rows: 1, columns: 1 },
+        down: { row: 0, start: 0, columns: 1 },
         hitbox: { widthPercentage: 0.1, heightPercentage: 0.2 },
-        zIndex: 10,  // Same z-index as player
+        zIndex: 10, // Same z-index as player
         dialogues: [
-            "Expolore the new terrain?",
-            "I love villager life!",
-            "Roblox is not better than Minecraft!",
+            "Do you want to explore the Endship?",
         ],
-        reaction: function() {
-            // Don't show any reaction dialogue - this prevents the first alert
-            // The interact function will handle all dialogue instead
-        },
-        interact: function() {
-            // Clear any existing dialogue first to prevent duplicates
-            if (this.dialogueSystem && this.dialogueSystem.isDialogueOpen()) {
-                this.dialogueSystem.closeDialogue();
-            }
-            
-            // Create a new dialogue system if needed
+        interact: function () {
             if (!this.dialogueSystem) {
-                this.dialogueSystem = new DialogueSystem();
+                this.dialogueSystem = new DialogueSystem(); // Initialize DialogueSystem
             }
-            
-            // Show portal dialogue with buttons
+
             this.dialogueSystem.showDialogue(
-                "Do you wish to explore the plains?",
-                "Plains Biome?",
-                this.spriteData.src
+                "Do you want to explore the Endship?",
+                "Endship",
+                this.src
             );
-            
-            // Add buttons directly to the dialogue
+
             this.dialogueSystem.addButtons([
                 {
-                    text: "Mountainous Plains",
+                    text: "Yes",
                     primary: true,
                     action: () => {
                         this.dialogueSystem.closeDialogue();
-                        
-                        // Clean up the current game state
-                        if (gameEnv && gameEnv.gameControl) {
-                            // Store reference to the current game control
-                            const gameControl = gameEnv.gameControl;
-                            
-                            // Create fade overlay for transition
-                            const fadeOverlay = document.createElement('div');
-                            Object.assign(fadeOverlay.style, {
-                                position: 'fixed',
-                                top: '0',
-                                left: '0',
-                                width: '100%',
-                                height: '100%',
-                                backgroundColor: '#000',
-                                opacity: '0',
-                                transition: 'opacity 1s ease-in-out',
-                                zIndex: '9999'
-                            });
-                            document.body.appendChild(fadeOverlay);
-                            
-                            console.log("Starting New level transition...");
-                            
-                            // Fade in
-                            requestAnimationFrame(() => {
-                                fadeOverlay.style.opacity = '1';
-                                
-                                // After fade in, transition to End level
-                                setTimeout(() => {
-                                    // Clean up current level properly
-                                    if (gameControl.currentLevel) {
-                                        // Properly destroy the current level
-                                        console.log("Destroying current level...");
-                                        gameControl.currentLevel.destroy();
-                                        
-                                        // Force cleanup of any remaining canvases
-                                        const gameContainer = document.getElementById('gameContainer');
-                                        const oldCanvases = gameContainer.querySelectorAll('canvas:not(#gameCanvas)');
-                                        oldCanvases.forEach(canvas => {
-                                            console.log("Removing old canvas:", canvas.id);
-                                            canvas.parentNode.removeChild(canvas);
-                                        });
-                                    }
-                                    
-                                    console.log("Setting up Platformer...");
-                                    
-                                    // IMPORTANT: Store the original level classes for return journey
-                                    gameControl._originalLevelClasses = gameControl.levelClasses;
-                                    
-                                    // Set the new level class to Platformer
-                                    window.location.href = "/finale/gamify/platformer"; // PLEASE WORK
+                        const primaryGame = gameEnv.gameControl;
 
-                                    
-                                    // Make sure game is not paused
-                                    gameControl.isPaused = false;
-                                    
-                                    // Start the End level with the same control
-                                    console.log("Transitioning to Platformer...");
-                                    gameControl.transitionToLevel();
-                                    
-                                    // Fade out overlay
-                                    setTimeout(() => {
-                                        fadeOverlay.style.opacity = '0';
-                                        setTimeout(() => {
-                                            document.body.removeChild(fadeOverlay);
-                                        }, 1000);
-                                    }, 500);
-                                }, 1000);
-                            });
-                        }
+                        // Pause the current game level
+                        primaryGame.pause();
+
+                        // Start GameLevelPlatformer
+                        const platformerGameControl = new GameControl(gameEnv.game, [GameLevelPlatformer]);
+                        platformerGameControl.start();
+
+                        // Resume GameLevelGym after GameLevelPlatformer ends
+                        platformerGameControl.gameOver = function () {
+                            primaryGame.resume();
+                        };
                     }
                 },
                 {
-                    text: "Not Ready",
+                    text: "No",
                     action: () => {
                         this.dialogueSystem.closeDialogue();
                     }
                 }
             ]);
         }
-    }
+    };
 
     // Add event listener for interaction (pressing 'E')
     window.addEventListener("keydown", (event) => {

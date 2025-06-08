@@ -156,12 +156,17 @@ class Character extends GameObject {
             this.direction = 'down';
         }
 
+        const directionData = this.spriteData[this.direction];
+        if (!directionData || typeof directionData !== 'object') {
+            console.error(`Invalid sprite data for direction "${this.direction}". Falling back to default.`);
+            this.direction = 'down';
+        }
+
         // Calculate the frame dimensions
         const frameWidth = this.spriteData.pixels.width / this.spriteData.orientation.columns;
         const frameHeight = this.spriteData.pixels.height / this.spriteData.orientation.rows;
 
         // Calculate the frame position on the sprite sheet
-        const directionData = this.spriteData[this.direction];
         const frameX = (directionData.start + this.frameIndex) * frameWidth;
         const frameY = directionData.row * frameHeight;
 
