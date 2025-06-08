@@ -363,7 +363,7 @@ Object.assign(returnButton.style, {
   zIndex: '10000'
 });
 returnButton.onclick = () => {
-  window.location.href = '/gamify/adventureGame'; // ← change this if your main game file is different
+  window.location.href = './GameLevelGym'; // ← change this if your main game file is different
 };
 
 document.body.appendChild(returnButton);

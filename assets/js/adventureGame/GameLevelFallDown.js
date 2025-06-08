@@ -5,8 +5,8 @@ class GameLevelFallDown {
       gameArea = document.createElement("div");
       gameArea.id = "gameArea";
       gameArea.style.position = "relative";
-      gameArea.style.width = "400px";
-      gameArea.style.height = "500px";
+      gameArea.style.width = "1000px"; // Increased width
+      gameArea.style.height = "700px"; // Increased height
       gameArea.style.margin = "0 auto";
       gameArea.style.backgroundImage = "url('/Lucky-Charms/images/gamify/gymbackground.png')"; // Gym background
       gameArea.style.backgroundSize = "cover";
@@ -29,7 +29,7 @@ class GameLevelFallDown {
       player.style.height = "20px";
       player.style.backgroundColor = "#007bff";
       player.style.bottom = "10px";
-      player.style.left = "170px";
+      player.style.left = "370px"; // Adjusted for wider gameArea
       gameArea.appendChild(player);
     }
 
@@ -37,8 +37,8 @@ class GameLevelFallDown {
       fallingObject = document.createElement("div");
       fallingObject.id = "fallingObject";
       fallingObject.style.position = "absolute";
-      fallingObject.style.width = "40px";
-      fallingObject.style.height = "40px";
+      fallingObject.style.width = "70px";
+      fallingObject.style.height = "70px";
       fallingObject.style.backgroundImage = "url('/Lucky-Charms/images/gamify/gym3.png')"; // Falling object image
       fallingObject.style.backgroundSize = "contain";
       fallingObject.style.backgroundRepeat = "no-repeat";
@@ -65,14 +65,14 @@ class GameLevelFallDown {
     }
 
     let score = 0;
-    let playerX = 170;
+    let playerX = 370; // Adjusted for wider gameArea
     let objectY = 0;
-    let objectX = Math.random() * 360;
+    let objectX = Math.random() * 760; // Adjusted for wider gameArea
 
     function movePlayer(event) {
       if (event.key === "ArrowLeft" && playerX > 0) {
         playerX -= 20;
-      } else if (event.key === "ArrowRight" && playerX < 340) {
+      } else if (event.key === "ArrowRight" && playerX < 740) { // Adjusted for wider gameArea
         playerX += 20;
       }
       player.style.left = `${playerX}px`;
@@ -80,7 +80,7 @@ class GameLevelFallDown {
 
     function resetObject() {
       objectY = 0;
-      objectX = Math.random() * 360;
+      objectX = Math.random() * 760; // Adjusted for wider gameArea
       fallingObject.style.left = `${objectX}px`;
     }
 
@@ -89,8 +89,8 @@ class GameLevelFallDown {
       fallingObject.style.top = `${objectY}px`;
 
       const objectBottom = objectY + 40;
-      const playerTop = 480;
-      const playerBottom = 500;
+      const playerTop = 580; // Adjusted for taller gameArea
+      const playerBottom = 600; // Adjusted for taller gameArea
 
       if (
         objectBottom >= playerTop &&
@@ -107,7 +107,7 @@ class GameLevelFallDown {
         resetObject();
       }
 
-      if (objectY > 500) {
+      if (objectY > 600) { // Adjusted for taller gameArea
         resetObject();
       }
 
