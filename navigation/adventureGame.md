@@ -12,8 +12,10 @@ permalink: /gamify/adventureGame
 <script type="module">
     // Adnventure Game assets locations
     import Game from '{{site.baseurl}}/assets/js/adventureGame/Game.js';
+    import GameLevelDesert from "{{site.baseurl}}/assets/js/adventureGame/GameLevelDesert.js";
     import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
 
+ const gameLevelClasses = [GameLevelDesert];
 
     // Web Server Environment data
     const environment = {

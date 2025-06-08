@@ -1,7 +1,6 @@
 import GameControl from './GameControl.js';
-import GameLevelDesert from './GameLevelDesert.js'; // Import GameLevelDesert
-import GameLevelGym from './GameLevelGym.js'; // Import GameLevelGym
-import GameLevelMinesweeper from './GameLevelMinesweeper.js';
+// Import GameLevelDesert only if needed
+import GameLevelDesert from './GameLevelDesert.js';
 
 class Game {
     constructor(environment) {
@@ -16,12 +15,8 @@ class Game {
         this.id = null;
         this.gname = null;
 
-        this.levels = [
-            GameLevelDesert,
-            GameLevelGym,
-            GameLevelMinesweeper,
-            
-        ];
+        // Use environment.gameLevelClasses if provided, otherwise default to GameLevelDesert
+        this.levels = environment.gameLevelClasses || [GameLevelDesert];
         this.gameControl = new GameControl(this, this.levels);
         this.gameControl.start();
     }
