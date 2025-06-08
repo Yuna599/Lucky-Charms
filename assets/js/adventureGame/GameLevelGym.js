@@ -128,7 +128,7 @@ class GameLevelGym {
         }
 
         let primaryGame = gameEnv.gameControl;
-        let levelArray = [GameLevelMinesweeper];
+        let levelArray = [GameLevelFallDown];
         let gameInGame = new GameControl(gameEnv.game, levelArray);
         primaryGame.pause();
         gameInGame.start();
