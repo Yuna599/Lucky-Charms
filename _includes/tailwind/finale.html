@@ -1,0 +1,80 @@
+<div>
+  <!-- Header Section -->
+  <header class="page-header">
+    <h1>{{ include.data.Title }}</h1>
+    <p>{{ include.data.Description }}</p>
+  </header>
+
+  {% assign data = include.data %}
+  <div class="container mx-auto p-6">
+
+    <!-- Header Section -->
+    {% if data.Title or data.Description %}
+      <div class="text-center mb-12">
+        {% if data.Title %}
+          <h1 class="text-4xl md:text-5xl font-bold mb-2 font-serif text-zinc-900 dark:text-white">
+            {{ data.Title }}
+          </h1>
+        {% endif %}
+        {% if data.Description %}
+          <p class="text-lg text-gray-600 dark:text-gray-300 font-sans max-w-xl mx-auto">
+            {{ data.Description }}
+          </p>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    <!-- Explanation Cards -->
+    <div class="space-y-10">
+      {% for topic in data.Topics %}
+        <div class="bg-white dark:bg-zinc-900 text-zinc-800 dark:text-white rounded-xl shadow-md hover:shadow-xl transition duration-300 ease-in-out">
+
+          <!-- Content Section -->
+          <div class="p-6">
+            {% if topic.title %}
+              <h2 class="text-2xl font-bold mb-4 text-blue-700 dark:text-blue-300 font-serif">
+                {{ topic.title }}
+              </h2>
+            {% endif %}
+
+            {% if topic.code %}
+              <div class="relative bg-zinc-900 text-green-400 font-mono text-sm p-4 rounded-md mb-4 overflow-x-auto">
+                <pre><code>{{ topic.code | escape }}</code></pre>
+              </div>
+            {% endif %}
+
+            {% if topic.description %}
+              <p class="text-base font-sans whitespace-pre-line text-gray-700 dark:text-gray-200">
+                {{ topic.description }}
+              </p>
+            {% endif %}
+          </div>
+
+          <!-- Optional Image Section -->
+          {% if topic.images %}
+            <div class="w-full flex justify-center pb-4">
+              <div class="flex justify-center flex-wrap gap-4">
+                {% for image in topic.images %}
+                  <img src="{{ site.baseurl }}/images/tailwinds{{ image.src }}" alt="{{ image.alt | default: 'Illustration' }}"
+                       class="w-64 max-h-64 object-cover rounded-lg shadow-md transition hover:scale-105 duration-300" />
+                {% endfor %}
+              </div>
+            </div>
+          {% endif %}
+
+          <!-- Optional Video Section -->
+          {% if topic.video %}
+            <div class="px-6 pb-6">
+              <video controls class="w-full rounded-md shadow-lg">
+                <source src="{{ site.baseurl }}/videos/{{ topic.video }}" type="video/mp4">
+                Your browser does not support the video tag.
+              </video>
+            </div>
+          {% endif %}
+
+        </div>
+      {% endfor %}
+    </div>
+
+  </div>
+</div>
