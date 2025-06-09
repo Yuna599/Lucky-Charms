@@ -152,9 +152,9 @@ class GameLevelGym {
       }
     };
     const sprite_src_gymportal = path + "/images/gamify/gym3.png";
-    const sprite_greet_gymportal = "FOLLOW THAT CHICKEN JOCKEY. ( Press E )";
+    const sprite_greet_gymportal = "Teleport to the game?";
     const sprite_data_gymportal = {
-        id: 'Chicken Jockey',
+        id: 'Gymportal',
         greeting: sprite_greet_gymportal,
         src: sprite_src_gymportal,
         SCALE_FACTOR: 3,
@@ -166,12 +166,8 @@ class GameLevelGym {
         hitbox: { widthPercentage: 0.1, heightPercentage: 0.2 },
         // Add dialogues array for random messages
         dialogues: [
-            "BAWK BAWK BAWK BAWK BAWK?!?!?!?",
-            "GRRRRRRRR!!",
-            "I'm placing blocks and stuff cuz im in freaking minceraftttt",
-            "BAWAKKKKK!",
-            "You want to fight the chicken?",
-            "CHICKEN JOCKEEEYYYY"
+            "Welcome to the Gym Portal!",
+            "Are you ready to play a game?",
         ],
         reaction: function() {
             // Don't show any reaction dialogue - this prevents the first alert
@@ -190,8 +186,7 @@ class GameLevelGym {
             
             // Show portal dialogue with buttons
             this.dialogueSystem.showDialogue(
-                "Do you follow the Chicken Jockey?",
-                "Chicken Jockey",
+                "do you want to go to the platformer game?",
                 this.spriteData.src
             );
             
@@ -223,7 +218,7 @@ class GameLevelGym {
                             });
                             document.body.appendChild(fadeOverlay);
                             
-                            console.log("You walk after the Chicken Jockey...");
+                            console.log("You step into the Gym Portal...");
                             
                             // Fade in
                             requestAnimationFrame(() => {
@@ -246,7 +241,7 @@ class GameLevelGym {
                                         });
                                     }
                                     
-                                    console.log("You walk after the Chicken Jockey...");
+                                    console.log("You step into the Gym Portal...");
                                     
                                     // IMPORTANT: Store the original level classes for return journey
                                     gameControl._originalLevelClasses = gameControl.levelClasses;
@@ -259,7 +254,7 @@ class GameLevelGym {
                                     gameControl.isPaused = false;
                                     
                                     // Start the End level with the same control
-                                    console.log("You walk after the Chicken Jockey...");
+                                    console.log("You are now in the Platformer Game!");
                                     gameControl.transitionToLevel();
                                     
                                     // Fade out overlay
@@ -284,12 +279,12 @@ class GameLevelGym {
         }
     }
 
-    const sprite_src_endship = path + "/images/gamify/gym1.png";
+    const sprite_src_benchpress = path + "/images/gamify/gym1.png";
 
-    const sprite_data_endship = {
-        id: 'Endship',
-        greeting: "Find the elytra",
-        src: sprite_src_endship,
+    const sprite_data_benchpress = {
+        id: 'benchpress',
+        greeting: "benchpress",
+        src: sprite_src_benchpress,
         SCALE_FACTOR: 3,
         ANIMATION_RATE: 100,
         pixels: { height: 500, width: 500 },
@@ -299,7 +294,7 @@ class GameLevelGym {
         hitbox: { widthPercentage: 0.1, heightPercentage: 0.2 },
         zIndex: 10, // Same z-index as player
         dialogues: [
-            "Do you want to explore the Endship?",
+            "benchpress",
         ],
         interact: function () {
             if (!this.dialogueSystem) {
@@ -307,8 +302,8 @@ class GameLevelGym {
             }
 
             this.dialogueSystem.showDialogue(
-                "Do you want to explore the Endship?",
-                "Endship",
+                "Do you want to play a game?",
+                "benchpress",
                 this.src
             );
 
@@ -348,8 +343,8 @@ class GameLevelGym {
         if (event.key === "E" || event.key === "e") {
             if (checkCollision(sprite_data_chillguy, sprite_data_desertportal)) {
                 sprite_data_desertportal.interact(); // Trigger interaction for Desert Portal
-            } else if (checkCollision(sprite_data_chillguy, sprite_data_endship)) {
-                sprite_data_endship.interact(); // Trigger interaction for Endship
+            } else if (checkCollision(sprite_data_chillguy, sprite_data_benchpress)) {
+                sprite_data_benchpress.interact(); // Trigger interaction for Bench Press
             }
         }
     });
@@ -359,7 +354,7 @@ class GameLevelGym {
       { class: GameEnvBackground, data: image_data_gym },
       { class: Player, data: sprite_data_chillguy },
       { class: Npc, data: sprite_data_desertportal },
-      { class: Npc, data: sprite_data_endship },
+      { class: Npc, data: sprite_data_benchpress },
       { class: Npc, data: sprite_data_gymportal }
     ];
 

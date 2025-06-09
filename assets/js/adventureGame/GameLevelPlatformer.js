@@ -22,18 +22,18 @@ class GameLevelPlatformer {
 
     const collectibles = []; // Declare collectibles array
 
-    // Define sprite_data_eye before using it
-    const sprite_src_eye = gameEnv.path + "/images/gamify/gym3.png";
+    // Define sprite_data_dumbell before using it
+    const sprite_src_dumbell = gameEnv.path + "/images/gamify/gym3.png";
 
-    // Load the image manually and assign it to sprite_data_eye
-    const eyeImage = new Image();
-    eyeImage.src = sprite_src_eye;
+    // Load the image manually and assign it to sprite_data_dumbell
+    const dumbellImage = new Image();
+    dumbellImage.src = sprite_src_dumbell;
 
-    const sprite_data_eye = {
-      id: 'Eye of Ender',
-      greeting: "Press E to collect the Eye of Ender!",
-      src: sprite_src_eye,
-      image: eyeImage, // Assign the loaded image
+    const sprite_data_dumbell = {
+      id: 'dumbell',
+      greeting: "Press E to collect the dumbell!",
+      src: sprite_src_dumbell,
+      image: dumbellImage, // Assign the loaded image
       SCALE_FACTOR: 3,
       pixels: { width: 32, height: 32 },
       INIT_POSITION: {
@@ -45,7 +45,7 @@ class GameLevelPlatformer {
       hitbox: { widthPercentage: 0.3, heightPercentage: 0.3 },
       zIndex: 10,
       dialogues: [
-        "You found an Eye of Ender!",
+        "You found an dumbell",
         "It pulses with ancient energy."
       ]
     };
@@ -53,18 +53,18 @@ class GameLevelPlatformer {
     // Ensure classes is properly defined
     this.classes = [
       { class: Background, data: { src: gameEnv.path + "/images/gamify/gim.png" } },
-      { class: Collectible, data: sprite_data_eye }
+      { class: Collectible, data: sprite_data_dumbell }
     ];
 
     function spawnCollectible() {
-      const eyeImageClone = new Image();
-      eyeImageClone.src = sprite_src_eye;
+      const dumbellImageClone = new Image();
+      dumbellImageClone.src = sprite_src_dumbell;
 
       const newData = {
-        id: 'Eye of Ender',
-        greeting: "Press E to collect the Eye of Ender!",
-        src: sprite_src_eye,
-        image: eyeImageClone,
+        id: 'dumbell',
+        greeting: "Press E to collect the dumbell!",
+        src: sprite_src_dumbell,
+        image: dumbellImageClone,
         SCALE_FACTOR: 3,
         pixels: { width: 32, height: 32 },
         INIT_POSITION: {
@@ -76,7 +76,7 @@ class GameLevelPlatformer {
         hitbox: { widthPercentage: 0.3, heightPercentage: 0.3 },
         zIndex: 10,
         dialogues: [
-          "You found an Eye of Ender!",
+          "You found an dumbell",
           "It pulses with ancient energy."
         ],
         interact: function () {
@@ -92,16 +92,16 @@ class GameLevelPlatformer {
           score++;
           scoreText.innerText = "Score: " + score;
 
-          console.log("Eye of Ender collected!");
+          console.log("dumbell collected!");
 
           // Spawn new one
           spawnCollectible();
         }
       };
 
-      const eye = new Collectible(newData, gameEnv);
-      collectibles.push(eye);
-      gameEnv.gameObjects.push(eye);
+      const dumbell = new Collectible(newData, gameEnv);
+      collectibles.push(dumbell);
+      gameEnv.gameObjects.push(dumbell);
     }
 
     // Player sprite setup
@@ -113,7 +113,7 @@ class GameLevelPlatformer {
 
     const sprite_data_player = {
       id: "Player",
-      greeting: "I am Alex.",
+      greeting: "I am player.",
       src: sprite_src_player,
       SCALE_FACTOR: PLAYER_SCALE_FACTOR,
       STEP_FACTOR: 1000,
@@ -322,11 +322,7 @@ class GameLevelPlatformer {
 
       ctx.restore(); // Restore canvas state
 
-      // Optional: Draw hitbox
-      ctx.strokeStyle = "red";
-      ctx.strokeRect(player.x, player.y, player.width, player.height);
-
-      // Draw Eye of Ender if not collected
+      // Draw dumbell if not collected
       collectibles.forEach((collectible) => {
         const img = collectible.spriteData.image;
 

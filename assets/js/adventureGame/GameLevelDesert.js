@@ -380,7 +380,7 @@ class GameLevelDesert {
               action: () => {
                 this.dialogueSystem.closeDialogue();
                 // Transition to gym.html
-                window.location.href = "./gym.html"; // Ensure gym.html only loads GameLevelGym
+                window.location.href = "../gym.html"; // Ensure gym.html only loads GameLevelGym
               }
             },
             {
