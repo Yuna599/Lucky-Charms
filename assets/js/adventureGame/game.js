@@ -1,130 +1,46 @@
 import GameControl from './GameControl.js';
-import GameLevelWater from "./GameLevelWater.js";
-import GameLevelDesert from "./GameLevelDesert.js";
+// Import GameLevelDesert only if needed
+import GameLevelDesert from './GameLevelDesert.js';
+
 class Game {
-    // initialize user and launch GameControl 
-    static main(environment) {
-
-        // setting Web Application path
+    constructor(environment) {
+        this.environment = environment;
         this.path = environment.path;
-
-        // setting Element IDs
         this.gameContainer = environment.gameContainer;
         this.gameCanvas = environment.gameCanvas;
-
-        // setting API environment variables 
         this.pythonURI = environment.pythonURI;
         this.javaURI = environment.javaURI;
         this.fetchOptions = environment.fetchOptions;
+        this.uid = null;
+        this.id = null;
+        this.gname = null;
 
-        // prepare user data for scoring and stats 
-        this.uid;
-        this.id;
-        this.initUser();
-        this.initStatsUI();
-        
-        // start the game
-        const gameLevelClasses = [GameLevelDesert, GameLevelWater]
-        new GameControl(this, gameLevelClasses).start();
+        // Use environment.gameLevelClasses if provided, otherwise default to GameLevelDesert
+        this.levels = environment.gameLevelClasses || [GameLevelDesert];
+        this.gameControl = new GameControl(this, this.levels);
+        this.gameControl.start();
     }
 
-    static initUser() {
-        const pythonURL = this.pythonURI + '/api/id';
-        fetch(pythonURL, this.fetchOptions)
-            .then(response => {
-                if (response.status !== 200) {
-                    console.error("HTTP status code: " + response.status);
-                    return null;
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (!data) return;
-                this.uid = data.uid;
-                console.log("User ID:", this.uid);  // Ensure this prints correctly
-    
-                // Now that this.uid is set, fetch from the Java backend
-                const javaURL = this.javaURI + '/rpg_answer/person/' + this.uid;
-                return fetch(javaURL, this.fetchOptions);
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`Spring server response: ${response.status}`);
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (!data) return;
-                this.id = data.id;
-                this.fetchStats(data.id);
-            })
-            .catch(error => {
-                console.error("Error:", error);
-            });
+    static main(environment) {
+        return new Game(environment);
     }
-    
 
-    static fetchStats(personId) {
-        const endpoints = {
-            balance: this.javaURI + '/rpg_answer/getBalance/' + personId,
-            strength: this.javaURI + '/rpg_answer/getStrength/' + personId,
-            questionsAnswered: this.javaURI + '/rpg_answer/getQuestionsAnswered/' + personId
-        };
-
-        for (let [key, url] of Object.entries(endpoints)) {
-            fetch(url, this.fetchOptions)
-                .then(response => response.json())
-                .then(data => {
-                    document.getElementById(key).innerHTML = data ?? 0;
-                    localStorage.setItem(key, data ?? 0);
-                })
-                .catch(err => console.error(`Error fetching ${key}:`, err));
-        }
-    }
-    // called to update scoreboard and player stats
-    static updateStats(content, questionId, personId) {
+    async initUser() {
         try {
-            const response = fetch(this.javaURI + '/rpg_answer/submitAnswer', {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    content: content,
-                    questionId: questionId,
-                    personId: personId
-                })
-            });
-
-            if (!response.ok) throw new Error("Network response was not ok");
-
-            const data = response.json();
-
-            return data.score || "Error scoring answer"; // Return score
-
+            const response = await fetch(this.pythonURI + '/api/id', this.fetchOptions);
+            if (!response.ok) throw new Error("API unreachable");
+            const userData = await response.json();
+            this.uid = userData.uid;
+            const javaResponse = await fetch(this.javaURI + '/rpg_answer/person/' + this.uid, this.fetchOptions);
+            if (!javaResponse.ok) throw new Error(`Spring server response: ${javaResponse.status}`);
+            const javaData = await javaResponse.json();
+            this.id = javaData.id;
         } catch (error) {
-            console.error("Error submitting answer:", error);
-            return "Error submitting answer";
+            console.warn("User API failed. Using fallback.");
+            this.uid = "fallback-user";
+            this.id = "fallback-id";
         }
-    }
-
-    static initStatsUI() {
-        const statsContainer = document.createElement('div');
-        statsContainer.id = 'stats-container';
-        statsContainer.style.position = 'fixed';
-        statsContainer.style.top = '75px'; 
-        statsContainer.style.right = '10px';
-        statsContainer.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
-        statsContainer.style.color = 'white';
-        statsContainer.style.padding = '10px';
-        statsContainer.style.borderRadius = '5px';
-        statsContainer.innerHTML = `
-            <div>Balance: <span id="balance">0</span></div>
-            <div>Strength: <span id="Strength">0</span></div>
-            <div>Questions Answered: <span id="questionsAnswered">0</span></div>
-        `;
-        document.body.appendChild(statsContainer);
     }
 }
-export default Game;
 
+export default Game;

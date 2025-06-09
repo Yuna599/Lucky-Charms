@@ -1,9 +1,11 @@
 import Character from "./Character.js";
+import DialogueSystem from "./DialogueSystem.js"; // Ensure DialogueSystem is imported
 
 class Npc extends Character {
     constructor(data = null, gameEnv = null) {
         super(data, gameEnv);
         this.interact = data?.interact; // Interact function
+        this.dialogueSystem = new DialogueSystem(); // Initialize DialogueSystem
         this.currentQuestionIndex = 0;
         this.alertTimeout = null;
         this.bindInteractKeyListeners();

@@ -11,7 +11,6 @@ layout: base
 </script>
 
 <style>
-  /* Custom Styling for Light and Dark Themes */
   body.dark {
     background-color: #121212;
     color: white;
@@ -21,7 +20,6 @@ layout: base
     color: black;
   }
 
-  /* Position and z-index for the theme toggle button */
   #theme-toggle {
     position: fixed;
     top: 10px;
@@ -32,8 +30,8 @@ layout: base
 </style>
 
 <!-- Tailwind-styled content -->
-<div>
-  <div class="container">
+<div class="bg-white min-h-screen">
+  <div class="max-w-3xl mx-auto p-6 space-y-8 text-gray-800 leading-relaxed">
     <!-- Theme Toggle Button -->
     <div class="flex justify-end p-1">
       <button id="theme-toggle" class="bg-gray-600 text-white px-4 py-2 rounded-full">🌙 Dark Mode</button>
@@ -43,24 +41,19 @@ layout: base
   </div>
 
   <script>
-    // Theme Toggle Logic
     const toggleButton = document.getElementById("theme-toggle");
     const body = document.body;
 
     function setTheme(theme) {
       body.classList.remove('light', 'dark');
       body.classList.add(theme);
-      console.log(`Theme set to: ${theme}`);
-      console.log(`Body classes: ${body.className}`);
       localStorage.setItem("theme", theme);
       toggleButton.innerHTML = theme === "dark" ? "☀️ Light Mode" : "🌙 Dark Mode";
     }
 
-    // Load saved theme
     const savedTheme = localStorage.getItem("theme") || "light";
     setTheme(savedTheme);
 
-    // Toggle theme on button click
     toggleButton.addEventListener("click", () => {
       const newTheme = body.classList.contains("dark") ? "light" : "dark";
       setTheme(newTheme);

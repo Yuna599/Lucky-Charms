@@ -1,5 +1,7 @@
 // GameControl.js
 import GameLevel from "./GameLevel.js";
+import Intro from "./Intro.js"; // Ensure Intro class is imported
+import GameLevelDesert from "./GameLevelDesert.js"; // Import GameLevelDesert
 
 class GameControl {
     /**
@@ -21,88 +23,28 @@ class GameControl {
         this.exitKeyListener = this.handleExitKey.bind(this);
         this.gameOver = null; // Callback for when the game is over 
         this.savedCanvasState = []; // Save the current levels game elements 
+        this.intro = new Intro(this); // Ensure Intro instance is initialized
+        this.interactionHandlers = []; // Add interaction handlers array
     }
 
     start() {
-        // Step 1: Create a "Click to Start" button
-        var startButton = document.createElement("button");
-        startButton.innerHTML = "Click to Start"; // Button text
-        startButton.id = "start-button"; // Button ID (optional, for styling or identification)
-        
-        // Optionally, style the button
-        startButton.style.padding = "10px 20px";
-        startButton.style.backgroundColor = "#4CAF50";
-        startButton.style.color = "white";
-        startButton.style.border = "none";
-        startButton.style.cursor = "pointer";
-    
-        // Step 2: Append the button to the page
-        document.body.appendChild(startButton);
-    
-        // Step 3: Add event listener to the button
-        startButton.addEventListener("click", () => {
-            // When the button is clicked, remove it from the page
-            startButton.remove();
-    
-            // Step 4: Call your game functions
-            this.addExitKeyListener();
-            this.transitionToLevel();
-            this.addBackgroundChangeButton();
-    
-            // Step 5: Play the music
-            const audio = new Audio('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3'); // Test with a known URL
-audio.play().then(() => {
-    console.log("Audio is playing!");
-}).catch((error) => {
-    console.error("Error playing audio:", error);
-});
-
-
-            
-
-            
-    
-            // Step 6: Show the alert message
-            alert(`
-                Hello, I have just seen a Kid pull that sword out. 
-                Then after, I have attempted to pull it out myself. 
-                But I'm too weak to pull the sword out of that sword. 
-                Can you help me buff up and get stronger enough to pull out that sword? 
-                First, talk to Doggie!
-            `);
-        });
-    }
-    
-    
-
-    addBackgroundChangeButton() {
-        // Ensure the gameContainer exists before creating the button
-        if (!this.gameContainer) {
-            console.error("Game container is not initialized.");
-            return;
+        if (this.levelClasses[this.currentLevelIndex] === GameLevelDesert) {
+            if (!this.intro) {
+                console.error("Intro instance is not initialized.");
+                return;
+            }
+            this.intro.showStartButton(); // Show intro only for GameLevelDesert
+        } else {
+            this.transitionToLevel(); // Directly transition to other levels
         }
+    }
 
-        // Create a new button element
-        const button = document.createElement("button");
-        button.innerText = "Go to the gym";
-        button.id = "changeBackgroundButton";
+    showConversationModal() {
+        this.intro.showConversationModal(); // Delegate conversation modal logic to Intro
+    }
 
-        // Style the button
-        button.style.position = "absolute";
-        button.style.top = "10px";
-        button.style.right = "10px";
-        button.style.padding = "10px";
-        button.style.backgroundColor = "black";
-        button.style.color = "white";
-        button.style.border = "none";
-        button.style.cursor = "pointer";
-        button.style.fontSize = "16px";
-
-        // Append the button to the game container
-        this.gameContainer.appendChild(button);
-
-        // Add event listener to change background
-        button.addEventListener("click", this.changeBackground.bind(this));
+    showResponse(responseText) {
+        this.intro.showResponse(responseText); // Delegate response modal logic to Intro
     }
 
     /**
@@ -180,6 +122,8 @@ audio.play().then(() => {
             // Start game loop after transition
             this.gameLoop();
         }, 1000); // Wait for fade-out duration
+
+        this.cleanupInteractionHandlers(); // Ensure interaction handlers are cleaned up during transitions
     }
     
     /**
@@ -189,18 +133,21 @@ audio.play().then(() => {
      * 3. Requests the next frame
      */
     gameLoop() {
+        // Stop the game loop if the game is over
+        if (this.currentLevel.gameOver || this.isPaused) {
+            console.log("Game loop stopped: Game is over or paused.");
+            return;
+        }
+
         // If the level is not set to continue, handle the level end condition 
         if (!this.currentLevel.continue) {
             this.handleLevelEnd();
             return;
         }
-        // If the game level is paused, stop the game loop
-        if (this.isPaused) {
-            return;
-        }
         this.currentLevel.update();
         this.handleInLevelLogic();
-        requestAnimationFrame(this.gameLoop.bind(this));
+        // Ensure requestAnimationFrame is called with the correct argument
+        requestAnimationFrame(() => this.gameLoop());
     }
 
     /**
@@ -320,6 +267,35 @@ audio.play().then(() => {
         this.addExitKeyListener();
         this.showCanvasState();
         this.gameLoop();
+    }
+
+    /**
+     * Register an interaction handler
+     * @param {Function} handler - The interaction handler to register
+     */
+    registerInteractionHandler(handler) {
+        this.interactionHandlers.push(handler); // Register interaction handler
+    }
+
+    /**
+     * Unregister an interaction handler
+     * @param {Function} handler - The interaction handler to unregister
+     */
+    unregisterInteractionHandler(handler) {
+        this.interactionHandlers = this.interactionHandlers.filter(h => h !== handler); // Unregister interaction handler
+    }
+
+    /**
+     * Clean up all interaction handlers
+     */
+    cleanupInteractionHandlers() {
+        this.interactionHandlers.forEach(handler => handler.destroy()); // Clean up all handlers
+        this.interactionHandlers = [];
+    }
+
+    update() {
+        // Placeholder for GameControl-specific update logic
+        console.log("GameControl update called.");
     }
 }
 
