@@ -292,6 +292,11 @@ class GameControl {
         this.interactionHandlers.forEach(handler => handler.destroy()); // Clean up all handlers
         this.interactionHandlers = [];
     }
+
+    update() {
+        // Placeholder for GameControl-specific update logic
+        console.log("GameControl update called.");
+    }
 }
 
 export default GameControl;

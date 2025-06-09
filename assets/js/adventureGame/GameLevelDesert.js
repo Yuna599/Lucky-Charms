@@ -6,12 +6,22 @@ import GameLevelGym from './GameLevelGym.js';
 import GameControl from './GameControl.js';
 import GameLevelStarWars from './GameLevelStarWars.js';
 import DialogueSystem from './DialogueSystem.js'; // Ensure DialogueSystem is imported
-
+import Unicorn from './Unicorn.js'; // Ensure Unicorn is imported
 class GameLevelDesert {
   constructor(gameEnv) {
+    this.gameEnv = gameEnv;
     let width = gameEnv.innerWidth;
     let height = gameEnv.innerHeight;
     let path = gameEnv.path;
+
+    // Bind restartGame to the class instance
+    this.restartGame = () => {
+      console.log("Restarting game...");
+      this.gameEnv.gameControl.transitionToLevel(GameLevelDesert);
+    };
+
+    // Bind restartGame globally for use in dyingAnimation
+    window._restartDesertGame = this.restartGame;
 
     // Background data
     const image_src_desert = path + "/images/gamify/disneyland.png";
@@ -113,8 +123,14 @@ class GameLevelDesert {
           playerElement.style.transition = "opacity 1s ease-out";
           playerElement.style.opacity = "0"; // Fade out the player
           setTimeout(() => {
-            playerElement.remove(); // Remove the player element after animation
-            restartGame();
+            playerElement.remove();
+
+            // Call the bound restart method
+            if (typeof window._restartDesertGame === "function") {
+              window._restartDesertGame();
+            } else {
+              console.warn("Restart method not bound.");
+            }
           }, 1000); // Wait for the animation to complete
         }
       }
@@ -137,20 +153,19 @@ class GameLevelDesert {
         left: {row: 0, start: 0, columns: 1 },
         up: {row: 0, start: 0, columns: 1 },  // This is the stationary npc, down is default 
         hitbox: { widthPercentage: 0.1, heightPercentage: 0.2 },
-
-        
-          //walking area creates the box where the Shark can walk in 
-          walkingArea: {
-            xMin: width / 5, //left boundary
-            xMax: (width * 3 / 5), //right boundary 
-            yMin: height / 4, //top boundary 
-            yMax: (height * 3 / 5) //bottom boundary
-          },
+        walkingArea: {
+          xMin: width / 10,
+          xMax: (width * 5 / 7),
+          yMin: height / 4,
+          yMax: (height * 8 / 15)
+        },
         speed: 10,
-        direction: { x: 1, y: 1 }, 
+        direction: { x: 1, y: 1 },
+  
         updatePosition: function () {
           this.INIT_POSITION.x += this.direction.x * this.speed;
           this.INIT_POSITION.y += this.direction.y * this.speed;
+  
           if (this.INIT_POSITION.x <= this.walkingArea.xMin) {
             this.INIT_POSITION.x = this.walkingArea.xMin;
             this.direction.x = 1;
@@ -167,85 +182,103 @@ class GameLevelDesert {
             this.INIT_POSITION.y = this.walkingArea.yMax;
             this.direction.y = -1;
           }
+  
+          // Update DOM element if present
           const spriteElement = document.getElementById(this.id);
-          if (spriteElement) { 
+          if (spriteElement) {
             spriteElement.style.transform = this.direction.x === -1 ? "scaleX(-1)" : "scaleX(1)";
             spriteElement.style.left = this.INIT_POSITION.x + 'px';
-            spriteElement.style.top = this.INIT_POSITION.y + 'px'; // Update position of the shark sprite
+            spriteElement.style.top = this.INIT_POSITION.y + 'px';
           }
         },
-        // Splash Animation
-        // This function creates a splash animation when the shark moves
         isAnimating: false,
+        sound: new Audio("../audio/shine.mp3"), // Optional sound setup
+  
         playAnimation: function () {
           if (this.isAnimating) return;
           this.isAnimating = true;
-        
+  
           const spriteElement = document.getElementById(this.id);
-          if (!spriteElement) return;
-        
-          const particleCount = 20;
-        
-          for (let i = 0; i < particleCount; i++) {
-            const particle = document.createElement('div');
-            particle.className = 'splash-particle';
-        
-            particle.style.position = 'absolute';
-            particle.style.left = `${spriteElement.offsetLeft + spriteElement.offsetWidth / 3}px`;
-            particle.style.top = `${spriteElement.offsetTop + spriteElement.offsetHeight / 3}px`;
-            particle.style.width = '6px';
-            particle.style.height = '6px';
-            particle.style.borderRadius = '50%';
-            particle.style.backgroundColor = 'aqua';
-            particle.style.pointerEvents = 'none';
-            particle.style.zIndex = 1000;
-            particle.style.opacity = 1;
-            particle.style.transition = 'transform 1s ease-out, opacity 1s ease-out';
-        
-            // Animate outward
-            const angle = Math.random() * 2 * Math.PI;
-            const distance = 60 + Math.random() * 40;
-            const x = Math.cos(angle) * distance;
-            const y = Math.sin(angle) * distance;
-        
-            document.body.appendChild(particle);
-            requestAnimationFrame(() => {
-              particle.style.transform = `translate(${x}px, ${y}px)`;
-              particle.style.opacity = 0;
-            });
-        
-            // Cleanup after animation
-            setTimeout(() => {
-              particle.remove();
-            }, 1000);
-          }
-        
-          setTimeout(() => {
+          if (!spriteElement) {
             this.isAnimating = false;
-          }, 1000);
+            return;
+          }
+  
+          try {
+            // 🌟 Apply glow effect
+            spriteElement.style.transition = "box-shadow 0.3s ease-in-out, transform 0.3s ease-in-out";
+            spriteElement.style.boxShadow = "0 0 30px 15px rgba(255, 255, 255, 0.7)";
+            spriteElement.style.transform = "scale(1.05)";
+  
+            // 🎆 Create shimmer particles
+            const particleCount = 20;
+            for (let i = 0; i < particleCount; i++) {
+              const particle = document.createElement('div');
+              particle.className = 'shine-particle';
+  
+              // Random color and position
+              const colors = ['#FFD700', '#FFFFFF', '#FFA500', '#FF69B4', '#87CEEB'];
+              particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+  
+              particle.style.position = 'absolute';
+              particle.style.left = `${spriteElement.offsetLeft + spriteElement.offsetWidth / 2}px`;
+              particle.style.top = `${spriteElement.offsetTop + spriteElement.offsetHeight / 2}px`;
+              particle.style.width = '5px';
+              particle.style.height = '5px';
+              particle.style.borderRadius = '50%';
+              particle.style.pointerEvents = 'none';
+              particle.style.zIndex = 1000;
+              particle.style.opacity = 1;
+              particle.style.transition = 'transform 1s ease-out, opacity 1s ease-out';
+  
+              const angle = Math.random() * 2 * Math.PI;
+              const distance = 50 + Math.random() * 30;
+              const x = Math.cos(angle) * distance;
+              const y = Math.sin(angle) * distance;
+  
+              document.body.appendChild(particle);
+  
+              requestAnimationFrame(() => {
+                particle.style.transform = `translate(${x}px, ${y}px)`;
+                particle.style.opacity = 0;
+              });
+  
+              setTimeout(() => {
+                particle.remove();
+              }, 1000);
+            }
+  
+            // Play sound if defined
+            if (this.sound) {
+              this.sound.play().catch((error) => {
+                console.warn("Sound playback failed:", error);
+              });
+            }
+  
+            // Reset glow effect
+            setTimeout(() => {
+              spriteElement.style.boxShadow = "none";
+              spriteElement.style.transform = "scale(1)";
+              this.isAnimating = false;
+            }, 1000);
+          } catch (error) {
+            console.error("Error in playAnimation:", error);
+            this.isAnimating = false;
+          }
         }
       };
-      // Set intervals to update position and play animation  
-      setInterval(() => {
-        sprite_data_unicorn.updatePosition();
-      }, 100);
-      setInterval(() => {
-        sprite_data_unicorn.playAnimation();
-      }, 1000);
+  
+      
+    // Schedule unicorn movement updates every 100ms
+    setInterval(() => {
+      sprite_data_unicorn.updatePosition();
+    }, 100);
 
-    function growUnicorn(unicorn) {
-      unicorn.SCALE_FACTOR += 0.5; // Increase the scale factor
-      unicorn.width = unicorn.pixels.width * unicorn.SCALE_FACTOR; // Update width
-      unicorn.height = unicorn.pixels.height * unicorn.SCALE_FACTOR; // Update height
+    // ✨ Trigger shimmer periodically
+    setInterval(() => {
+      sprite_data_unicorn.playAnimation();
+    }, 5000);
 
-      const spriteElement = document.getElementById(unicorn.id);
-      if (spriteElement) {
-        spriteElement.style.width = `${unicorn.width}px`;
-        spriteElement.style.height = `${unicorn.height}px`;
-      }
-
-      console.log(`Unicorn grew! New size: ${unicorn.width}x${unicorn.height}`);
-    }
 
     // Add Employee NPC data
     const sprite_src_employee = path + "/images/gamify/employee.png"; // Ensure the path is correct
@@ -379,58 +412,7 @@ class GameLevelDesert {
         }
     }
 
-    const sprite_src_robot = path + "/images/gamify/robot.png";
-    const sprite_greet_robot = "Hi I am Robot, the Jupyter Notebook mascot. I am very happy to spend some linux shell time with you!";
-    const sprite_data_robot = {
-        id: 'Robot',
-        greeting: sprite_greet_robot,
-        src: sprite_src_robot,
-        SCALE_FACTOR: 10,
-        ANIMATION_RATE: 100,
-        pixels: {height: 316, width: 627},
-        INIT_POSITION: { x: (width * 3 / 4), y: (height * 1 / 4)},
-        orientation: {rows: 3, columns: 6 },
-        down: {row: 1, start: 0, columns: 6 },
-        hitbox: { widthPercentage: 0.1, heightPercentage: 0.2 },
-        // Add dialogues array for random messages
-        dialogues: [
-            "Jupyter Notebooks let you mix code, text, and visualizations.",
-            "The name Jupyter comes from Julia, Python, and R - popular data science languages.",
-            "Interactive computing makes data exploration so much more fun!",
-            "I can help you analyze and visualize your data.",
-            "Notebooks are perfect for data storytelling and sharing insights.",
-            "Many scientists use me for reproducible research.",
-            "Press Shift+Enter to run a cell in Jupyter Notebook.",
-            "You can export notebooks to many formats, like HTML and PDF."
-        ],
-        reaction: function() {
-            // Use dialogue system instead of alert
-            if (this.dialogueSystem) {
-                this.showReactionDialogue();
-            } else {
-                console.log(sprite_greet_robot);
-            }
-        },
-        interact: function() {
-            // KEEP ORIGINAL GAME-IN-GAME FUNCTIONALITY
-            // Set a primary game reference from the game environment
-            let primaryGame = gameEnv.gameControl;
-            // Define the game in game level
-            let levelArray = [GameLevelGym];
-            // Define a new GameControl instance with the MeteorBlaster level
-            let gameInGame = new GameControl(gameEnv.game, levelArray);
-            // Pause the primary game 
-            primaryGame.pause();
-            // Start the game in game
-            gameInGame.start();
-            // Setup "callback" function to allow transition from game in game to the underlying game
-            gameInGame.gameOver = function() {
-                // Call .resume on primary game
-                primaryGame.resume();
-            }
-        }
-    };
-
+  
     function checkCollision(player, npc) {
       const playerRect = {
         x: player.x,
@@ -453,18 +435,21 @@ class GameLevelDesert {
       );
     }
 
-    function restartGame() {
-      window.location.reload(); // Reload the page to restart the game
-    }
-
     function gameLoop() {
-      // Check collision between player and unicorn
-      if (checkCollision(sprite_data_chillguy, sprite_data_unicorn)) {
-        console.log("Collision detected! Player is dying...");
-        sprite_data_chillguy.dyingAnimation();
+      if (!this.gameEnv) {
+        console.error("gameEnv is undefined. Ensure it is properly initialized.");
+        return;
       }
 
-      requestAnimationFrame(gameLoop);
+      // Check collision between player and unicorn
+      if (checkCollision(sprite_data_chillguy, sprite_data_unicorn)) {
+        const playerObj = this.gameEnv.gameObjects.find(obj => obj.spriteData?.id === 'chill-guy');
+        if (playerObj && typeof playerObj.handleDeath === 'function') {
+          playerObj.handleDeath(); // Trigger player death logic
+        }
+      }
+
+      requestAnimationFrame(gameLoop.bind(this)); // Ensure proper binding of `this`
     }
 
     // Start the game loop
@@ -474,17 +459,15 @@ class GameLevelDesert {
     this.validateSpriteSource(sprite_data_chillguy);
     this.validateSpriteSource(sprite_data_unicorn);
     this.validateSpriteSource(sprite_data_employee);
-    this.validateSpriteSource(sprite_data_chickenj);
-    this.validateSpriteSource(sprite_data_robot);
+    this.validateSpriteSource(sprite_data_chickenj)
 
     // Ensure classes is properly defined
     this.classes = [
       { class: Background, data: image_data_desert },
       { class: Player, data: sprite_data_chillguy },
-      { class: Npc, data: sprite_data_unicorn },
+      { class: Unicorn, data: sprite_data_unicorn },
       { class: Npc, data: sprite_data_employee },
-      { class: Npc, data: sprite_data_chickenj },
-      { class: Npc, data: sprite_data_robot }
+      { class: Npc, data: sprite_data_chickenj }
     ];
 
     // Start Unicorn position updates
@@ -501,6 +484,30 @@ class GameLevelDesert {
       console.error(`Sprite sheet for ${spriteData.id} is not loaded or is in a broken state.`);
       spriteData.src = ""; // Reset the source to prevent further errors
     };
+  }
+
+  handleCollisionEvent() {
+    const player = this.gameEnv.gameObjects.find(obj => obj instanceof Player);
+    if (player && player.id === this.collisionData.touchPoints.other.id) {
+        console.log("Unicorn collided with player!");
+
+        // Stop movement
+        this.velocity.x = 0;
+        this.velocity.y = 0;
+
+        // Explode player object with animation
+        this.explode(player.position.x, player.position.y);
+        player.destroy();
+        this.playerDestroyed = true;
+
+        // Restart the game after explosion animation
+        setTimeout(() => {
+            console.log("Restarting the game...");
+            this.gameEnv.gameControl.currentLevel.destroy(); // Destroy the current level
+            const newGameLevel = new GameLevelDesert(this.gameEnv); // Create a new instance
+            newGameLevel.initialize(); // Initialize the new game level
+        }, 2000); // Adjust delay based on explosion animation duration
+    }
   }
 }
 

@@ -85,10 +85,31 @@ class GameLevelFallDown {
       fallingObject.style.left = `${objectX}px`;
     }
 
-    function endGame() {
-      isPaused = true; // Stop the game loop
+    this.cleanup = function () {
+      document.removeEventListener("keydown", movePlayer);
+      if (gameArea && gameArea.parentNode) {
+        gameArea.parentNode.removeChild(gameArea);
+      }
+    };
+
+    this.destroy = function () {
+      score = 0;
+      playerX = 370;
+      objectY = 0;
+      objectX = Math.random() * 760;
+      isPaused = false;
+    };
+
+    this.initialize = function () {
+      new GameLevelFallDown();
+    };
+
+    this.endGame = function () {
+      this.running = false;
+
+      // Optional: Show game over message
       const gameOverMessage = document.createElement("div");
-      gameOverMessage.textContent = "Game Over! You reached a score of 5!";
+      gameOverMessage.textContent = "Game Over! Restarting...";
       gameOverMessage.style.position = "absolute";
       gameOverMessage.style.top = "50%";
       gameOverMessage.style.left = "50%";
@@ -103,9 +124,20 @@ class GameLevelFallDown {
       document.body.appendChild(gameOverMessage);
 
       setTimeout(() => {
-        window.location.href = "/Lucky-Charms/gamify/gym.html"; // Redirect back to GameLevelGym
-      }, 2000); // Wait for 2 seconds before redirecting
-    }
+        // Clean up the old game state
+        this.cleanup();
+        this.destroy();
+
+        // Clear the game over message
+        if (gameOverMessage && gameOverMessage.parentNode) {
+          gameOverMessage.parentNode.removeChild(gameOverMessage);
+        }
+
+        // Restart a fresh instance
+        const newGame = new GameLevelFallDown();
+        newGame.initialize();
+      }, 2000); // Wait 2 seconds before restarting
+    };
 
     function gameLoop() {
       if (isPaused) return; // Stop the game loop if paused
@@ -132,7 +164,7 @@ class GameLevelFallDown {
         resetObject();
 
         if (score >= 5) {
-          endGame(); // End the game when score reaches 5
+          this.endGame(); // End the game when score reaches 5
           return;
         }
       }
