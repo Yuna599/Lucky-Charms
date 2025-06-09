@@ -5,36 +5,7 @@ class Unicorn extends Enemy {
     constructor(data = null, gameEnv = null) {
         super(data, gameEnv);
 
-        // Inject confetti styles only once
-        if (!document.getElementById("confetti-style")) {
-            const style = document.createElement("style");
-            style.id = "confetti-style";
-            style.innerHTML = `
-                .unicorn-confetti {
-                    position: fixed;
-                    z-index: 9999;
-                    border-radius: 50%;
-                    animation: confetti-fall 2.5s ease-out forwards;
-                }
-
-                @keyframes confetti-fall {
-                    0% {
-                        transform: translateY(0) rotate(0deg);
-                        opacity: 1;
-                    }
-                    100% {
-                        transform: translateY(100vh) rotate(720deg);
-                        opacity: 0;
-                    }
-                }
-            `;
-            document.head.appendChild(style);
-        }
-
-        // Optional: load a sound for confetti
-        this.sound = new Audio('/Lucky-Charms/sounds/confetti.mp3'); // Adjust path if needed
     }
-
     /**
      * Check for proximity of objects.
      * This method checks if any players are within a certain distance of the creeper.
@@ -199,25 +170,7 @@ class Unicorn extends Enemy {
         }, 1000);
     }
 
-    spawnConfetti() {
-        const count = 30;
-        const colors = ["#ff0", "#0f0", "#0ff", "#f0f", "#f66", "#6ff"];
-
-        for (let i = 0; i < count; i++) {
-            const confetti = document.createElement("div");
-            confetti.classList.add("unicorn-confetti");
-            confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-            confetti.style.left = Math.random() * window.innerWidth + "px";
-            confetti.style.top = "-20px";
-            confetti.style.width = "10px";
-            confetti.style.height = "10px";
-            confetti.style.animationDelay = Math.random() + "s";
-
-            document.body.appendChild(confetti);
-            setTimeout(() => confetti.remove(), 3000);
-        }
-    }
-
+    
     // Override other methods if needed
 }
 

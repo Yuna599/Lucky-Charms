@@ -192,7 +192,7 @@ class GameLevelDesert {
           }
         },
         isAnimating: false,
-        sound: new Audio("../audio/shine.mp3"), // Optional sound setup
+        sound: new Audio("../assets/audio/shine.mp3"), // Optional sound setup
   
         playAnimation: function () {
           if (this.isAnimating) return;
@@ -215,21 +215,6 @@ class GameLevelDesert {
             for (let i = 0; i < particleCount; i++) {
               const particle = document.createElement('div');
               particle.className = 'shine-particle';
-  
-              // Random color and position
-              const colors = ['#FFD700', '#FFFFFF', '#FFA500', '#FF69B4', '#87CEEB'];
-              particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-  
-              particle.style.position = 'absolute';
-              particle.style.left = `${spriteElement.offsetLeft + spriteElement.offsetWidth / 2}px`;
-              particle.style.top = `${spriteElement.offsetTop + spriteElement.offsetHeight / 2}px`;
-              particle.style.width = '5px';
-              particle.style.height = '5px';
-              particle.style.borderRadius = '50%';
-              particle.style.pointerEvents = 'none';
-              particle.style.zIndex = 1000;
-              particle.style.opacity = 1;
-              particle.style.transition = 'transform 1s ease-out, opacity 1s ease-out';
   
               const angle = Math.random() * 2 * Math.PI;
               const distance = 50 + Math.random() * 30;
@@ -354,28 +339,24 @@ class GameLevelDesert {
       },
     };
 
-    // Define sprite_data_chickenj before validation
-    const sprite_src_chickenj = path + "/images/gamify/robot.png";
-    const sprite_greet_chickenj = "FOLLOW THAT CHICKEN JOCKEY. ( Press E )";
-    const sprite_data_chickenj = {
-        id: 'Chicken Jockey',
-        greeting: sprite_greet_chickenj,
-        src: sprite_src_chickenj,
-        SCALE_FACTOR: 9,
+    // Define sprite_data_door before validation
+    const sprite_src_door = path + "/images/gamify/door.png";
+    const sprite_greet_door = "Go through the door to enter the gym!";
+    const sprite_data_door = {
+        id: 'Door',
+        greeting: sprite_greet_door,
+        src: sprite_src_door,
+        SCALE_FACTOR: 10,
         ANIMATION_RATE: 100,
-        pixels: { width: 150, height: 255 },
-        INIT_POSITION: { x: (width * 1 / 6), y: (height * 1 / 10) }, // Moved more to the left
+        pixels: { width: 1024, height: 1024 },
+        INIT_POSITION: { x: (width * 1 / 10), y: (height * 1 / 2) }, // Moved more to the left
         orientation: { rows: 1, columns: 1 },
         down: { row: 0, start: 0, columns: 1 },
         hitbox: { widthPercentage: 0.1, heightPercentage: 0.2 },
         // Add dialogues array for random messages
         dialogues: [
-            "BAWK BAWK BAWK BAWK BAWK?!?!?!?",
-            "GRRRRRRRR!!",
-            "I'm placing blocks and stuff cuz im in freaking minceraftttt",
-            "BAWAKKKKK!",
-            "You want to fight the chicken?",
-            "CHICKEN JOCKEEEYYYY"
+            "Go through the door to enter the gym!",
+            "The gym is just through this door!",
         ],
         reaction: function() {
             // Don't show any reaction dialogue - this prevents the first alert
@@ -387,8 +368,8 @@ class GameLevelDesert {
           }
       
           this.dialogueSystem.showDialogue(
-            "Do you want to follow the Chicken Jockey?",
-            "Chicken Jockey",
+            "Do you want to enter the gym?",
+            this.greeting,
             this.src
           );
       
@@ -436,14 +417,14 @@ class GameLevelDesert {
     }
 
     function gameLoop() {
-      if (!this.gameEnv) {
-        console.error("gameEnv is undefined. Ensure it is properly initialized.");
+      if (!this || !this.gameEnv) {
+        console.error("gameEnv is undefined or 'this' is not bound correctly. Ensure it is properly initialized.");
         return;
       }
 
       // Check collision between player and unicorn
       if (checkCollision(sprite_data_chillguy, sprite_data_unicorn)) {
-        const playerObj = this.gameEnv.gameObjects.find(obj => obj.spriteData?.id === 'chill-guy');
+        const playerObj = this.gameEnv.gameObjects.find(obj => obj.spriteData?.id === 'Chill Guy');
         if (playerObj && typeof playerObj.handleDeath === 'function') {
           playerObj.handleDeath(); // Trigger player death logic
         }
@@ -452,14 +433,14 @@ class GameLevelDesert {
       requestAnimationFrame(gameLoop.bind(this)); // Ensure proper binding of `this`
     }
 
-    // Start the game loop
-    gameLoop();
+    // Ensure the game loop is properly bound and started
+    gameLoop.call(this);
 
     // Validate sprite sources after all definitions
     this.validateSpriteSource(sprite_data_chillguy);
     this.validateSpriteSource(sprite_data_unicorn);
     this.validateSpriteSource(sprite_data_employee);
-    this.validateSpriteSource(sprite_data_chickenj)
+    this.validateSpriteSource(sprite_data_door)
 
     // Ensure classes is properly defined
     this.classes = [
@@ -467,7 +448,7 @@ class GameLevelDesert {
       { class: Player, data: sprite_data_chillguy },
       { class: Unicorn, data: sprite_data_unicorn },
       { class: Npc, data: sprite_data_employee },
-      { class: Npc, data: sprite_data_chickenj }
+      { class: Npc, data: sprite_data_door }
     ];
 
     // Start Unicorn position updates
