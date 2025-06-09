@@ -1,98 +1,38 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CSSE Final Reflection</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gray-50 text-gray-800 p-6">
-  <div class="max-w-4xl mx-auto">
-    <h1 class="text-4xl font-bold text-center mb-6 text-blue-700"> CSSE Final Reflection</h1>
-    <p class="text-center text-gray-600 mb-12 text-lg">By Yuna Lee — Class of 2025</p>
+<div>
+  {% assign data = site.data[page.infoGraph] %}
+  <div class="container">
+    <!-- Header Section -->
+    <div class="p-6 rounded-lg shadow-md">
+      <h1 class="text-5xl mb-4">{{ data.Title }}</h1>
+      <p class="text-lg mb-4">{{ data.Description }}</p>
+    </div>
 
-    <section class="mb-12">
-      <h2 class="text-2xl font-semibold text-blue-700 mb-4"> Learning Through Teamwork</h2>
-      <p class="text-lg leading-relaxed">
-        At the beginning of this CSSE class, I honestly felt a little lost. Everyone seemed to know what they were doing — GitHub, terminal commands, writing methods — while I was still trying to figure out how to run the program at all. But what made this class special for me was the people I worked with. I didn’t just "learn" programming. I learned how to lean on my team.
-        <br /><br />
-        I had moments where I was stuck, completely unsure what to do next. That’s where my group stepped in. Whether it was helping me figure out a broken branch or explaining what a pull request actually does, they were patient and explained things in ways I could understand. Eventually, I stopped being afraid to ask for help — and started finding confidence in giving help back. <br /><br />
-        <em><strong>GitHub:</strong> A platform for hosting and collaborating on code.</em>
-      </p>
-    </section>
-
-    <section class="mb-12">
-      <h2 class="text-2xl font-semibold text-purple-700 mb-4"> What We Built (and Broke and Fixed)</h2>
-      <p class="text-lg leading-relaxed">
-        Our group worked together to plan, build, and test different projects. We started using <strong>GitHub</strong> to track versions of our code, and I learned how to use <strong>branches</strong> to safely try new ideas without messing up the main project. I didn’t understand how merging worked at first — and yes, I broke the main branch once. But I learned how to fix it, how to test before I push, and how to write better commit messages. We also learned about deployment: seeing our projects actually live online felt real. <br /><br />
-        <em><strong>Branches:</strong> versions of a project that allow for isolated development.</em><br />
-        <em><strong>Merging:</strong> Combining code from one branch into another.</em><br />
-        <em><strong>Deployment:</strong> Putting your finished project online so people can use it.</em>
-      </p>
-    </section>
-
-    <section class="mb-12">
-      <h2 class="text-2xl font-semibold text-green-700 mb-4"> Growing from Reviews</h2>
-      <p class="text-lg leading-relaxed">
-        At first, I was nervous about <strong>code reviews</strong> — what if someone pointed out something I completely missed? But over time, I saw how useful those conversations were. I got better at receiving feedback and also giving it. Our <strong>retrospectives</strong> helped us reflect on what went well and what needed to change. Presenting live demos also pushed me out of my comfort zone and helped me grow in confidence, not just as a coder, but as a communicator. <br /><br />
-        <em><strong>Code reviews:</strong> Class checking your code for errors, style, and improvements.</em><br />
-        <em><strong>Retrospectives:</strong> Talking with your team about what went well and what could be better.</em>
-      </p>
-    </section>
-
-    <section class="mb-12">
-      <h2 class="text-2xl font-semibold text-orange-600 mb-4">Understanding the Foundations</h2>
-      <p class="text-lg leading-relaxed">
-        We covered essential data types like <strong>numbers</strong>, <strong>strings</strong>, <strong>booleans</strong>, <strong>arrays</strong>, and <strong>JSON objects</strong>. These might sound basic, but they’re the building blocks of everything we did. I learned how to use <strong>operators</strong> to combine strings or perform calculations, and how to use <strong>boolean logic</strong> in control structures.
-        <br /><br />
-        Before this class, I didn’t really get how loops or `if` statements worked. But writing games and apps using <strong>control structures</strong> like `for` loops and `if/else` helped it finally click. <br /><br />
-        <em><strong>Numbers:</strong> Numeric values like integers or decimals.</em><br />
-        <em><strong>Strings:</strong> Text inside quotes.</em><br />
-        <em><strong>Booleans:</strong> Values that are either true or false.</em><br />
-        <em><strong>Arrays:</strong> Ordered lists of elements.</em><br />
-        <em><strong>JSON objects:</strong> Data in key-value pair format.</em><br />
-        <em><strong>Operators:</strong> Special symbols that let the computer do things like math or comparisons. (e.g., +, -, &&).</em><br />
-        <em><strong>Control structures:</strong> Tools like if/else and loops that control code flow.</em>
-      </p>
-    </section>
-
-    <section class="mb-12">
-      <h2 class="text-2xl font-semibold text-pink-600 mb-4">Input, Output, and Interaction</h2>
-      <p class="text-lg leading-relaxed">
-        One of the coolest parts was learning how to get input from users using <strong>HTML forms</strong>, and then using <strong>JavaScript</strong> to validate that input or trigger things with <strong>key events</strong>. Working with the <strong>DOM</strong> made everything feel interactive — like building something real, not just typing into a console. <br /><br />
-        <em><strong>HTML Forms:</strong> A way to gather data from people using text fields, checkboxes, and more.</em><br />
-        <em><strong>Key events:</strong> When the computer reacts to someone pressing a key on the keyboard.</em><br />
-        <em><strong>DOM (Document Object Model):</strong> The part of the page your code interacts with to make changes happen live.</em>
-      </p>
-    </section>
-
-    <section class="mb-12">
-      <h2 class="text-2xl font-semibold text-yellow-600 mb-4"> Object-Oriented Concepts</h2>
-      <p class="text-lg leading-relaxed">
-        Classes were confusing to me at first. Writing a class, adding methods, instantiating objects — it felt like too much. But after enough repetition and support from my group, I finally understood how to use them. We created objects with different behaviors and properties, and I saw how powerful it is when you structure your code cleanly. <br /><br />
-        <em><strong>Classes:</strong> Structured templates used to define the properties and behaviors of objects.</em><br />
-        <em><strong>Methods:</strong> Functions defined within a class that describe what an object can do.</em><br />
-        <em><strong>Objects:</strong> Individual instances created from a class, each with its own data and behavior.</em><br />
-        <em><strong>Instantiation:</strong> The process of creating an object based on a class definition.</em>        
-      </p>
-    </section>
-
-    <section class="mb-12">
-      <h2 class="text-2xl font-semibold text-teal-600 mb-4"> Practices That Stuck</h2>
-      <p class="text-lg leading-relaxed">
-        One of the biggest takeaways from this year was the <strong>Single Responsibility Principle (SRP)</strong> — making sure each class or function only has one job. We also learned about <strong>Object Literals</strong> and how they differ from <strong>Instances</strong>. I especially enjoyed learning how to build <strong>FSMs (Finite State Machines)</strong> for games. Using <strong>inheritance</strong> was something I struggled with but started to grasp as the year went on. <br /><br />
-        <em><strong>SRP (Single Responsibility Principle):</strong> Each piece of code should have one job only.</em><br />
-        <em><strong>Object Literal:</strong> An object created directly using curly braces { }.</em><br />
-        <em><strong>Instance:</strong> A specific object created from a class.</em><br />
-        <em><strong>FSM (Finite State Machine):</strong> A system with limited states (like start, play, end).</em><br />
-        <em><strong>Inheritance:</strong> When one class takes on properties of another.</em>
-      </p>
-    </section>
-
-    <footer class="text-center text-sm text-gray-500 py-10">
-      CSSE • 2025  •  Yuna Lee
-      <br />
-    </footer>
+    <!-- Rows Section -->
+    <div id="rows" class="grid gap-4 p-6">
+      {% for topic in data.Topics %}
+        <div class="grid grid-cols-3 gap-4 items-center p-4 rounded-lg shadow-md">
+          <!-- Image Column -->
+          <div class="text-center">
+            <a href="{{ site.baseurl }}{{ topic.link }}">
+              <img src="{{ site.baseurl }}/images/{{ topic.image }}" alt="{{ topic.alt }}" class="rounded-lg mx-auto h-40 object-cover">
+            </a>
+          </div>
+          <!-- Key Points Column -->
+          <div>
+            <h3 class="text-xl font-semibold mb-2">{{ topic.title }}</h3>
+            <ul class="list-disc list-inside">
+              {% for point in topic.keyPoints %}
+                <li>{{ point }}</li>
+              {% endfor %}
+            </ul>
+          </div>
+          <!-- Description Column -->
+          <div>
+            <h3 class="text-xl font-semibold mb-2">{{ topic.subtitle }}</h3>
+            <p class="text-sm">{{ topic.description }}</p>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
   </div>
-</body>
-</html>
+</div>
