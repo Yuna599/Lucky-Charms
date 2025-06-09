@@ -157,7 +157,7 @@ class GameLevelPlatformer {
 
     // Platform data
     const platforms = [
-      { x: 0, y: 350, width: 1500, height: 500 }, // Extended ground platform width
+      { x: 0, y: 350, width: 2000, height: 500 }, // Extended ground platform width
       { x: 200, y: 280, width: 100, height: 10 },
       { x: 400, y: 220, width: 150, height: 10 },
       { x: 600, y: 150, width: 100, height: 10 },

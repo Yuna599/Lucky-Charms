@@ -1,0 +1,18 @@
+sections:
+  - title: "Learning Through Teamwork"
+    color: blue
+    content: >
+      At the beginning of this CSSE class, I honestly felt a little lost. Everyone seemed to know what they were doing — GitHub, terminal commands, writing methods — while I was still trying to figure out how to run the program at all.
+    key_terms:
+      - name: GitHub
+        description: A platform for hosting and collaborating on code.
+
+  - title: "What We Built (and Broke and Fixed)"
+    color: purple
+    content: >
+      Our group worked together to plan, build, and test different projects. We used GitHub to track versions, learned about branches and merging...
+    key_terms:
+      - name: Branches
+        description: Versions of a project for isolated development.
+      - name: Merging
+        description: Combining code from one branch into another.

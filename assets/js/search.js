@@ -38,18 +38,15 @@
   // Site search
   function initSearch() {
     var request = new XMLHttpRequest();
-    request.open('GET', '{{ "assets/js/search-data.json" | relative_url }}', true);
+    // Replace Liquid syntax with a static or dynamically processed URL
+    request.open('GET', '/assets/js/search-data.json', true);
 
     request.onload = function () {
       if (request.status >= 200 && request.status < 400) {
-        // Success!
         var data = JSON.parse(request.responseText);
 
-        {% if site.search_tokenizer_separator != nil %}
-        lunr.tokenizer.separator = {{ site.search_tokenizer_separator }};
-        {% else %}
+        // Use a default separator if Liquid processing is not applied
         lunr.tokenizer.separator = /[\s\-/]+/;
-        {% endif %}
 
         var index = lunr(function () {
           this.ref('id');
@@ -70,13 +67,11 @@
 
         searchResults(index, data);
       } else {
-        // We reached our target server, but it returned an error
         console.log('Error loading ajax request. Request status:' + request.status);
       }
     };
 
     request.onerror = function () {
-      // There was a connection error of some sort
       console.log('There was a connection error');
     };
 
@@ -282,3 +277,6 @@
     }
   });
 })(window.jtd = window.jtd || {});
+
+// Correct usage
+let result = 10 % 2; // Valid modulo operation
