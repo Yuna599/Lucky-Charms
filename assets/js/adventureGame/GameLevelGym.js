@@ -160,17 +160,17 @@ class GameLevelGym {
         SCALE_FACTOR: 3,
         ANIMATION_RATE: 100,
         pixels: { width: 500, height: 500 },
-        INIT_POSITION: { x: (width * 1 / 6), y: (height * 1 / 10) }, // Moved more to the left
+        INIT_POSITION: { x: (width * 1 / 6), y: (height * 1 / 10) }, 
         orientation: { rows: 1, columns: 1 },
         down: { row: 0, start: 0, columns: 1 },
-        hitbox: { widthPercentage: 0.1, heightPercentage: 0.2 },
+        hitbox: { widthPercentage: 0.1, heightPercentage: 0.01 },
+
         // Add dialogues array for random messages
         dialogues: [
             "Welcome to the Gym Portal!",
             "Are you ready to play a game?",
         ],
         reaction: function() {
-            // Don't show any reaction dialogue - this prevents the first alert
             // The interact function will handle all dialogue instead
         },
         interact: function() {
@@ -359,6 +359,31 @@ class GameLevelGym {
     ];
         this.createScoreDisplay();
         this.createLivesDisplay();
+        // Create a pause and restart button
+const pauseButton = document.createElement("button");
+pauseButton.textContent = "Pause and Restart Gym";
+pauseButton.style.position = "absolute";
+pauseButton.style.top = "20px";
+pauseButton.style.right = "20px";
+pauseButton.style.padding = "10px 15px";
+pauseButton.style.backgroundColor = "#111";
+pauseButton.style.color = "#fff";
+pauseButton.style.border = "2px solid white";
+pauseButton.style.fontFamily = "monospace";
+pauseButton.style.fontSize = "14px";
+pauseButton.style.cursor = "pointer";
+pauseButton.style.zIndex = "10000";
+
+// Handle button click
+pauseButton.onclick = () => {
+  // Optional: stop animations or sounds here if needed
+  console.log("Game paused. Returning to Gym.");
+  window.location.href = "/Lucky-Charms/gamify/gym.html";
+};
+
+// Add button to DOM
+document.body.appendChild(pauseButton);
+
       }
     
       createScoreDisplay() {

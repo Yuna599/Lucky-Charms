@@ -9,24 +9,18 @@ class GameLevelPlatformer {
     const canvas = gameEnv.gameCanvas;
     const ctx = canvas.getContext("2d");
 
-    // Define width and height from gameEnv
     const width = gameEnv.innerWidth;
     const height = gameEnv.innerHeight;
 
-    // Ensure canvas dimensions are set
     canvas.width = width;
     canvas.height = height;
 
-    // Game settings
     const gravity = 0.5;
     const friction = 0.8;
+    const collectibles = [];
+    const self = this; // Capture reference to this
 
-    const collectibles = []; // Declare collectibles array
-
-    // Define sprite_data_dumbell before using it
     const sprite_src_dumbell = gameEnv.path + "/images/gamify/gym3.png";
-
-    // Load the image manually and assign it to sprite_data_dumbell
     const dumbellImage = new Image();
     dumbellImage.src = sprite_src_dumbell;
 
@@ -34,7 +28,7 @@ class GameLevelPlatformer {
       id: 'dumbell',
       greeting: "Press E to collect the dumbell!",
       src: sprite_src_dumbell,
-      image: dumbellImage, // Assign the loaded image
+      image: dumbellImage,
       SCALE_FACTOR: 3,
       pixels: { width: 32, height: 32 },
       INIT_POSITION: {
@@ -46,12 +40,46 @@ class GameLevelPlatformer {
       hitbox: { widthPercentage: 0.3, heightPercentage: 0.3 },
       zIndex: 10,
       dialogues: [
-        "You found an dumbell",
+        "You found a dumbell",
         "It pulses with ancient energy."
       ]
     };
 
-    // Ensure classes is properly defined
+    function applyBooster(type) {
+      switch (type) {
+        case "faster": player.speed += 2; break;
+        case "slower": player.speed = Math.max(1, player.speed - 2); break;
+        case "highJump": player.jumpPower = -18; break;
+        case "doubleJump": player.canDoubleJump = true; break;
+      }
+    }
+
+    function showBoosterDialogue(type) {
+      const messages = {
+        faster: "You got a Speed Boost! 🏃‍♂️",
+        slower: "Oops! You're moving slower. 🐢",
+        highJump: "Jump Boost! 🦘",
+        doubleJump: "Double Jump unlocked! 🪂"
+      };
+
+      const dialogue = document.createElement("div");
+      dialogue.innerText = messages[type];
+      Object.assign(dialogue.style, {
+        position: "absolute",
+        top: "50px",
+        left: "50%",
+        transform: "translateX(-50%)",
+        background: "#222",
+        color: "#fff",
+        padding: "10px 20px",
+        border: "2px solid white",
+        fontFamily: "monospace",
+        zIndex: 1000
+      });
+      document.body.appendChild(dialogue);
+      setTimeout(() => document.body.removeChild(dialogue), 3000);
+    }
+
     this.classes = [
       { class: Background, data: { src: gameEnv.path + "/images/gamify/gim.png" } },
       { class: Collectible, data: sprite_data_dumbell }
@@ -62,40 +90,32 @@ class GameLevelPlatformer {
       dumbellImageClone.src = sprite_src_dumbell;
 
       const newData = {
-        id: 'dumbell',
-        greeting: "Press E to collect the dumbell!",
-        src: sprite_src_dumbell,
+        ...sprite_data_dumbell,
         image: dumbellImageClone,
-        SCALE_FACTOR: 3,
-        pixels: { width: 32, height: 32 },
         INIT_POSITION: {
           x: (Math.random() * (width - 100)) + 50,
           y: (Math.random() * (height - 300)) + 100
         },
-        orientation: { rows: 1, columns: 1 },
-        down: { row: 0, start: 0, columns: 1 },
-        hitbox: { widthPercentage: 0.3, heightPercentage: 0.3 },
-        zIndex: 10,
-        dialogues: [
-          "You found an dumbell",
-          "It pulses with ancient energy."
-        ],
         interact: function () {
-          if (this.collected) return; // Prevent double interaction
+          if (this.collected) return;
           this.collected = true;
 
-          // Remove from scene
           const index = collectibles.indexOf(this);
           if (index !== -1) collectibles.splice(index, 1);
           gameEnv.gameObjects = gameEnv.gameObjects.filter(obj => obj !== this);
 
-          // Update score
           score++;
           scoreText.innerText = "Score: " + score;
 
           console.log("dumbell collected!");
 
-          // Spawn new one
+          if (Math.random() < 0.1) {
+            const boosters = ["faster", "slower", "highJump", "doubleJump"];
+            const randomBooster = boosters[Math.floor(Math.random() * boosters.length)];
+            applyBooster(randomBooster);
+            showBoosterDialogue(randomBooster);
+          }
+
           spawnCollectible();
         }
       };
@@ -105,13 +125,11 @@ class GameLevelPlatformer {
       gameEnv.gameObjects.push(dumbell);
     }
 
-    // Player sprite setup
     const sprite_src_player = gameEnv.path + "/images/gamify/pixilart.png";
     const playerImage = new Image();
     playerImage.src = sprite_src_player;
 
     const PLAYER_SCALE_FACTOR = 1.5;
-
     const sprite_data_player = {
       id: "Player",
       greeting: "I am player.",
@@ -125,17 +143,16 @@ class GameLevelPlatformer {
       down: { row: 0, start: 0, columns: 3 },
       downRight: { row: 1, start: 0, columns: 3, rotate: Math.PI / 16 },
       downLeft: { row: 2, start: 0, columns: 3, rotate: -Math.PI / 16 },
-      left: { row: 2, start: 0, columns: 3 },   // Swapped with 'right'
-      right: { row: 1, start: 0, columns: 3 },  // Swapped with 'left'
+      left: { row: 2, start: 0, columns: 3 },
+      right: { row: 1, start: 0, columns: 3 },
       up: { row: 3, start: 0, columns: 3 },
       upLeft: { row: 2, start: 0, columns: 3, rotate: Math.PI / 16 },
       upRight: { row: 1, start: 0, columns: 3, rotate: -Math.PI / 16 },
       idle: { row: 0, start: 0, columns: 1 },
       hitbox: { widthPercentage: 0.45, heightPercentage: 0.2 },
-      keypress: { up: 87, left: 65, down: 83, right: 68 },
+      keypress: { up: 87, left: 65, down: 83, right: 68 }
     };
 
-    // Player object
     const frameWidth = sprite_data_player.pixels.width / sprite_data_player.orientation.columns;
     const frameHeight = sprite_data_player.pixels.height / sprite_data_player.orientation.rows;
 
@@ -156,64 +173,45 @@ class GameLevelPlatformer {
       flashTimer: 0
     };
 
-    // Platform data
     const platforms = [
-      { x: 0, y: 350, width: 2000, height: 500 }, // Extended ground platform width
+      { x: 0, y: 350, width: 2000, height: 500 },
       { x: 200, y: 280, width: 100, height: 10 },
       { x: 400, y: 220, width: 150, height: 10 },
       { x: 600, y: 150, width: 100, height: 10 },
-      { x: 800, y: 250, width: 150, height: 10 } // New platform added
+      { x: 800, y: 250, width: 150, height: 10 }
     ];
 
-    // Key tracking
     const keys = {};
     document.addEventListener("keydown", (e) => (keys[e.code] = true));
     document.addEventListener("keyup", (e) => (keys[e.code] = false));
 
-    // Background image setup
     const backgroundImage = new Image();
-    backgroundImage.src = gameEnv.path + "/images/gamify/gim.png"; // Background image source
+    backgroundImage.src = gameEnv.path + "/images/gamify/gim.png";
 
-    let score = 0; // Initialize score
-    const scoreText = document.createElement("div"); // Create score display
-    scoreText.style.position = "absolute";
-    scoreText.style.top = "20px";
-    scoreText.style.left = "20px";
-    scoreText.style.color = "white";
-    scoreText.style.fontSize = "18px";
-    scoreText.style.fontFamily = "monospace";
+    let score = 0;
+    const scoreText = document.createElement("div");
+    Object.assign(scoreText.style, {
+      position: "absolute",
+      top: "20px",
+      left: "20px",
+      color: "white",
+      fontSize: "18px",
+      fontFamily: "monospace"
+    });
     scoreText.innerText = "Score: 0";
     document.body.appendChild(scoreText);
 
     function checkCollectibleCollision() {
-      collectibles.forEach((collectible, index) => {
-        if (!collectible.collected) {
-          const c = collectible.spriteData;
-          const cx = c.INIT_POSITION.x;
-          const cy = c.INIT_POSITION.y;
-          const cw = c.pixels.width * c.SCALE_FACTOR;
-          const ch = c.pixels.height * c.SCALE_FACTOR;
-
-          const px = player.x;
-          const py = player.y;
-          const pw = player.width;
-          const ph = player.height;
-
-          const overlapping =
-            px < cx + cw &&
-            px + pw > cx &&
-            py < cy + ch &&
-            py + ph > cy;
-
-          if (overlapping && keys["KeyE"]) {
-            collectible.interact(); // Trigger interaction logic
+      collectibles.forEach((collectible) => {
+        if (!collectible.collected && self.checkCollision(player, collectible)) {
+          if (keys["KeyE"]) {
+            collectible.interact();
           }
         }
       });
     }
 
     function update() {
-      // Movement input
       if (keys["ArrowRight"] || keys["KeyD"]) {
         player.velocityX = player.speed;
         player.frameY = sprite_data_player.right.row;
@@ -224,20 +222,15 @@ class GameLevelPlatformer {
         player.velocityX *= friction;
       }
 
-      // Jumping
       if ((keys["ArrowUp"] || keys["KeyW"] || keys["Space"]) && player.onGround) {
         player.velocityY = player.jumpPower;
         player.onGround = false;
       }
 
-      // Gravity
       player.velocityY += gravity;
-
-      // Position update
       player.x += player.velocityX;
       player.y += player.velocityY;
 
-      // Platform collision
       player.onGround = false;
       platforms.forEach(platform => {
         if (
@@ -254,80 +247,44 @@ class GameLevelPlatformer {
         }
       });
 
-      // Stay inside canvas
       if (player.x < 0) player.x = 0;
-      if (player.x + player.width > canvas.width) {
-        player.x = canvas.width - player.width;
-      }
+      if (player.x + player.width > canvas.width) player.x = canvas.width - player.width;
 
-      // Animate sprite
       player.frameCounter++;
       if (player.frameCounter >= sprite_data_player.ANIMATION_RATE) {
         player.frameX = (player.frameX + 1) % sprite_data_player.right.columns;
         player.frameCounter = 0;
       }
 
-      // Check collectible collision
       checkCollectibleCollision();
-
-      // Update collectibles
-      collectibles.forEach((collectible) => collectible.update());
-
+      collectibles.forEach(c => c.update());
       draw();
       requestAnimationFrame(update);
-    };
+    }
 
-    // Drawing
     const draw = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      // Draw background
       ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
-
-      // Draw platforms
       ctx.fillStyle = "green";
-      platforms.forEach((p) => ctx.fillRect(p.x, p.y, p.width, p.height));
+      platforms.forEach(p => ctx.fillRect(p.x, p.y, p.width, p.height));
 
-      ctx.save(); // Save canvas state
+      ctx.save();
+      ctx.translate(player.x + player.width / 2, player.y + player.height / 2);
+      ctx.drawImage(
+        playerImage,
+        player.frameX * frameWidth,
+        player.frameY * frameHeight,
+        frameWidth,
+        frameHeight,
+        -player.width / 2,
+        -player.height / 2,
+        player.width,
+        player.height
+      );
+      ctx.restore();
 
-      // If facing right, flip the sprite
-      if (player.facing === "right") {
-        ctx.translate(player.x + player.width / 2, player.y + player.height / 2);
-        ctx.scale(-1, 1); // Flip horizontally
-        ctx.drawImage(
-          playerImage,
-          player.frameX * frameWidth,
-          player.frameY * frameHeight,
-          frameWidth,
-          frameHeight,
-          -player.width / 2,
-          -player.height / 2,
-          player.width,
-          player.height
-        );
-      } else {
-        // Normal draw (left-facing or idle)
-        ctx.translate(player.x + player.width / 2, player.y + player.height / 2);
-        ctx.drawImage(
-          playerImage,
-          player.frameX * frameWidth,
-          player.frameY * frameHeight,
-          frameWidth,
-          frameHeight,
-          -player.width / 2,
-          -player.height / 2,
-          player.width,
-          player.height
-        );
-      }
-
-      ctx.restore(); // Restore canvas state
-
-      // Draw dumbell if not collected
-      collectibles.forEach((collectible) => {
+      collectibles.forEach(collectible => {
         const img = collectible.spriteData.image;
-
-        // Only draw if the image is loaded
         if (img instanceof HTMLImageElement && img.complete) {
           ctx.drawImage(
             img,
@@ -340,16 +297,29 @@ class GameLevelPlatformer {
       });
     };
 
-    spawnCollectible(); // Spawn the first collectible
+    spawnCollectible();
 
-    // Ensure proper game loop initialization
-    playerImage.onload = () => {
-      update();
-    };
+    playerImage.onload = () => update();
+    playerImage.onerror = () => console.error("Failed to load player sprite:", playerImage.src);
+  }
 
-    playerImage.onerror = () => {
-      console.error("Failed to load player sprite:", playerImage.src);
-    };
+  checkCollision(player, collectible) {
+    const c = collectible.spriteData;
+    const cx = c.INIT_POSITION.x;
+    const cy = c.INIT_POSITION.y;
+    const cw = c.pixels.width * c.SCALE_FACTOR;
+    const ch = c.pixels.height * c.SCALE_FACTOR;
+    const px = player.x;
+    const py = player.y;
+    const pw = player.width;
+    const ph = player.height;
+
+    return (
+      px < cx + cw &&
+      px + pw > cx &&
+      py < cy + ch &&
+      py + ph > cy
+    );
   }
 
   updateScore(newScore) {
@@ -357,7 +327,7 @@ class GameLevelPlatformer {
     if (this.score >= 10) {
       console.log("Score reached 10! Transitioning to GameLevelGym...");
       this.gameEnv.gameControl.transitionToLevel(GameLevelGym);
-      this.gameEnv.gameControl.currentLevel.incrementGymScore(); // Increment score in GameLevelGym
+      this.gameEnv.gameControl.currentLevel.incrementGymScore();
     }
   }
 }
