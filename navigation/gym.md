@@ -13,6 +13,7 @@ permalink: /gamify/gym
     // Adventure Game assets locations
     import Game from "{{site.baseurl}}/assets/js/adventureGame/Game.js";
     import GameLevelGym from "{{site.baseurl}}/assets/js/adventureGame/GameLevelGym.js";
+    import DialogueSystem from "{{site.baseurl}}/assets/js/adventureGame/DialogueSystem.js"; // Corrected path
     import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
 
     const gameLevelClasses = [GameLevelGym]; // Only include GameLevelGym
@@ -59,7 +60,7 @@ permalink: /gamify/gym
 
     // Web Server Environment data
     const environment = {
-        path: "{{site.baseurl}}",
+        path: "/Lucky-Charms", // Ensure this matches the actual base URL
         pythonURI: pythonURI,
         javaURI: javaURI,
         fetchOptions: fetchOptions,

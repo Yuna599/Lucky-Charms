@@ -1,99 +1,142 @@
+// Collectible.js with DialogueSystem integration
 import Character from "./Character.js";
-import DialogueSystem from "./DialogueSystem.js";
+import DialogueSystem from "./DialogueSystem.js"; // Corrected path
 
 class Collectible extends Character {
-  constructor(data = null, gameEnv = null) {
-    super(data, gameEnv);
-    this.interact = data?.interact || (() => console.log("Collected!"));
-    this.collected = false;
-
-    this.dialogues = data?.dialogues || [data?.greeting || "Press E to collect."];
-    this.dialogueSystem = new DialogueSystem({
-      dialogues: this.dialogues,
-      enableSound: data?.enableDialogueSound || false
-    });
-
-    this.position = {
-      x: data?.INIT_POSITION?.x || 0,
-      y: data?.INIT_POSITION?.y || 0
-    };
-    this.width = data?.pixels?.width * data?.SCALE_FACTOR || 50;
-    this.height = data?.pixels?.height * data?.SCALE_FACTOR || 50;
-
-    if (gameEnv && gameEnv.gameControl && typeof gameEnv.gameControl.registerInteractionHandler === "function") {
-      gameEnv.gameControl.registerInteractionHandler(this);
+    constructor(data = null, gameEnv = null) {
+        super(data, gameEnv);
+        this.interact = data?.interact;
+        this.alertTimeout = null;
+        this.isInteracting = false; // Flag to track if currently interacting
+        this.handleKeyDownBound = this.handleKeyDown.bind(this);
+        this.handleKeyUpBound = this.handleKeyUp.bind(this);
+        this.bindInteractKeyListeners();
+        
+        // Initialize dialogue system only if dialogues are provided
+        if (data?.dialogues && data.dialogues.length > 0) {
+            this.dialogueSystem = new DialogueSystem({
+                dialogues: data.dialogues,
+                enableSound: data.enableDialogueSound
+            });
+        } else {
+            this.dialogueSystem = null; // Disable dialogue system if no dialogues are provided
+        }
+        
+        // Register with game control for cleanup during transitions
+        if (gameEnv && gameEnv.gameControl) {
+            gameEnv.gameControl.registerInteractionHandler(this);
+        }
     }
-  }
 
-  update() {
-    if (this.collected) return;
-    this.draw();
-
-    const players = this.gameEnv.gameObjects.filter(
-      obj => obj.constructor.name === 'Player'
-    );
-
-    for (const player of players) {
-      const overlapping = this.checkOverlap(player);
-      if (overlapping && !this.collected) {
-        this.showItemMessage();
-      }
+    update() {
+        this.draw();
+        // Check if player is still in collision
+        const players = this.gameEnv.gameObjects.filter(
+            obj => obj.state.collisionEvents.includes(this.spriteData.id)
+        );
+        
+        // Reset interaction state if player moved away
+        if (players.length === 0 && this.isInteracting) {
+            this.isInteracting = false;
+            // Close dialogue if player moves away
+            if (this.dialogueSystem && this.dialogueSystem.isDialogueOpen()) {
+                this.dialogueSystem.closeDialogue();
+            }
+        }
     }
-  }
 
-  draw() {
-    const ctx = this.gameEnv.gameCanvas.getContext("2d");
-    const img = new Image();
-    img.src = this.spriteData.src;
-    ctx.drawImage(
-      img,
-      this.position.x,
-      this.position.y,
-      this.width,
-      this.height
-    );
-  }
-
-  checkOverlap(player) {
-    return (
-      player.x < this.position.x + this.width &&
-      player.x + player.width > this.position.x &&
-      player.y < this.position.y + this.height &&
-      player.y + player.height > this.position.y
-    );
-  }
-
-  handleKeyInteract() {
-    if (this.collected) return;
-
-    const players = this.gameEnv.gameObjects.filter(
-      obj => obj.constructor.name === 'Player'
-    );
-
-    for (const player of players) {
-      if (this.checkOverlap(player)) {
-        this.interact.call(this);
-        this.collected = true;
-        this.dialogueSystem.showDialogue("Collected!", this.spriteData.id);
-        setTimeout(() => {
-          this.dialogueSystem.closeDialogue();
-        }, 800);
-        return;
-      }
+    bindInteractKeyListeners() {
+        // Add event listeners for keydown and keyup
+        document.addEventListener('keydown', this.handleKeyDownBound);
+        document.addEventListener('keyup', this.handleKeyUpBound);
     }
-  }
 
-  showItemMessage() {
-    if (!this.dialogueSystem) return;
-    this.dialogueSystem.showDialogue(this.dialogues[0], this.spriteData?.id || "Collectible");
-  }
-
-  destroy() {
-    if (this.dialogueSystem && this.dialogueSystem.isDialogueOpen()) {
-      this.dialogueSystem.closeDialogue();
+    removeInteractKeyListeners() {
+        // Remove event listeners to prevent memory leaks
+        document.removeEventListener('keydown', this.handleKeyDownBound);
+        document.removeEventListener('keyup', this.handleKeyUpBound);
+        
+        // Clear any pending timeouts
+        if (this.alertTimeout) {
+            clearTimeout(this.alertTimeout);
+            this.alertTimeout = null;
+        }
+        
+        // Close any open dialogue
+        if (this.dialogueSystem && this.dialogueSystem.isDialogueOpen()) {
+            this.dialogueSystem.closeDialogue();
+        }
+        
+        // Reset interaction state
+        this.isInteracting = false;
     }
-    super.destroy();
-  }
+
+    handleKeyDown(event) {
+        if (event.key === 'e' || event.key === 'u') {
+            this.handleKeyInteract();
+        }
+    }
+
+    handleKeyUp(event) {
+        if (event.key === 'e' || event.key === 'u') {
+            if (this.alertTimeout) {
+                clearTimeout(this.alertTimeout);
+                this.alertTimeout = null;
+            }
+        }
+    }
+
+    handleKeyInteract() {
+        // Check if game is active - don't allow interactions during transitions
+        if (this.gameEnv.gameControl && this.gameEnv.gameControl.isPaused) {
+            return;
+        }
+        
+        // Find players in collision with this collectible
+        const players = this.gameEnv.gameObjects.filter(
+            obj => obj.state.collisionEvents.includes(this.spriteData.id)
+        );
+        
+        // Check if this collectible has an interact function
+        const hasInteract = this.interact !== undefined;
+
+        // Only trigger interaction if:
+        // 1. Player is in collision with this collectible
+        // 2. Collectible has an interact function
+        if (players.length > 0 && hasInteract) {
+            // Execute the interact function
+            this.interact.call(this);
+
+            // Show dialogue only if it exists and is not empty
+            if (this.dialogueSystem && this.dialogueSystem.dialogues.length > 0) {
+                this.dialogueSystem.showDialogue(this.dialogueSystem.dialogues[0]);
+            }
+        }
+    }
+    
+    // Method for showing item message
+    showItemMessage() {
+        if (!this.dialogueSystem) return;
+        
+        // Get item name and icon if available
+        const itemName = this.spriteData?.id || "";
+        const itemIcon = this.spriteData?.src || null;
+        
+        // Show dialogue with item message
+        const message = this.spriteData?.greeting || "Press E to interact.";
+        this.dialogueSystem.showDialogue(message, itemName, itemIcon);
+    }
+
+    // Clean up event listeners when Collectible is destroyed
+    destroy() {
+        // Unregister from game control
+        if (this.gameEnv && this.gameEnv.gameControl) {
+            this.gameEnv.gameControl.unregisterInteractionHandler(this);
+        }
+        
+        this.removeInteractKeyListeners();
+        super.destroy();
+    }
 }
 
 export default Collectible;

@@ -6,9 +6,9 @@ import GameLevelDesert from "../adventureGame/GameLevelDesert.js";
 import Npc from "../adventureGame/Npc.js"; // Ensure proper import
 import GameLevelMinesweeper from "../adventureGame/GameLevelMinesweeper.js"; // Add this import
 import GameControl from "../adventureGame/GameControl.js"; // Ensure GameControl is imported
-import DialogueSystem from "../adventureGame/DialogueSystem.js"; // Ensure DialogueSystem is imported
+import DialogueSystem from "./DialogueSystem.js"; // Corrected path
 import PlatformerGame from "../adventureGame/PlatformerGame.js"; // Ensure PlatformerGame is imported
-import GameLevelFallDown from '../adventureGame/GameLevelFallDown.js'; // Ensure GameLevelFallDown is imported
+import GameLevelFallDown from './GameLevelFallDown.js'; // Ensure GameLevelFallDown is imported
 import GameLevelPlatformer from './GameLevelPlatformer.js'; // Ensure GameLevelPlatformer is imported
 
 console.log("Resolved Player path:", Player);
@@ -52,7 +52,7 @@ class GameLevelGym {
     this.quiz = new Quiz();
     this.quiz.initialize();
 
-    const image_src_gym = path + "/images/gamify/gym.png"; // Gym background image
+    const image_src_gym = path + "/images/gamify/gym.png"; // Ensure this path matches the actual file location
     const image_data_gym = {
       id: "Gym-Background",
       src: image_src_gym,

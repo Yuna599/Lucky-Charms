@@ -47,15 +47,7 @@ class GameLevelPlatformer {
       dialogues: [
         "You found an Eye of Ender!",
         "It pulses with ancient energy."
-      ],
-      interact: function () {
-        this.collected = true;
-
-        const index = collectibles.indexOf(this);
-        if (index !== -1) collectibles.splice(index, 1);
-
-        console.log("Eye of Ender collected!");
-      }
+      ]
     };
 
     // Ensure classes is properly defined
@@ -65,9 +57,51 @@ class GameLevelPlatformer {
     ];
 
     function spawnCollectible() {
-      const eye = new Collectible(sprite_data_eye, gameEnv);
+      const eyeImageClone = new Image();
+      eyeImageClone.src = sprite_src_eye;
+
+      const newData = {
+        id: 'Eye of Ender',
+        greeting: "Press E to collect the Eye of Ender!",
+        src: sprite_src_eye,
+        image: eyeImageClone,
+        SCALE_FACTOR: 3,
+        pixels: { width: 32, height: 32 },
+        INIT_POSITION: {
+          x: (Math.random() * (width - 100)) + 50,
+          y: (Math.random() * (height - 300)) + 100
+        },
+        orientation: { rows: 1, columns: 1 },
+        down: { row: 0, start: 0, columns: 1 },
+        hitbox: { widthPercentage: 0.3, heightPercentage: 0.3 },
+        zIndex: 10,
+        dialogues: [
+          "You found an Eye of Ender!",
+          "It pulses with ancient energy."
+        ],
+        interact: function () {
+          if (this.collected) return; // Prevent double interaction
+          this.collected = true;
+
+          // Remove from scene
+          const index = collectibles.indexOf(this);
+          if (index !== -1) collectibles.splice(index, 1);
+          gameEnv.gameObjects = gameEnv.gameObjects.filter(obj => obj !== this);
+
+          // Update score
+          score++;
+          scoreText.innerText = "Score: " + score;
+
+          console.log("Eye of Ender collected!");
+
+          // Spawn new one
+          spawnCollectible();
+        }
+      };
+
+      const eye = new Collectible(newData, gameEnv);
       collectibles.push(eye);
-      gameEnv.gameObjects.push(eye); // Track all game objects
+      gameEnv.gameObjects.push(eye);
     }
 
     // Player sprite setup
@@ -100,35 +134,35 @@ class GameLevelPlatformer {
       keypress: { up: 87, left: 65, down: 83, right: 68 },
     };
 
-// Player object
-const frameWidth = sprite_data_player.pixels.width / sprite_data_player.orientation.columns;
-const frameHeight = sprite_data_player.pixels.height / sprite_data_player.orientation.rows;
+    // Player object
+    const frameWidth = sprite_data_player.pixels.width / sprite_data_player.orientation.columns;
+    const frameHeight = sprite_data_player.pixels.height / sprite_data_player.orientation.rows;
 
-const player = {
-  x: 100,
-  y: 0,
-  width: frameWidth * 1.5,
-  height: frameHeight * 1.5,
-  velocityX: 0,
-  velocityY: 0,
-  speed: 4,
-  jumpPower: -12,
-  onGround: false,
-  frameX: 0,
-  frameY: sprite_data_player.down.row,
-  frameCounter: 0,
-  flashRed: false,
-  flashTimer: 0
-};
+    const player = {
+      x: 100,
+      y: 0,
+      width: frameWidth * 1.5,
+      height: frameHeight * 1.5,
+      velocityX: 0,
+      velocityY: 0,
+      speed: 4,
+      jumpPower: -12,
+      onGround: false,
+      frameX: 0,
+      frameY: sprite_data_player.down.row,
+      frameCounter: 0,
+      flashRed: false,
+      flashTimer: 0
+    };
 
-// Platform data
-const platforms = [
-  { x: 0, y: 350, width: 1500, height: 500 }, // Extended ground platform width
-  { x: 200, y: 280, width: 100, height: 10 },
-  { x: 400, y: 220, width: 150, height: 10 },
-  { x: 600, y: 150, width: 100, height: 10 },
-  { x: 550, y: 250, width: 150, height: 10 } // New platform added
-];
+    // Platform data
+    const platforms = [
+      { x: 0, y: 350, width: 1500, height: 500 }, // Extended ground platform width
+      { x: 200, y: 280, width: 100, height: 10 },
+      { x: 400, y: 220, width: 150, height: 10 },
+      { x: 600, y: 150, width: 100, height: 10 },
+      { x: 800, y: 250, width: 150, height: 10 } // New platform added
+    ];
 
     // Key tracking
     const keys = {};
@@ -138,6 +172,44 @@ const platforms = [
     // Background image setup
     const backgroundImage = new Image();
     backgroundImage.src = gameEnv.path + "/images/gamify/gim.png"; // Background image source
+
+    let score = 0; // Initialize score
+    const scoreText = document.createElement("div"); // Create score display
+    scoreText.style.position = "absolute";
+    scoreText.style.top = "20px";
+    scoreText.style.left = "20px";
+    scoreText.style.color = "white";
+    scoreText.style.fontSize = "18px";
+    scoreText.style.fontFamily = "monospace";
+    scoreText.innerText = "Score: 0";
+    document.body.appendChild(scoreText);
+
+    function checkCollectibleCollision() {
+      collectibles.forEach((collectible, index) => {
+        if (!collectible.collected) {
+          const c = collectible.spriteData;
+          const cx = c.INIT_POSITION.x;
+          const cy = c.INIT_POSITION.y;
+          const cw = c.pixels.width * c.SCALE_FACTOR;
+          const ch = c.pixels.height * c.SCALE_FACTOR;
+
+          const px = player.x;
+          const py = player.y;
+          const pw = player.width;
+          const ph = player.height;
+
+          const overlapping =
+            px < cx + cw &&
+            px + pw > cx &&
+            py < cy + ch &&
+            py + ph > cy;
+
+          if (overlapping && keys["KeyE"]) {
+            collectible.interact(); // Trigger interaction logic
+          }
+        }
+      });
+    }
 
     function update() {
       // Movement input
@@ -150,20 +222,20 @@ const platforms = [
       } else {
         player.velocityX *= friction;
       }
-    
+
       // Jumping
       if ((keys["ArrowUp"] || keys["KeyW"] || keys["Space"]) && player.onGround) {
         player.velocityY = player.jumpPower;
         player.onGround = false;
       }
-    
+
       // Gravity
       player.velocityY += gravity;
-    
+
       // Position update
       player.x += player.velocityX;
       player.y += player.velocityY;
-    
+
       // Platform collision
       player.onGround = false;
       platforms.forEach(platform => {
@@ -180,7 +252,7 @@ const platforms = [
           }
         }
       });
-    
+
       // Stay inside canvas
       if (player.x < 0) player.x = 0;
       if (player.x + player.width > canvas.width) {
@@ -188,12 +260,14 @@ const platforms = [
       }
 
       // Animate sprite
-  player.frameCounter++;
-  if (player.frameCounter >= sprite_data_player.ANIMATION_RATE) {
-    player.frameX = (player.frameX + 1) % sprite_data_player.right.columns;
-    player.frameCounter = 0;
-  }
+      player.frameCounter++;
+      if (player.frameCounter >= sprite_data_player.ANIMATION_RATE) {
+        player.frameX = (player.frameX + 1) % sprite_data_player.right.columns;
+        player.frameCounter = 0;
+      }
 
+      // Check collectible collision
+      checkCollectibleCollision();
 
       // Update collectibles
       collectibles.forEach((collectible) => collectible.update());
