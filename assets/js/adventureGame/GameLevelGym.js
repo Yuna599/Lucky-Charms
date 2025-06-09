@@ -357,135 +357,131 @@ class GameLevelGym {
       { class: Npc, data: sprite_data_benchpress },
       { class: Npc, data: sprite_data_gymportal }
     ];
-
-    this.createScoreDisplay();
-    this.createLivesDisplay();
-  }
-
-  createScoreDisplay() {
-    const gameContainer = document.getElementById("gameContainer");
-    if (!gameContainer) {
-      console.error("Game container not found");
-      return;
+        this.createScoreDisplay();
+        this.createLivesDisplay();
+      }
+    
+      createScoreDisplay() {
+        const gameContainer = document.getElementById("gameContainer");
+        if (!gameContainer) {
+          console.error("Game container not found");
+          return;
+        }
+    
+        const existingScore = document.getElementById("gym-score");
+        if (existingScore) {
+          existingScore.remove();
+        }
+    
+        this.scoreElement = document.createElement("div");
+        this.scoreElement.id = "gym-score";
+        this.scoreElement.style.position = "absolute";
+        this.scoreElement.style.top = "20px";
+        this.scoreElement.style.left = "50%";
+        this.scoreElement.style.transform = "translateX(-50%)";
+        this.scoreElement.style.color = "#FFFFFF";
+        this.scoreElement.style.fontSize = "28px";
+        this.scoreElement.style.fontWeight = "bold";
+        this.scoreElement.style.zIndex = "1000";
+        this.scoreElement.style.textShadow = "2px 2px 4px rgba(0, 0, 0, 0.5)";
+        this.scoreElement.style.backgroundColor = "rgba(0, 0, 0, 0.5)";
+        this.scoreElement.style.padding = "10px 20px";
+        this.scoreElement.style.borderRadius = "15px";
+        this.scoreElement.innerHTML = `<span style="color: #FFD700">Score: ${this.score}</span>`;
+    
+        gameContainer.appendChild(this.scoreElement);
+      }
+    
+      createLivesDisplay() {
+        const gameContainer = document.getElementById("gameContainer");
+        if (!gameContainer) {
+          console.error("Game container not found");
+          return;
+        }
+    
+        const existingLives = document.getElementById("gym-lives");
+        if (existingLives) {
+          existingLives.remove();
+        }
+    
+        this.livesElement = document.createElement("div");
+        this.livesElement.id = "gym-lives";
+        this.livesElement.style.position = "absolute";
+        this.livesElement.style.top = "10px";
+        this.livesElement.style.right = "10px";
+        this.livesElement.style.color = "white";
+        this.livesElement.style.fontSize = "24px";
+        this.livesElement.style.fontWeight = "bold";
+        this.livesElement.style.zIndex = "1000";
+        this.livesElement.textContent = `Lives: ${this.lives}`;
+    
+        gameContainer.appendChild(this.livesElement);
+      }
+    
+      updateScore(points) {
+        this.score += points;
+        this.updateDisplay();
+      }
+    
+      updateDisplay() {
+        if (this.scoreElement) {
+          this.scoreElement.innerHTML = `<span style="color: #FFD700">Score: ${this.score}</span>`;
+        } else {
+          this.createScoreDisplay();
+        }
+      }
+    
+      updateLives(lives) {
+        this.lives = lives;
+        if (this.livesElement) {
+          this.livesElement.textContent = `Lives: ${this.lives}`;
+        }
+    
+        if (this.lives <= 0) {
+          this.endGame();
+        }
+      }
+    
+      endGame() {
+        this.gameOver = true;
+    
+        const gameContainer = document.getElementById("gameContainer");
+        if (!gameContainer) {
+          console.error("Game container not found");
+          return;
+        }
+    
+        const gameOverMsg = document.createElement("div");
+        gameOverMsg.style.position = "absolute";
+        gameOverMsg.style.top = "50%";
+        gameOverMsg.style.left = "50%";
+        gameOverMsg.style.transform = "translate(-50%, -50%)";
+        gameOverMsg.style.color = "white";
+        gameOverMsg.style.fontSize = "48px";
+        gameOverMsg.style.fontWeight = "bold";
+        gameOverMsg.style.textAlign = "center";
+        gameOverMsg.style.zIndex = "1000";
+        gameOverMsg.innerHTML = `
+          GAME OVER<br>Score: ${this.score}<br>
+          <span style="font-size: 24px">Press ESC to exit the game</span>
+        `;
+    
+        gameContainer.appendChild(gameOverMsg);
+      }
+    
+      cleanup() {
+        if (this.scoreElement) this.scoreElement.remove();
+        if (this.livesElement) this.livesElement.remove();
+      }
+    
+      destroy() {
+        this.cleanup();
+      }
+    
+      incrementGymScore() {
+        this.gymScore += 1;
+        console.log("🏋️ Gym score is now:", this.gymScore);
+      }
     }
-
-    const existingScore = document.getElementById("gym-score");
-    if (existingScore) {
-      existingScore.remove();
-    }
-
-    this.scoreElement = document.createElement("div");
-    this.scoreElement.id = "gym-score";
-    this.scoreElement.style.position = "absolute";
-    this.scoreElement.style.top = "20px";
-    this.scoreElement.style.left = "50%";
-    this.scoreElement.style.transform = "translateX(-50%)";
-    this.scoreElement.style.color = "#FFFFFF";
-    this.scoreElement.style.fontSize = "28px";
-    this.scoreElement.style.fontWeight = "bold";
-    this.scoreElement.style.zIndex = "1000";
-    this.scoreElement.style.textShadow = "2px 2px 4px rgba(0, 0, 0, 0.5)";
-    this.scoreElement.style.backgroundColor = "rgba(0, 0, 0, 0.5)";
-    this.scoreElement.style.padding = "10px 20px";
-    this.scoreElement.style.borderRadius = "15px";
-    this.scoreElement.innerHTML = `
-      <span style="color: #FFD700">Score: ${this.score}</span>
-    `;
-
-    gameContainer.appendChild(this.scoreElement);
-  }
-
-  createLivesDisplay() {
-    const gameContainer = document.getElementById("gameContainer");
-    if (!gameContainer) {
-      console.error("Game container not found");
-      return;
-    }
-
-    const existingLives = document.getElementById("gym-lives");
-    if (existingLives) {
-      existingLives.remove();
-    }
-
-    this.livesElement = document.createElement("div");
-    this.livesElement.id = "gym-lives";
-    this.livesElement.style.position = "absolute";
-    this.livesElement.style.top = "10px";
-    this.livesElement.style.right = "10px";
-    this.livesElement.style.color = "white";
-    this.livesElement.style.fontSize = "24px";
-    this.livesElement.style.fontWeight = "bold";
-    this.livesElement.style.zIndex = "1000";
-    this.livesElement.textContent = "Lives: 3";
-
-    gameContainer.appendChild(this.livesElement);
-  }
-
-  updateScore(points) {
-    this.score += points;
-    this.updateDisplay();
-  }
-
-  updateDisplay() {
-    const scoreElement = document.getElementById("gym-score");
-    if (scoreElement) {
-      scoreElement.innerHTML = `
-        <span style="color: #FFD700">Score: ${this.score}</span>
-      `;
-    } else {
-      this.createScoreDisplay();
-    }
-  }
-
-  updateLives(lives) {
-    this.lives = lives;
-    if (this.livesElement) {
-      this.livesElement.textContent = `Lives: ${this.lives}`;
-    }
-
-    if (this.lives <= 0) {
-      this.endGame();
-    }
-  }
-
-  endGame() {
-    this.gameOver = true;
-
-    const gameContainer = document.getElementById("gameContainer");
-    if (!gameContainer) {
-      console.error("Game container not found");
-      return;
-    }
-
-    const gameOverMsg = document.createElement("div");
-    gameOverMsg.style.position = "absolute";
-    gameOverMsg.style.top = "50%";
-    gameOverMsg.style.left = "50%";
-    gameOverMsg.style.transform = "translate(-50%, -50%)";
-    gameOverMsg.style.color = "white";
-    gameOverMsg.style.fontSize = "48px";
-    gameOverMsg.style.fontWeight = "bold";
-    gameOverMsg.style.textAlign = "center";
-    gameOverMsg.style.zIndex = "1000";
-    gameOverMsg.innerHTML = `GAME OVER<br>Score: ${this.score}<br><span style="font-size: 24px">Press ESC to exit the game</span>`;
-
-    gameContainer.appendChild(gameOverMsg);
-  }
-
-  cleanup() {
-    if (this.scoreElement) {
-      this.scoreElement.remove();
-    }
-
-    if (this.livesElement) {
-      this.livesElement.remove();
-    }
-  }
-
-  destroy() {
-    this.cleanup();
-  }
-}
-
-export default GameLevelGym;
-
+    
+    export default GameLevelGym;

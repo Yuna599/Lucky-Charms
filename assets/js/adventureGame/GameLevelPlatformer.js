@@ -2,6 +2,7 @@ import Background from "./Background.js";
 import Collectible from "./Collectible.js";
 import GameObject from "./GameObject.js";
 import GameControl from "./GameControl.js";
+import GameLevelGym from "./GameLevelGym.js";
 
 class GameLevelPlatformer {
   constructor(gameEnv) {
@@ -349,6 +350,15 @@ class GameLevelPlatformer {
     playerImage.onerror = () => {
       console.error("Failed to load player sprite:", playerImage.src);
     };
+  }
+
+  updateScore(newScore) {
+    this.score = newScore;
+    if (this.score >= 10) {
+      console.log("Score reached 10! Transitioning to GameLevelGym...");
+      this.gameEnv.gameControl.transitionToLevel(GameLevelGym);
+      this.gameEnv.gameControl.currentLevel.incrementGymScore(); // Increment score in GameLevelGym
+    }
   }
 }
 

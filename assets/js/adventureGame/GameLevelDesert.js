@@ -131,6 +131,56 @@ class GameLevelDesert {
             } else {
               console.warn("Restart method not bound.");
             }
+
+            // Remove particle after animation
+            setTimeout(() => {
+              if (particle.parentNode) {
+                particle.parentNode.removeChild(particle);
+              }
+            }, 1000);
+
+            // Show death message dialog
+            const deathMessage = document.createElement('div');
+            deathMessage.style.position = 'fixed';
+            deathMessage.style.top = '50%';
+            deathMessage.style.left = '50%';
+            deathMessage.style.transform = 'translate(-50%, -50%)';
+            deathMessage.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+            deathMessage.style.color = '#FF0000';
+            deathMessage.style.padding = '30px';
+            deathMessage.style.borderRadius = '10px';
+            deathMessage.style.fontFamily = "'Press Start 2P', sans-serif";
+            deathMessage.style.fontSize = '24px';
+            deathMessage.style.textAlign = 'center';
+            deathMessage.style.zIndex = '10000';
+            deathMessage.style.border = '3px solid #FF0000';
+            deathMessage.style.boxShadow = '0 0 20px rgba(255, 0, 0, 0.5)';
+            deathMessage.style.width = '400px';
+            deathMessage.innerHTML = `
+                <div style="margin-bottom: 20px;">☠️ YOU DIED ☠️</div>
+                <div style="font-size: 16px; margin-bottom: 20px;">The Enderman got you!</div>
+                <div style="font-size: 14px;">Respawning in 2 seconds...</div>
+            `;
+
+            document.body.appendChild(deathMessage);
+
+            // Remove message after delay
+            setTimeout(() => {
+              if (deathMessage.parentNode) {
+                deathMessage.parentNode.removeChild(deathMessage);
+              }
+            }, 2000);
+
+            // Reset the level after a short delay using page reload for reliability
+            setTimeout(() => {
+              // Clean up any lingering resources before reload
+              if (self && self.timerInterval) {
+                clearInterval(self.timerInterval);
+              }
+
+              // Force a complete page reload - most reliable way to reset
+              location.reload();
+            }, 2000); // 2 second delay before reset
           }, 1000); // Wait for the animation to complete
         }
       }
@@ -192,7 +242,7 @@ class GameLevelDesert {
           }
         },
         isAnimating: false,
-        sound: new Audio("../assets/audio/shine.mp3"), // Optional sound setup
+        sound: new Audio("http://127.0.0.1:4100/Lucky-Charms/assets/audio/shine.mp3 "), // Optional sound setup
   
         playAnimation: function () {
           if (this.isAnimating) return;
@@ -253,17 +303,56 @@ class GameLevelDesert {
         }
       };
   
-      
-    // Schedule unicorn movement updates every 100ms
+    const canvas = document.getElementById('gameCanvas');
+    if (!canvas) {
+      console.error("Canvas element with id 'gameCanvas' not found.");
+      return;
+    }
+    
+    // Unicorn random motion logic
+    function updateUnicornMotion() {
+      // Update position
+      sprite_data_unicorn.x += sprite_data_unicorn.direction.x * sprite_data_unicorn.speed;
+      sprite_data_unicorn.y += sprite_data_unicorn.direction.y * sprite_data_unicorn.speed;
+    
+      // Bounce horizontally
+      if (sprite_data_unicorn.x < 0) {
+        sprite_data_unicorn.x = 0;
+        sprite_data_unicorn.direction.x = Math.random() < 0.5 ? 1 : 0.5;
+      }
+      if (sprite_data_unicorn.x > canvas.width - sprite_data_unicorn.width) {
+        sprite_data_unicorn.x = canvas.width - sprite_data_unicorn.width;
+        sprite_data_unicorn.direction.x = Math.random() < 0.5 ? -1 : -0.5;
+      }
+    
+      // Bounce vertically
+      if (sprite_data_unicorn.y < 0) {
+        sprite_data_unicorn.y = 0;
+        sprite_data_unicorn.direction.y = Math.random() < 0.5 ? 1 : 0.5;
+      }
+      if (sprite_data_unicorn.y > canvas.height - sprite_data_unicorn.height) {
+        sprite_data_unicorn.y = canvas.height - sprite_data_unicorn.height;
+        sprite_data_unicorn.direction.y = Math.random() < 0.5 ? -1 : -0.5;
+      }
+    
+      // Occasionally change direction randomly
+      if (Math.random() < 0.02) {
+        sprite_data_unicorn.direction.x = (Math.random() * 2 - 1); // range -1 to 1
+        sprite_data_unicorn.direction.y = (Math.random() * 2 - 1); // range -1 to 1
+        sprite_data_unicorn.speed = Math.random() * 3 + 2; // speed between 2 and 5
+      }
+    }
+    
+    // Schedule unicorn updates
     setInterval(() => {
-      sprite_data_unicorn.updatePosition();
+      updateUnicornMotion();
+      sprite_data_unicorn.updatePosition(); // update the actual drawing/render logic
     }, 100);
-
-    // ✨ Trigger shimmer periodically
+    
+    // Trigger shimmer animation periodically
     setInterval(() => {
       sprite_data_unicorn.playAnimation();
     }, 5000);
-
 
     // Add Employee NPC data
     const sprite_src_employee = path + "/images/gamify/employee.png"; // Ensure the path is correct
@@ -356,7 +445,7 @@ class GameLevelDesert {
         // Add dialogues array for random messages
         dialogues: [
             "Go through the door to enter the gym!",
-            "The gym is just through this door!",
+            "The gym is just through this door!"
         ],
         reaction: function() {
             // Don't show any reaction dialogue - this prevents the first alert
@@ -391,7 +480,7 @@ class GameLevelDesert {
             }
           ]);
         }
-    }
+    }; // Add missing semicolon
 
   
     function checkCollision(player, npc) {
@@ -440,9 +529,9 @@ class GameLevelDesert {
     this.validateSpriteSource(sprite_data_chillguy);
     this.validateSpriteSource(sprite_data_unicorn);
     this.validateSpriteSource(sprite_data_employee);
-    this.validateSpriteSource(sprite_data_door)
+    this.validateSpriteSource(sprite_data_door);
 
-    // Ensure classes is properly defined
+    // Ensure classes are properly defined
     this.classes = [
       { class: Background, data: image_data_desert },
       { class: Player, data: sprite_data_chillguy },
@@ -455,17 +544,19 @@ class GameLevelDesert {
     setInterval(() => {
       sprite_data_unicorn.updatePosition();
     }, 100);
+
+    updateUnicornMotion();
   }
 
   // Define validateSpriteSource function as a class method
-  validateSpriteSource(spriteData) {
+  validateSpriteSource(spriteData) { // Correct syntax for method definition
     const img = new Image();
     img.src = spriteData.src;
     img.onerror = () => {
       console.error(`Sprite sheet for ${spriteData.id} is not loaded or is in a broken state.`);
       spriteData.src = ""; // Reset the source to prevent further errors
     };
-  }
+  } // Ensure no TypeScript-specific syntax is used
 
   handleCollisionEvent() {
     const player = this.gameEnv.gameObjects.find(obj => obj instanceof Player);
