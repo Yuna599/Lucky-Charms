@@ -175,10 +175,10 @@ class GameLevelPlatformer {
 
     const platforms = [
       { x: 0, y: 350, width: 2000, height: 500 },
-      { x: 200, y: 280, width: 100, height: 10 },
-      { x: 400, y: 220, width: 150, height: 10 },
-      { x: 600, y: 150, width: 100, height: 10 },
-      { x: 800, y: 250, width: 150, height: 10 }
+      { x: 200, y: 280, width: 100, height: 20 },
+      { x: 400, y: 220, width: 150, height: 20 },
+      { x: 600, y: 150, width: 100, height: 20 },
+      { x: 800, y: 250, width: 250, height: 20 }
     ];
 
     const keys = {};
@@ -265,7 +265,7 @@ class GameLevelPlatformer {
     const draw = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
-      ctx.fillStyle = "green";
+      ctx.fillStyle = "#000000";
       platforms.forEach(p => ctx.fillRect(p.x, p.y, p.width, p.height));
 
       ctx.save();
